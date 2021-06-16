@@ -8,13 +8,13 @@
 
                     <label for="EvenImage">上傳活動照片：</label>
                     <input type="file" accept="image/*,.pdf" @change="previewImage" id="EventImage" name="" ><br>
-                    <!-- <div class="previewImage" v-if="preview">
+                    <div class="previewImage" v-if="preview">
                         <img class="image--resp" :src="preview" />
                         <p>file name: {{ image.name }}</p>
                         <p>size: {{ image.size/1024 }}KB</p>
-                    </div> -->
+                    </div>
 
-                    <div style="width:500px; height:500px">
+                    <!-- <div style="width:500px; height:500px">
                         <vueCropper
                         ref="cropper"
                         autoCrop
@@ -25,7 +25,7 @@
                         ></vueCropper>
                     </div>
                     <button @click="getCropData()" ref="cropper" >確定</button>
-                    <button @click="getData()" class="btn">download(base64)</button>
+                    <button @click="getData()" class="btn">download(base64)</button> -->
                     
                 </div>
 
@@ -90,14 +90,13 @@
                     <input type="datetime-local" id="Deadline" name=""><br>
 
                     <div class="event__wrap">
-                        <label for="EventType">活動類型：<span>(最多選擇三項)</span></label>
+                        <label for="EventType">活動類型：</label>
                         <section v-for="(type, index) in eventType" :key=type.eng>
                             <input type="checkbox" 
                                         :id="'EventType'+(index+1)" 
                                         name="" 
                                         :value=type.eng 
-                                        v-model="eventCheck" 
-                                        :disabled="eventCheck.length > 2 && eventCheck.indexOf(type.eng) === -1" >
+                                        v-model="eventCheck" >
                             <label :for="'EventType'+(index+1)">{{type.zh}}</label>
                         </section>
                     </div>
@@ -111,7 +110,8 @@
                     placeholder="請為你的活動做一點說明吧"
                     ></textarea>
 
-                    <br><br><input type="button" value="Submit" class="submit">
+                    <!-- <br><br><input type="button" value="發起活動" class="submit"> -->
+                    <br><br><router-link  to="/Event" class="nextStep" tag="button" >Continue</router-link>
                 </form>
                 </div>
 
@@ -129,7 +129,7 @@ export default {
                 preview: null,
                 image: null,
                 eventCheck: [],
-                hostTime,
+                hostTime: null,
             // event:[
             //     {preview: null},
             //     {image: null},
@@ -199,7 +199,6 @@ export default {
     }
     .event article{
         display: flex;
-        ;
     }
     .event label{
         font-size: 1.5em;

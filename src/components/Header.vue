@@ -1,13 +1,23 @@
 <template>
     <header class="header">
         <div class="header__logo">
-            <h1><router-link to="/">Party Animlas</router-link></h1>
+            <h1><router-link to="/">Hangout</router-link></h1>
         </div>
         <div class="header__tool">
-            <ul>
-                <li><router-link to="/holdEvent">我要發起活動</router-link></li>
-                <li><router-link to="/login">登入</router-link></li>
-                <li><router-link to="/signup">註冊</router-link></li>
+            <ul v-if="isLogin" class="header__tool__ul">
+                <li class="header__tool__li"><router-link to="/holdEvent">我要發起活動</router-link></li>
+                <li class="header__tool__li gradient">會員中心
+                    <ul class="accountCenter">
+                        <li class="accountCenter__li"><router-link to="/">會員資料</router-link></li>
+                        <li class="accountCenter__li"><router-link to="/">管理活動</router-link></li>
+                    </ul>
+                </li>
+                <li class="header__tool__li"><a href="" @click.prevent="logout">登出</a></li>
+            </ul>
+            <ul v-else class="header__tool__ul">
+                <li class="header__tool__li"><router-link to="/holdEvent">我要發起活動</router-link></li>
+                <li class="header__tool__li"><router-link to="/login">登入</router-link></li>
+                <li class="header__tool__li"><router-link to="/signup">註冊</router-link></li>
             </ul>
         </div>
         
@@ -18,12 +28,17 @@
 
 <script>
     export default {
-        // methods: {
-        //     logout(){
-        //         $cookies.remove('token');
-        //         this.$router.push('/login');
-        //     }
-        // }
+        data(){
+            return{
+                isLogin: this.$cookies.get("token") === 'isLogin',
+            }
+        },
+        methods: {
+            logout(){
+                $cookies.remove('token');
+                this.$router.push('/');
+            },
+        },
     }
 </script>
 
@@ -43,14 +58,28 @@
     margin-left: auto;
     position: relative;
 }
-.header__tool ul{
+.header__tool__ul{
     display: flex;
     list-style-type: none;
     margin-top: 0;
     height: 100%;
     align-items: center;
 }
-.header__tool ul li{
+.header__tool__li{
     margin-left: 2.5em;
+}
+.gradient{
+    position: relative;
+}
+.accountCenter{
+    position: absolute;
+    width: 100%;
+    left: 50%;
+    padding-left: 0;
+    border: 1px solid black;
+}
+.accountCenter__li{
+    list-style-type: none;
+    margin-top: .3em;
 }
 </style>

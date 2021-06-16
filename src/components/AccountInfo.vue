@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <header><h1>會員資料填寫</h1></header>
+        <header><h1>會員資料</h1></header>
         <form action="/action_page.php">
 
             <div class="form__img gradient">
@@ -10,6 +10,7 @@
                 @change="previewImage" 
                 id="EventImage" 
                 name="EventImage" 
+                multiple
                 required><br>
                 <div class="previewImage" v-if="preview">
                     <img class="image--resp" :src="preview" />
@@ -19,15 +20,17 @@
             </div>
 
             <div class="form__text">
-                <label for="Name">*名稱：</label>
-                <input type="text" id="Name" name="Name" required autofocus><br>
-                <label for="Sex">*性別：</label>
+                <label for="Email">帳號：</label>
+                <input type="email" id="Email" name="Email"><br>
+                <label for="Name">名稱：</label>
+                <input type="text" id="Name" name="Name"><br>
+                <label for="Sex">性別：男生</label><br>
                 <input type="radio" id="Male" name="Sex" value="M" class="checkBox">男姓
                 <input type="radio" id="Female" name="Sex" value="F" class="checkBox">女姓<br>
-                <label for="Birthday">*生日：</label>
+                <label for="Birthday">生日：</label>
                 <input type="date" id="Birthday" name="Birthday" required><br>
-                <label for="Location">*居住城市：</label>
-                <select name="Location" id="Location" required>
+                <label for="Location">居住城市：彰化市</label>
+                <select name="Location" id="Location" v-if="isEdit" required>
                     <optgroup label="北部地區">
                         <option value="01">基隆市</option>
                         <option value="02">台北市</option>
@@ -76,9 +79,9 @@
                 </div>
 
                 <label for="JobType" class="gradient">工作類型：</label>
-                <input type="text" id="JobType" name="JobType" placeholder="(選填)"><br>
+                <input type="text" id="JobType" name="JobType" placeholder="工程師"><br>
                 <label for="JobTitle" class="gradient">工作職稱：</label>
-                <input type="text" id="JobTitle" name="JobTitle" placeholder="(選填)"><br>
+                <input type="text" id="JobTitle" name="JobTitle" placeholder="Junior"><br>
                 <label for="Intro" class="intro">*自我介紹：</label><br>
                 <textarea name="Intro" id="Intro" style="font-size:1.5em" cols="70" rows="20" placeholder="幫助大家更快速了解你自己" required></textarea><br>
 
@@ -92,6 +95,7 @@
 export default {
     data(){
         return{
+            isEdit: false,
             preview: null,
             image: null,
             eventCheck: [],
