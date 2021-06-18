@@ -9,6 +9,11 @@ import Event from './components/Event.vue';
 import AccountInfo from './components/AccountInfo'
 import ManageEvent from './components/ManageEvent'
 
+// const original = Router.prototype.push;
+// Router.prototype.push = function push(location) {
+//   return original.call(this, location).catch(err => err);
+// };
+
 export const routes = [
   {
     path: '/login',

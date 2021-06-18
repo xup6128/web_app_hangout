@@ -37,36 +37,36 @@
                     <label for="EvenAddress">活動地點：</label>
                     <select name="" id="EvenAddress">
                         <optgroup label="北部地區">
-                            <option value="01">基隆市</option>
-                            <option value="02">台北市</option>
-                            <option value="03">新北市</option>
-                            <option value="04">桃園縣</option>
-                            <option value="05">新竹市</option>
-                            <option value="06">新竹縣</option>
-                            <option value="07">苗栗縣</option>
+                            <option value="0">基隆市</option>
+                            <option value="1">台北市</option>
+                            <option value="2">新北市</option>
+                            <option value="3">桃園縣</option>
+                            <option value="4">新竹市</option>
+                            <option value="5">新竹縣</option>
+                            <option value="6">苗栗縣</option>
                         </optgroup>
                         <optgroup label="中部地區">
-                            <option value="08">台中市</option>
-                            <option value="09">彰化縣</option>
-                            <option value="10">南投縣</option>
+                            <option value="7">台中市</option>
+                            <option value="8">彰化縣</option>
+                            <option value="9">南投縣</option>
                         </optgroup>
                         <optgroup label="南部地區">
-                            <option value="11">雲林縣</option>
-                            <option value="12">嘉義市</option>
-                            <option value="13">嘉義縣</option>
-                            <option value="14">台南市</option>
-                            <option value="15">高雄市</option>
-                            <option value="16">屏東縣</option>
+                            <option value="10">雲林縣</option>
+                            <option value="11">嘉義市</option>
+                            <option value="12">嘉義縣</option>
+                            <option value="13">台南市</option>
+                            <option value="14">高雄市</option>
+                            <option value="15">屏東縣</option>
                         </optgroup>
                         <optgroup label="東部地區">
-                            <option value="17">台東縣</option>
-                            <option value="18">花蓮縣</option>
-                            <option value="19">宜蘭縣</option>
+                            <option value="16">台東縣</option>
+                            <option value="17">花蓮縣</option>
+                            <option value="18">宜蘭縣</option>
                         </optgroup>
                         <optgroup label="離島地區">
-                            <option value="20">澎湖縣</option>
-                            <option value="21">金門縣</option>
-                            <option value="22">連江縣</option>
+                            <option value="19">澎湖縣</option>
+                            <option value="20">金門縣</option>
+                            <option value="21">連江縣</option>
                         </optgroup>
                     </select><br>
 

@@ -19,6 +19,7 @@
 
 <script>
   export default {
+    inject:['reload'],
     data () {
       return {
         userName: '',
@@ -47,7 +48,8 @@
           }else{
             this.$cookies.set("token","isLogin");
           }
-
+          //
+          this.reload();
           this.$router.push('/');
 
         } else{

@@ -8,8 +8,8 @@
                 <li class="header__tool__li"><router-link to="/holdEvent">我要發起活動</router-link></li>
                 <li class="header__tool__li gradient">會員中心
                     <ul class="accountCenter">
-                        <li class="accountCenter__li"><router-link to="/">會員資料</router-link></li>
-                        <li class="accountCenter__li"><router-link to="/">管理活動</router-link></li>
+                        <li class="accountCenter__li"><router-link to="/AccountInfo">會員資料</router-link></li>
+                        <li class="accountCenter__li"><router-link to="/ManageEvent">管理活動</router-link></li>
                     </ul>
                 </li>
                 <li class="header__tool__li"><a href="" @click.prevent="logout">登出</a></li>
@@ -36,7 +36,9 @@
         methods: {
             logout(){
                 $cookies.remove('token');
+                this.isLogin=false;
                 this.$router.push('/');
+                alert('已登出會員')
             },
         },
     }

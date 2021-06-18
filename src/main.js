@@ -25,7 +25,6 @@ new Vue({
 })
 
 router.beforeEach((to, from, next)=>{
-//|| $session.get('token') === 'isLogin'
   if($cookies.get('token') === 'isLogin' ){
     next();
   } else {

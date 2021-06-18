@@ -1,10 +1,15 @@
 <template>
     <div class="container">
-        <header><h1>會員資料</h1></header>
+        <header class="gradient">
+            <h1>會員資料</h1>
+            <button class="edit" @click="reverse()">修改資料</button>
+            <button class="confirm" @click="confirm()">確認</button>
+            <button class="cancel">取消</button>
+        </header>
         <form action="/action_page.php">
 
             <div class="form__img gradient">
-                <label for="EvenImage">*上傳活動照片：</label>
+                <label for="EvenImage">上傳活動照片：</label>
                 <input type="file" 
                 accept="image/*,.pdf" 
                 @change="previewImage" 
@@ -21,49 +26,55 @@
 
             <div class="form__text">
                 <label for="Email">帳號：</label>
-                <input type="email" id="Email" name="Email"><br>
+                <input type="email" id="Email" name="Email" v-model="member[0].email" :readonly="!isEdit"><br>
                 <label for="Name">名稱：</label>
-                <input type="text" id="Name" name="Name"><br>
-                <label for="Sex">性別：男生</label><br>
-                <input type="radio" id="Male" name="Sex" value="M" class="checkBox">男姓
-                <input type="radio" id="Female" name="Sex" value="F" class="checkBox">女姓<br>
+                <input type="text" id="Name" name="Name" v-model="member[0].name" :readonly="!isEdit"><br>
+                <div v-if="!isEdit"><label for="Sex">性別：{{sexToString[member[0].sex].value}}</label></div>
+                <div v-else>
+                    <label for="Sex">性別：</label>
+                    <input type="radio" id="Male" name="Sex" value="M" class="checkBox">男
+                    <input type="radio" id="Female" name="Sex" value="F" class="checkBox">女<br>
+                </div>
                 <label for="Birthday">生日：</label>
-                <input type="date" id="Birthday" name="Birthday" required><br>
-                <label for="Location">居住城市：彰化市</label>
-                <select name="Location" id="Location" v-if="isEdit" required>
-                    <optgroup label="北部地區">
-                        <option value="01">基隆市</option>
-                        <option value="02">台北市</option>
-                        <option value="03">新北市</option>
-                        <option value="04">桃園縣</option>
-                        <option value="05">新竹市</option>
-                        <option value="06">新竹縣</option>
-                        <option value="07">苗栗縣</option>
-                    </optgroup>
-                    <optgroup label="中部地區">
-                        <option value="08">台中市</option>
-                        <option value="09">彰化縣</option>
-                        <option value="10">南投縣</option>
-                    </optgroup>
-                    <optgroup label="南部地區">
-                        <option value="11">雲林縣</option>
-                        <option value="12">嘉義市</option>
-                        <option value="13">嘉義縣</option>
-                        <option value="14">台南市</option>
-                        <option value="15">高雄市</option>
-                        <option value="16">屏東縣</option>
-                    </optgroup>
-                    <optgroup label="東部地區">
-                        <option value="17">台東縣</option>
-                        <option value="18">花蓮縣</option>
-                        <option value="19">宜蘭縣</option>
-                    </optgroup>
-                    <optgroup label="離島地區">
-                        <option value="20">澎湖縣</option>
-                        <option value="21">金門縣</option>
-                        <option value="22">連江縣</option>
-                    </optgroup>
-                </select><br>
+                <input type="date" id="Birthday" name="Birthday" v-model="member[0].birth" :readonly="!isEdit"><br>
+                <div v-if="!isEdit"><label for="Location">居住城市：{{cityToString[member[0].city].value}}</label></div>
+                <div v-else>
+                    <label for="Location">居住城市：</label>
+                    <select name="Location" id="Location" v-model="member[0].city">
+                        <optgroup label="北部地區">
+                            <option value="0">基隆市</option>
+                            <option value="1">台北市</option>
+                            <option value="2">新北市</option>
+                            <option value="3">桃園縣</option>
+                            <option value="4">新竹市</option>
+                            <option value="5">新竹縣</option>
+                            <option value="6">苗栗縣</option>
+                        </optgroup>
+                        <optgroup label="中部地區">
+                            <option value="7">台中市</option>
+                            <option value="8">彰化縣</option>
+                            <option value="9">南投縣</option>
+                        </optgroup>
+                        <optgroup label="南部地區">
+                            <option value="10">雲林縣</option>
+                            <option value="11">嘉義市</option>
+                            <option value="12">嘉義縣</option>
+                            <option value="13">台南市</option>
+                            <option value="14">高雄市</option>
+                            <option value="15">屏東縣</option>
+                        </optgroup>
+                        <optgroup label="東部地區">
+                            <option value="16">台東縣</option>
+                            <option value="17">花蓮縣</option>
+                            <option value="18">宜蘭縣</option>
+                        </optgroup>
+                        <optgroup label="離島地區">
+                            <option value="19">澎湖縣</option>
+                            <option value="20">金門縣</option>
+                            <option value="21">連江縣</option>
+                        </optgroup>
+                    </select><br>
+                </div>
 
                 <div class="eventType__wrap">
                     <label for="EventType">*感興趣的活動：</label>
@@ -79,13 +90,13 @@
                 </div>
 
                 <label for="JobType" class="gradient">工作類型：</label>
-                <input type="text" id="JobType" name="JobType" placeholder="工程師"><br>
+                <input type="text" id="JobType" name="JobType" v-model="member[0].jobType" :readonly="!isEdit"><br>
                 <label for="JobTitle" class="gradient">工作職稱：</label>
-                <input type="text" id="JobTitle" name="JobTitle" placeholder="Junior"><br>
-                <label for="Intro" class="intro">*自我介紹：</label><br>
-                <textarea name="Intro" id="Intro" style="font-size:1.5em" cols="70" rows="20" placeholder="幫助大家更快速了解你自己" required></textarea><br>
+                <input type="text" id="JobTitle" name="JobTitle" v-model="member[0].jobTitle" :readonly="!isEdit"><br>
+                <label for="Intro" class="intro">自我介紹：</label><br>
+                <textarea name="Intro" id="Intro" style="font-size:1.5em" cols="70" rows="20" v-model="member[0].intro" :readonly="!isEdit"></textarea><br>
 
-                <input type="submit" class="submit" value="完成註冊" @click="print">
+                <input type="submit" class="submit" value="完成註冊">
             </div>
         </form>
     </div>
@@ -98,7 +109,44 @@ export default {
             isEdit: false,
             preview: null,
             image: null,
-            eventCheck: [],
+            sexToString: [
+                {value: "女" },
+                {value: "男"}
+            ],
+            cityToString:[
+                {value: "基隆市"},
+                {value: "台北市"},
+                {value: "新北市"},
+                {value: "桃園市"},
+                {value: "新竹市"},
+                {value: "新竹縣"},
+                {value: "苗栗縣"},
+                {value: "台中市"},
+                {value: "彰化市"},
+                {value: "南投市"},
+                {value: "雲林市"},
+                {value: "嘉義市"},
+                {value: "嘉義縣"},
+                {value: "台南市"},
+                {value: "高雄市"},
+                {value: "屏東市"},
+                {value: "台東市"},
+                {value: "花蓮市"},
+                {value: "宜蘭市"},
+                {value: "澎湖市"},
+                {value: "金門市"},
+                {value: "連江市"},
+            ],
+            member:[{
+                email: "xup6128",
+                name: "Ethan",
+                sex: "1",
+                city: "8",
+                birth: "1994-11-28",
+                jobType: "工程師",
+                jobTitle: "Junior",
+                intro: "27歲 男 射手座"
+            }],
             eventType:[
                 { eng: 'travel', zh: '旅行出遊' },
                 { eng: 'fitness', zh: '運動健身' },
@@ -125,6 +173,12 @@ export default {
                 reader.readAsDataURL(input.files[0]);
             }
         },
+        reverse(){
+            this.isEdit = true;
+        },
+        confirm(){
+            this.isEdit = false;
+        }
     }
 }
 </script>
