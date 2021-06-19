@@ -10,6 +10,7 @@
     "build": "node build/build.js"
   },
   "dependencies": {
+    "axios": "^0.21.1",
     "vue": "^2.5.2",
     "vue-cookies": "^1.7.4",
     "vue-cropper": "^0.5.6",

@@ -36,6 +36,7 @@ export default {
 <style>
 body{
   margin: 0;
+  background-color: #F3F3F3;
 }
 *{
   box-sizing: content-box;

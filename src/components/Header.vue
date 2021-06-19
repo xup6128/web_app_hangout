@@ -6,10 +6,13 @@
         <div class="header__tool">
             <ul v-if="isLogin" class="header__tool__ul">
                 <li class="header__tool__li"><router-link to="/holdEvent">我要發起活動</router-link></li>
-                <li class="header__tool__li gradient">會員中心
+                <li 
+                @mouseenter="dropdown" 
+                @mouseleave="headsup" 
+                class="header__tool__li gradient">會員中心
                     <ul class="accountCenter">
-                        <li class="accountCenter__li"><router-link to="/AccountInfo">會員資料</router-link></li>
-                        <li class="accountCenter__li"><router-link to="/ManageEvent">管理活動</router-link></li>
+                        <li class="accountCenter__list"><router-link to="/AccountInfo">會員資料</router-link></li>
+                        <li class="accountCenter__lisy"><router-link to="/ManageEvent">管理活動</router-link></li>
                     </ul>
                 </li>
                 <li class="header__tool__li"><a href="" @click.prevent="logout">登出</a></li>
@@ -39,6 +42,12 @@
                 this.isLogin=false;
                 this.$router.push('/');
                 alert('已登出會員')
+            },
+            dropdown(){
+                document.querySelector('.accountCenter').style.display = 'block';
+            },
+            headsup(){
+                document.querySelector('.accountCenter').style.display = 'none';
             },
         },
     }
@@ -74,14 +83,15 @@
     position: relative;
 }
 .accountCenter{
+    display: none;
+    list-style-type: none;
     position: absolute;
     width: 100%;
     left: 50%;
     padding-left: 0;
     border: 1px solid black;
 }
-.accountCenter__li{
-    list-style-type: none;
+.accountCenter__list{
     margin-top: .3em;
 }
 </style>

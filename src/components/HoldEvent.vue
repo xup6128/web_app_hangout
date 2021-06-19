@@ -74,10 +74,13 @@
                     <input type="datetime-local" id="HostTime" name="" v-model="hostTime"><br>
 
                     <label for="SpendTime">活動進行時間：</label>
-                    <input type="number" id="SpendHours" name="" min="0" max="23" value="1">
+                    <input type="number" id="SpendHours" name="" min="0" max="23" value="1" :disabled="overnight">
                     <span>：</span>
-                    <input type="number" id="SpendMins" name="" min="0" max="59" value="00">
-                    <input class="overnight" type="checkbox" id="Overnight" name="">
+                    <select name="SpendMins" id="SpendMins" :disabled="overnight">
+                        <option value="0">00</option>
+                        <option value="30">30</option>
+                    </select>
+                    <input class="overnight" type="checkbox" id="Overnight" name="Overnight" v-model="overnight">
                     <label for="Overnight">過夜</label><br>
 
                     <label for="EventPrice">活動花費：</label>
@@ -130,6 +133,7 @@ export default {
                 image: null,
                 eventCheck: [],
                 hostTime: null,
+                overnight: false,
             // event:[
             //     {preview: null},
             //     {image: null},
@@ -187,7 +191,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
     .container{
         width: 80%;
         margin-left: auto;

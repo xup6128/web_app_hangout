@@ -1,6 +1,8 @@
 <template>
     <div>
         <main class="container">
+
+            <!-- 主辦人 -->
             <div class="hoster">
                 <figure class="hoster__img">
                     <img class="image--resp"
@@ -11,11 +13,12 @@
                     <h5>台北市、35、整合行銷</h5>
                 </div>
             </div>
+            
+            <!-- 活動資訊 -->
             <figure class="eventImg">
                 <img class="image--resp"
                 src="https://www.tsc.taipei/wp-content/uploads/%E6%B4%BB%E5%8B%95%E5%9C%96%E6%A8%99.jpg" alt="">
             </figure>
-            <!-- 活動類型 -->
             <h1>桌遊團</h1>
             <h2 class="location">106台北市大安區師大路9號</h2>
             <h2 class="hostTime">(星期一) 六月14日 19：00</h2>
@@ -80,15 +83,49 @@
     </div>
 </template>
 
+<script>
+import { apiEventList } from "../api"
+
+export default {
+    data(){
+       return{
+            event: null,
+       }
+    },
+    mounted(){
+        //查看是否已經參數是否傳至跳轉之後的頁面，若傳入，則根據需求進行調用
+        console.log(this.$route.query.targetData)
+    },
+    methods:{
+        //將返回函數寫到methods中
+        goBackSheet() {
+            if(this.$route.query.goBackName === 'dataSearch'){
+                this.$router.push({
+                    name: this.pageName,
+                    query: {
+                        storageData: this.$route.query.storageData,
+                        isBackSelect: true,
+                    }
+                });
+            }
+        }
+    },
+    watch:{
+        $route(to,from){
+            //刷新頁面
+            this.$router.go(1);
+        }  
+    }
+}
+</script>
+
 <style scoped>
 /* reset.css */
 figure{
     margin: 0;
 }
-
-
 .container{
-    border: 1px solid black;
+    /* border: 1px solid black; */
     width: 30%;
     margin-left: 15%;
     padding: 16px 40px;
