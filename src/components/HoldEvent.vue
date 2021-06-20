@@ -36,6 +36,7 @@
 
                     <label for="EvenAddress">活動地點：</label>
                     <select name="" id="EvenAddress">
+                        <option value="" style="display:none">請選擇城市</option>
                         <optgroup label="北部地區">
                             <option value="0">基隆市</option>
                             <option value="1">台北市</option>

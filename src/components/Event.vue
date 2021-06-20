@@ -19,21 +19,21 @@
                 <img class="image--resp"
                 src="https://www.tsc.taipei/wp-content/uploads/%E6%B4%BB%E5%8B%95%E5%9C%96%E6%A8%99.jpg" alt="">
             </figure>
-            <h1>桌遊團</h1>
-            <h2 class="location">106台北市大安區師大路9號</h2>
-            <h2 class="hostTime">(星期一) 六月14日 19：00</h2>
+            <h1>{{event.eventName}}</h1>
+            <h2 class="location">{{event.addressId}}</h2>
+            <h2 class="hostTime">{{timeToString(event.hostTime)}}</h2>
             <div class="subInfo__wrap">
                 <div class="subInfo">
                     <img src="../assets/Time.png" width="400" height="400" class="image--resp" alt="">
-                    <h4>2<span>hrs</span></h4>
+                    <h4>{{event.costTime}}<span>hrs</span></h4>
                 </div>
                 <div class="subInfo">
                     <img src="../assets/Money.png" width="400" height="400" class="image--resp" alt="">
-                    <h4>200<span>$</span></h4>
+                    <h4>{{event.eventPrice}}<span>$</span></h4>
                 </div>
                 <div class="subInfo">
                     <img src="../assets/People.png" width="400" height="400" class="image--resp" alt="">
-                    <h4>6<span>人</span></h4>
+                    <h4>{{event.personLimit}}<span>人</span></h4>
                 </div>
             </div>
             <div class="attender">參加者資訊
@@ -41,13 +41,9 @@
             </div>
             <div>
                 <button type="button" class="join">參加</button>
-                <h4 class="deadline"><span>報名截止時間：</span>(星期一) 六月14日 17：00</h4>
+                <h4 class="deadline"><span>報名截止時間：</span>{{timeToString(event.deadline)}}</h4>
             </div>
-            <p>在英文網站上玩 恆河王侯<br>
-                    <a href="https://www.yucata.de/en/GameInfo/Rajas">https://www.yucata.de/en/GameInfo/Rajas</a><br>
-                    要先註策冊 免費的<br><br>
-                    PS： 用discord 軟體 需有mic<br><br>
-                    如果沒玩過恆河王侯 請先到youtube 搜 看教學影片</p>
+            <p>{{event.eventContent}}</p>
             <div class="comment">
                 活動評論
             </div>
@@ -84,17 +80,26 @@
 </template>
 
 <script>
-import { apiEventList } from "../api"
+import { apiEvent } from "../api"
 
 export default {
     data(){
        return{
+            eventId: this.$route.params.eventId,
             event: null,
+            participants: null,
        }
     },
     mounted(){
         //查看是否已經參數是否傳至跳轉之後的頁面，若傳入，則根據需求進行調用
-        console.log(this.$route.query.targetData)
+        apiEvent(this.eventId)
+        .then( res =>{
+            this.event = res.data
+            console.log(this.event);
+        })
+        .catch( err=>{
+            console.log(err);
+        })
     },
     methods:{
         //將返回函數寫到methods中
@@ -108,14 +113,21 @@ export default {
                     }
                 });
             }
-        }
+        },
+        timeToString(time){
+            const monthList = ['一','二','三','四','五','六','七','八','九','十','十一','十二'] 
+            const dayList = ['日','一','二','三','四','五','六']
+            let t = new Date(time)
+            let r = 
+            "(星期"+dayList[t.getUTCDay()]+") "+
+            monthList[t.getMonth()]+"月"+ 
+            t.getDate()+"日 "+
+            (t.getHours()<10 ? '0' : '')+t.getHours()+":"+
+            (t.getMinutes()<10 ? '0' : '')+t.getMinutes()
+
+            return r
+        },
     },
-    watch:{
-        $route(to,from){
-            //刷新頁面
-            this.$router.go(1);
-        }  
-    }
 }
 </script>
 

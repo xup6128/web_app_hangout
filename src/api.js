@@ -17,9 +17,15 @@ const commentRequest = axios.create({
 })
 
 //Event
-export const apiEventList = data => eventRequest.get('/date='+new Date().toISOString().slice(0,19).replace(/T/i, " "), data);
+export const apiEventList = () => eventRequest.get('/date='+new Date().toISOString().slice(0,19).replace(/T/i, " "));
+export function apiEvent(params){
+  return  eventRequest.get('/'+params);
+}
 
 
-export const apiMessage = () => messageRequest.get('/2');
+//Message
+export function apiMessage(params){
+  return  messageRequest.get('/'+params);
+}
 
 

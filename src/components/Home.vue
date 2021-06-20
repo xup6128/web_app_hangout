@@ -85,11 +85,12 @@
         </section>
 
         <!-- Private Event List -->
-        <section class="private__wrap gradient">
+
+        <!-- <section class="private__wrap gradient">
             <div v-for="e in eventList" 
             :key="e.eventId"
-             @click="goto()"
-              class="event">
+            @click="goTo(e)"
+            class="event">
                 <figure class="event__img">
                     <img class="img--resp" src="https://www.tsc.taipei/wp-content/uploads/%E6%B4%BB%E5%8B%95%E5%9C%96%E6%A8%99.jpg" alt="">
                 </figure>
@@ -97,6 +98,21 @@
                 <h5>{{timeToString(e.hostTime)}}</h5>
                 <h5>{{e.addressId}}</h5>
             </div>
+        </section> -->
+
+        <section class="private__wrap gradient">
+            <router-link :to="/Event/+e.eventId"
+            v-for="e in eventList" 
+            :key="e.eventId">
+                <div class="event">
+                    <figure class="event__img">
+                        <img class="img--resp" src="https://www.tsc.taipei/wp-content/uploads/%E6%B4%BB%E5%8B%95%E5%9C%96%E6%A8%99.jpg" alt="">
+                    </figure>
+                    <h4>{{e.eventName}}</h4>
+                    <h5>{{timeToString(e.hostTime)}}</h5>
+                    <h5>{{e.addressId}}</h5>
+                </div>
+            </router-link>
         </section>
     </div>
 </template>
@@ -190,6 +206,7 @@ export default {
             this.myVar = setInterval(this.playAds,3000)
         },
         playAds(){
+            if(!this.pages[this.onPage]){return}
             this.pages[this.onPage].classList.remove('page--active')
             this.onPage++;
             document.querySelector('.ad').style.marginLeft = this.onPage*-1000+'px';
@@ -213,32 +230,32 @@ export default {
             return r
         },
         //跳轉前頁面傳參數：
-        goTo(item) {
-            //storageData中數據用於跳轉到下一個頁面之後，進行返回時能夠返回到跳轉之前的頁面
-            let storageData = {
-                searchWords: this.keyWord,
-                pageSize: this.paging.pageSize,
-                pageNo: this.paging.currentPage 
-            };
-            //data中數據用於將本頁面中數據通過跳轉功能將其應用到下一個頁面，與父子組件傳值同理
-            let data = {
-                type: item.srcType,
-                tableName: item.tableName,
-                name: item.datasourceName,
-                tableId: item.tableId,
-                id: item.datasourceId,
-            };
-            //將下一個頁面中將會用到的數據全部push到$router中
-            this.$router.push({
-                //name表示跳轉之後的資源前端訪問路徑，query用於存儲待使用數據，其中page是本頁面name,
-                name: 'onlineSearch',
-                query: {targetData: data ,storageData,
-                page:'search',
-                isBackSelect: true,
-                goBackName:'dataSearch'
-                }
-            })    
-        }
+        // goTo(item) {
+        //     //storageData中數據用於跳轉到下一個頁面之後，進行返回時能夠返回到跳轉之前的頁面
+        //     let storageData = {
+        //         searchWords: this.keyWord,
+        //         pageSize: this.paging.pageSize,
+        //         pageNo: this.paging.currentPage 
+        //     };
+        //     //data中數據用於將本頁面中數據通過跳轉功能將其應用到下一個頁面，與父子組件傳值同理
+        //     let data = {
+        //         type: item.srcType,
+        //         tableName: item.tableName,
+        //         name: item.datasourceName,
+        //         tableId: item.tableId,
+        //         id: item.datasourceId,
+        //     };
+        //     //將下一個頁面中將會用到的數據全部push到$router中
+        //     this.$router.push({
+        //         //name表示跳轉之後的資源前端訪問路徑，query用於存儲待使用數據，其中page是本頁面name,
+        //         name: 'onlineSearch',
+        //         query: {targetData: data ,storageData,
+        //         page:'/Event',
+        //         isBackSelect: true,
+        //         goBackName:'dataSearch'
+        //         }
+        //     })    
+        // }
     },
     created(){
         apiEventList({})
