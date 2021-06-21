@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div>
 
         <section class="ads__wrap gradient">
             <div class="ads">
@@ -10,110 +10,146 @@
             </ol>
         </section>
 
-        <!-- Public Event List -->
-        <section class="public__wrap">
-            <div v-for="n in 4" :key="n" class="event">
-                <figure class="event__img">
-                    <img class="img--resp" src="https://www.tsc.taipei/wp-content/uploads/%E6%B4%BB%E5%8B%95%E5%9C%96%E6%A8%99.jpg" alt="">
-                </figure>
-                <h4>桌遊團</h4>
-                <h5>(星期一) 六月14日 19：00</h5>
-                <h5>106台北市大安區師大路9號</h5>
-            </div>
-        </section>
+        <div class="container">
 
-
-        <!-- 篩選器 -->
-        <section class="filter__wrap gradient">
-            <ul @click="dropdown($event)" class="filter_list">
-                <li class="1">活動類型</li>
-                <li class="2">花費</li>
-                <li class="3">人數</li>
-                <li class="4">城市</li>
-                <li class="5">距離</li>
-                <li class="6">時間</li>
-            </ul>
-            <div>
-            <div v-if="filterNum == 1" class="filter__option">
-                <label for="EventType">活動類型：</label>
-                <div v-for="(type, index) in eventType" :key=type.eng>
-                    <input type="checkbox" 
-                                :id="'EventType'+(index+1)" 
-                                name="" 
-                                :value=type.eng 
-                                v-model="eventCheck" >
-                    <label :for="'EventType'+(index+1)">{{type.zh}}</label>
-                </div>
-            </div>
-            <div v-if="filterNum == 2" class="filter__option">
-                <label for="Expense">費用：</label>
-                <input type="radio" id="free" name="Expense">免費
-                <input type="radio" id="lt300" name="Expense">300以內
-                <input type="radio" id="lt500" name="Expense">500以內
-                <input type="radio" id="lt1000" name="Expense">1000以內
-            </div>
-            <div v-if="filterNum == 3" class="filter__option">
-                <label for="Expense">聚會人數：</label>
-                <input type="radio" id="" name="people">兩人聚會
-                <input type="radio" id="" name="people">小型聚會(3~4人)
-                <input type="radio" id="" name="people">中型聚會(5~8人)
-                <input type="radio" id="" name="people">大型聚會(8人以上)
-            </div>
-            <div v-if="filterNum == 4" class="filter__option">
-                <label for="Expense">聚會地點：</label>
-                <div v-for="city in cities" :key=city.value>
-                    <input type="checkbox" v-model="cityCheck" :id="'City:'+(index+1)" name="City">
-                    <label :for="'City:'+(index+1)">{{city.value}}</label>
-                </div>
-            </div>
-            <div v-if="filterNum == 5" class="filter__option">
-                <label for="Expense">距離：</label>
-                <input type="radio" id="" name="distance">500公尺以內
-                <input type="radio" id="" name="distance">1公里以內
-                <input type="radio" id="" name="distance">3公里以內
-                <input type="radio" id="" name="distance">5公里以內
-            </div>
-            <div v-if="filterNum == 6" class="filter__option">
-                <div>
-                    <label for="Expense">日期選擇：</label><br><br>
-                    選擇日期：<date-picker v-model="time1" valueType="format"></date-picker><br><br>
-                    選擇日期範圍：<date-picker v-model="time2" range></date-picker>
-                </div>
-            </div>
-
-            </div>
-        </section>
-
-        <!-- Private Event List -->
-
-        <!-- <section class="private__wrap gradient">
-            <div v-for="e in eventList" 
-            :key="e.eventId"
-            @click="goTo(e)"
-            class="event">
-                <figure class="event__img">
-                    <img class="img--resp" src="https://www.tsc.taipei/wp-content/uploads/%E6%B4%BB%E5%8B%95%E5%9C%96%E6%A8%99.jpg" alt="">
-                </figure>
-                <h4>{{e.eventName}}</h4>
-                <h5>{{timeToString(e.hostTime)}}</h5>
-                <h5>{{e.addressId}}</h5>
-            </div>
-        </section> -->
-
-        <section class="private__wrap gradient">
-            <router-link :to="/Event/+e.eventId"
-            v-for="e in eventList" 
-            :key="e.eventId">
-                <div class="event">
+            <!-- Public Event List -->
+            <section class="public__wrap">
+                <div v-for="n in 4" :key="n" class="event">
                     <figure class="event__img">
                         <img class="img--resp" src="https://www.tsc.taipei/wp-content/uploads/%E6%B4%BB%E5%8B%95%E5%9C%96%E6%A8%99.jpg" alt="">
                     </figure>
-                    <h4>{{e.eventName}}</h4>
-                    <h5>{{timeToString(e.hostTime)}}</h5>
-                    <h5>{{e.addressId}}</h5>
+                    <h4>桌遊團</h4>
+                    <h5>(星期一) 六月14日 19：00</h5>
+                    <h5>106台北市大安區師大路9號</h5>
                 </div>
-            </router-link>
-        </section>
+            </section>
+
+
+            <!-- 篩選器 -->
+            <section class="filter__wrap gradient">
+                <ul @click="dropdown($event)" class="filter__list">
+                    <li id="4" class="filter__item arrow">城市</li>
+                    <li id="6" class="filter__item arrow">日期</li>
+                    <li id="1" class="filter__item arrow">活動類型</li>
+                    <li id="2" class="filter__item arrow">花費</li>
+                    <li id="3" class="filter__item arrow">人數</li>
+                    <li id="5" class="filter__item arrow">距離</li>
+                </ul>
+                <div>
+                <div v-if="filterNum == 1" class="filter__option__wrap">
+                    <div class="filter__option">活動類型：
+                        <label  v-for="(type, index) in eventType" :key=type.eng>
+                                    <input type="checkbox" 
+                                    name="eventType" 
+                                    :value=index 
+                                    v-model="eventType" >
+                                    {{type.zh}}
+                        </label>
+                    </div>
+                </div>
+                <div v-if="filterNum == 2" class="filter__option__wrap">
+                    <div class="filter__option">
+                        <label>預算：
+                            <input type="radio" v-model="expense" value="0" name="Expense" @change="retainRecord" @click="controlSingel($event)">免費
+                            <input type="radio" v-model="expense" value="300" name="Expense" @change="retainRecord" @click="controlSingel($event)">300以內
+                            <input type="radio" v-model="expense" value="500" name="Expense" @change="retainRecord" @click="controlSingel($event)">500以內
+                            <input type="radio" v-model="expense" value="1000" name="Expense" @change="retainRecord" @click="controlSingel($event)">1000以內
+                        </label>
+                    </div>
+                </div>
+                <div v-if="filterNum == 3" class="filter__option__wrap">
+                    <div class="filter__option">
+                        <label>聚會人數：
+                            <input type="radio" v-model="group" value="2" name="people" @change="retainRecord" @click="controlSingel($event)">兩人聚會
+                            <input type="radio" v-model="group" value="4"  name="people" @change="retainRecord" @click="controlSingel($event)">小型聚會(3~4人)
+                            <input type="radio" v-model="group" value="8"  name="people" @change="retainRecord" @click="controlSingel($event)">中型聚會(5~8人)
+                            <input type="radio" v-model="group" value="999"  name="people" @change="retainRecord" @click="controlSingel($event)">大型聚會(8人以上)
+                        </label>
+                    </div>
+                </div>
+                <div v-if="filterNum == 4" class="filter__option__wrap">
+                    <div class="filter__option">北部地區：
+                        <label><input type="checkbox" v-model="cities"  value="0" name="City">基隆市</label>
+                        <label><input type="checkbox" v-model="cities"  value="1" name="City">台北市</label>
+                        <label><input type="checkbox" v-model="cities"  value="2" name="City">新北市</label>
+                        <label><input type="checkbox" v-model="cities"  value="3" name="City">桃園縣</label>
+                        <label><input type="checkbox" v-model="cities"  value="4" name="City">新竹市</label>
+                        <label><input type="checkbox" v-model="cities"  value="5" name="City">新竹縣</label>
+                        <label><input type="checkbox" v-model="cities"  value="6" name="City">苗栗縣</label>
+                    </div>
+                    <div class="filter__option">中部地區：
+                        <label><input type="checkbox" v-model="cities"  value="7" name="City">台中市</label>
+                        <label><input type="checkbox" v-model="cities"  value="8" name="City">彰化縣</label>
+                        <label><input type="checkbox" v-model="cities"  value="9" name="City">南投縣</label>
+                    </div>
+                    <div class="filter__option">南部地區：
+                        <label><input type="checkbox" v-model="cities"  value="10" name="City">雲林縣</label>
+                        <label><input type="checkbox" v-model="cities"  value="11" name="City">嘉義市</label>
+                        <label><input type="checkbox" v-model="cities"  value="12" name="City">嘉義縣</label>
+                        <label><input type="checkbox" v-model="cities"  value="13" name="City">台南市</label>
+                        <label><input type="checkbox" v-model="cities"  value="14" name="City">高雄市</label>
+                        <label><input type="checkbox" v-model="cities"  value="15" name="City">屏東縣</label>
+                    </div>
+                    <div class="filter__option">東部地區：
+                        <label><input type="checkbox" v-model="cities"  value="16" name="City">台東縣</label>
+                        <label><input type="checkbox" v-model="cities"  value="17" name="City">花蓮縣</label>
+                        <label><input type="checkbox" v-model="cities"  value="18" name="City">宜蘭縣</label>
+                    </div>
+                    <div class="filter__option">離島地區：
+                        <label><input type="checkbox" v-model="cities"  value="19" name="City">澎湖縣</label>
+                        <label><input type="checkbox" v-model="cities"  value="20" name="City">金門縣</label>
+                        <label><input type="checkbox" v-model="cities"  value="21" name="City">連江縣</label>
+                    </div>
+                </div>
+                <div v-if="filterNum == 5" class="filter__option__wrap">
+                    <div class="filter__option">
+                        <label>距離：
+                            <input type="radio" v-model="distance" value="500" name="distance" @change="retainRecord" @click="controlSingel($event)">500公尺以內
+                            <input type="radio" v-model="distance" value="1000" name="distance" @change="retainRecord" @click="controlSingel($event)">1公里以內
+                            <input type="radio" v-model="distance" value="3000" name="distance" @change="retainRecord" @click="controlSingel($event)">3公里以內
+                            <input type="radio" v-model="distance" value="5000" name="distance" @change="retainRecord" @click="controlSingel($event)">5公里以內
+                        </label>
+                    </div>
+                </div>
+                <!-- <div v-if="filterNum == 6">
+                    <div class="filter__option">
+                        <label for="Expense">日期選擇：</label><br><br>
+                        選擇特定日期：<date-picker v-model="time1" valueType="format"></date-picker><br><br>
+                        選擇日期範圍：<date-picker v-model="time2" range></date-picker>
+                    </div>
+                </div> -->
+                <div v-if="filterNum == 6" class="filter__option__wrap">
+                    <div class="filter__option">
+                        <label>日期：
+                            <input type="radio" v-model="day" value="0" name="day" @change="retainRecord" @click="controlSingel($event)">今天我想來點
+                            <input type="radio" v-model="day" value="1" name="day" @change="retainRecord" @click="controlSingel($event)">明天會更好
+                            <input type="radio" v-model="day" value="500" name="day" @change="retainRecord" @click="controlSingel($event)">週五找刺激
+                            <input type="radio" v-model="day" value="1000" name="day" @change="retainRecord" @click="controlSingel($event)">週末不一樣
+                        </label>
+                    </div>
+                </div>
+                
+
+                </div>
+            </section>
+
+            <!-- Private Event List -->
+            <section class="private__wrap gradient">
+                <router-link :to="/Event/+e.eventId"
+                v-for="e in eventList" 
+                :key="e.eventId">
+                    <div class="event">
+                        <figure class="event__img">
+                            <img class="img--resp" src="https://www.tsc.taipei/wp-content/uploads/%E6%B4%BB%E5%8B%95%E5%9C%96%E6%A8%99.jpg" alt="">
+                        </figure>
+                        <h4>{{e.eventName}}</h4>
+                        <h5>{{timeToString(e.hostTime)}}</h5>
+                        <h5>{{e.addressId}}</h5>
+                    </div>
+                </router-link>
+            </section>
+
+        </div>
     </div>
 </template>
 
@@ -131,17 +167,24 @@ export default {
             myVar: null,
             onPage: 0,
             pages : null,
-            //EventList
-            eventList: null,
+            //控制Filter
             filterNum: 0,
-            eventCheck: [],
-            cityCheck: [],
+            lastFilterItem: null,
+            cities: [],
+            day: null,
+            // time1: null,
+            // time2: null,
+            eventType: [],
+            expense: null,
+            group: null,
+            distance: null,
+            //Creat
+            eventList: null,
             adsArr:[
-                { src:'https://drupal8-prod.visitcalifornia.com/sites/drupal8-prod.visitcalifornia.com/files/styles/fluid_1200/public/2020-06/VC_Experiences_ReopeningBeaches_RF_1156532604_1280x640.jpg?itok=tPCjquVe', alt: 'beach'},
-                { src:'https://res.cloudinary.com/whistler/image/upload/w_500,c_scale,dpr_3.0,q_auto/v1/s3/images/header/hiking-header.jpg', alt: 'hiking'},
-                { src:'https://www.visittheusa.com/sites/default/files/styles/hero_l_x2/public/images/hero_media_image/2019-06/eb8cf4b594d4e921b074d1424a671fec.jpeg?itok=TyfJTE8x', alt: 'wood bridge'},
+                { src:'https://imgcy.trivago.com/c_limit,d_dummy.jpeg,f_auto,h_1300,q_auto,w_2000/itemimages/19/79/197931_v3.jpeg', alt: 'beach'},
+                { src:'https://www.incimages.com/uploaded_files/image/1920x1080/getty_1141196125_411306.jpg', alt: 'hiking'},
+                { src:'https://discoverhalifaxns.com/wp-content/uploads/2020/07/Crystal-Crescent-Beach_-IMG_0024.jpg', alt: 'wood bridge'},
             ],
-            eventList:null,
             eventType:[
                 { eng: 'travel', zh: '旅行出遊' },
                 { eng: 'fitness', zh: '運動健身' },
@@ -155,43 +198,24 @@ export default {
                 { eng: 'consult', zh: '命理諮商' },
                 { eng: 'other', zh: '其他' },
             ],
-            cities:[
-                {value: '基隆市'},
-                {value: '台北市'},
-                {value: '新北市'},
-                {value: '桃園縣'},
-                {value: '新竹市'},
-                {value: '新竹縣'},
-                {value: '苗栗縣'},
-                {value: '台中市'},
-                {value: '彰化縣'},
-                {value: '南投縣'},
-                {value: '雲林縣'},
-                {value: '嘉義市'},
-                {value: '嘉義縣'},
-                {value: '台南市'},
-                {value: '高雄市'},
-                {value: '屏東縣'},
-                {value: '台東縣'},
-                {value: '花蓮縣'},
-                {value: '宜蘭縣'},
-                {value: '澎湖縣'},
-                {value: '金門縣'},
-                {value: '連江縣'},
-            ],
-            time1: null,
-            time2: null,
         }
     },
     methods:{
         dropdown(e){
             let self = e.target
             if(self.nodeName !== "LI"){return}
-            if(this.filterNum == self.className){
+            if(this.lastFilterItem){
+                this.lastFilterItem.classList.remove('arrow--dropdown')
+            }
+            if(this.filterNum == self.id){
+                // console.log(self.classList)
+                self.classList.remove('arrow--dropdown')
                 this.filterNum =0
                 return
             }
-            this.filterNum = self.className;
+            self.classList.add('arrow--dropdown')
+            this.lastFilterItem = self;
+            this.filterNum = self.id
         },
         changeAds(e){
             let self = e.target
@@ -209,7 +233,7 @@ export default {
             if(!this.pages[this.onPage]){return}
             this.pages[this.onPage].classList.remove('page--active')
             this.onPage++;
-            document.querySelector('.ad').style.marginLeft = this.onPage*-1000+'px';
+            document.querySelector('.ad').style.marginLeft = this.onPage*-(1902)+'px';
             if(this.onPage == this.pages.length){
                 this.onPage = 0;
                 document.querySelector('.ad').style.marginLeft = 0+'px';
@@ -229,6 +253,22 @@ export default {
 
             return r
         },
+        controlSingel($event){
+            let _this = this;
+            window.setTimeout(() =>{
+                if(!this.changed){
+                    $event.target.checked = false
+                    this.expense = null
+                }
+                _this.changed = false;
+            }, 0);
+        },
+        retainRecord(){
+            this.changed = true
+        },
+        //取得使用者位置
+
+        
         //跳轉前頁面傳參數：
         // goTo(item) {
         //     //storageData中數據用於跳轉到下一個頁面之後，進行返回時能夠返回到跳轉之前的頁面
@@ -266,6 +306,19 @@ export default {
         .catch( err=>{
             console.log(err);
         })
+
+        //do we support geolocation
+        if(!("geolocation" in navigator)) {
+            console.log('Geolocation is not available')
+            return;
+        }
+        // get position
+        navigator.geolocation.getCurrentPosition(pos => {
+        console.log(`Your location data is ${pos.coords.latitude }, ${ pos.coords.longitude}`)
+        }, err => {
+        console.log(err.message)
+        })
+
     },
     mounted() {
         this.pages = document.querySelector('.ads__pages').children
@@ -288,10 +341,7 @@ export default {
 .ads{
     display: flex;
     overflow: hidden;
-    width: 1000px;
-    height: 575px;
-    margin-left: auto;
-    margin-right: auto;
+    height: 60vh;
 }
 .ad{
     transition: margin-left .5s;
@@ -315,32 +365,50 @@ export default {
     text-indent:-9999px;
 }
 .page--active{
-    background-color:rgba(184, 184, 184, 0.637);
+    background-color:rgba(58, 58, 58, 0.383);
 }
 .img--resp{
     width: 100%;
-    max-height: 100%;
+    height: auto;
 }
 .filter__wrap{
     border-top: 1px solid #F6F6F6;
-    border-bottom: 1px solid black;
+    border: 2px solid white;
     box-shadow: 0 4px 2px -2px gray;
-
+    background-color: #FFFAF2;
 }
-.filter_list{
+.filter__list{
     display: flex;
     justify-content: space-around;
     padding-left: 0;
     list-style-type: none;
 }
+.arrow::after{
+    content: "";
+    border: solid black;
+    border-width: 0px 2px 2px 0;
+    display: inline-block;
+    padding: 3px;
+    border-color: transparent #B5B5B5 #B5B5B5 transparent;
+    transform: rotate(-135deg);
+    transition: all .5s;
+    margin-left: .3em;
+}
+.arrow--dropdown::after{
+    transform: rotate(45deg);
+}
+.filter__option__wrap{
+    border-top: 1px solid #F3F3F3;
+}
 .filter__option{
     width: 100%;
     display: flex;
     flex-wrap: wrap;
-    background-color: #FFEEDF;
+    /* background-color: #FFEEDF; */
     box-sizing: border-box;
     padding: 1em;
-    border: 1px solid black;
+    /* border: 1px solid black; */
+    /* border-top: 1px solid gray; */
 }
 .filter__option input{
     margin-left: 1em;
@@ -374,6 +442,7 @@ export default {
     border: 1px solid black;
     border-radius: 1em;
     overflow: hidden;
+    background-color: white;
 }
 .event figure{
     margin: 0;
@@ -381,5 +450,8 @@ export default {
 .event h4, .event h5{
     margin-top: .5em;
     margin-bottom: 0;
+}
+input[type=checkbox]{
+    margin-bottom: 1em;
 }
 </style>

@@ -80,7 +80,7 @@
 </template>
 
 <script>
-import { apiEvent } from "../api"
+import { apiEventGet } from "../api"
 
 export default {
     data(){
@@ -92,7 +92,7 @@ export default {
     },
     mounted(){
         //查看是否已經參數是否傳至跳轉之後的頁面，若傳入，則根據需求進行調用
-        apiEvent(this.eventId)
+        apiEventGet(this.eventId)
         .then( res =>{
             this.event = res.data
             console.log(this.event);

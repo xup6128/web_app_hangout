@@ -22,8 +22,8 @@
                 <label for="Name">*名稱：</label>
                 <input type="text" id="Name" name="Name" required autofocus><br>
                 <label for="Sex">*性別：</label>
-                <input type="radio" id="Male" name="Sex" value="M" class="checkBox">男姓
-                <input type="radio" id="Female" name="Sex" value="F" class="checkBox">女姓<br>
+                <input type="radio" id="Male" name="Sex" value="1" class="checkBox">男姓
+                <input type="radio" id="Female" name="Sex" value="2" class="checkBox">女姓<br>
                 <label for="Birthday">*生日：</label>
                 <input type="date" id="Birthday" name="Birthday" required><br>
                 <label for="Location">*居住城市：</label>

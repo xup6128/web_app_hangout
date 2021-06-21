@@ -60,6 +60,7 @@
     padding-right: 6em;
     display: flex;
     background-color: #F8F4EC;
+    border-bottom: 2px solid #EEEEEE;
 }
 .header a{
     text-decoration: none;
