@@ -5,14 +5,14 @@
         </div>
         <div class="header__tool">
             <ul v-if="isLogin" class="header__tool__ul">
-                <li class="header__tool__li"><router-link to="/holdEvent">我要發起活動</router-link></li>
+                <li class="header__tool__li holdEvent"><router-link to="/holdEvent">我要發起活動</router-link></li>
                 <li 
                 @mouseenter="dropdown" 
                 @mouseleave="headsup" 
                 class="header__tool__li gradient">會員中心
                     <ul class="accountCenter">
                         <li class="accountCenter__list"><router-link to="/AccountInfo">會員資料</router-link></li>
-                        <li class="accountCenter__lisy"><router-link to="/ManageEvent">管理活動</router-link></li>
+                        <li class="accountCenter__list"><router-link to="/ManageEvent">管理活動</router-link></li>
                     </ul>
                 </li>
                 <li class="header__tool__li"><a href="" @click.prevent="logout">登出</a></li>
@@ -23,9 +23,6 @@
                 <li class="header__tool__li"><router-link to="/signup">註冊</router-link></li>
             </ul>
         </div>
-        
-        <!-- <router-link to="/userInfo">User Info</router-link>
-        <a href="" @click.prevent="logout">Logout</a> -->
     </header>
 </template>
 
@@ -39,6 +36,7 @@
         methods: {
             logout(){
                 $cookies.remove('token');
+                $cookies.remove('MemberId');
                 this.isLogin=false;
                 this.$router.push('/');
                 alert('已登出會員')
@@ -59,8 +57,8 @@
     padding-left: 6em;
     padding-right: 6em;
     display: flex;
-    background-color: #F8F4EC;
-    border-bottom: 2px solid #EEEEEE;
+    background-color: #FFF;
+    border-bottom: 3px solid #E1E1E1;
 }
 .header a{
     text-decoration: none;
@@ -85,14 +83,28 @@
 }
 .accountCenter{
     display: none;
+    z-index: 1;
     list-style-type: none;
     position: absolute;
-    width: 100%;
-    left: 50%;
+    width: 200%;
+    left: 0%;
+    top: 100%;
     padding-left: 0;
-    border: 1px solid black;
+    background-color: #F5F5F3;
+    box-shadow: 5px 5px 5px  rgba(156, 156, 156, 0.698);
+    border-radius: 10px;
+    text-align: center;
+}
+.accountCenter__list:hover{
+    background-color: #E2E2E0;
+    border-radius: 10px;
 }
 .accountCenter__list{
-    margin-top: .3em;
+    padding: .5em .67em;
+}
+.holdEvent{
+    border-radius: 25px;
+    padding: .67em 1.2em;
+    background-color: #FFD934;
 }
 </style>

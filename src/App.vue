@@ -38,6 +38,16 @@ body{
   margin: 0;
   background-color: #F3F3F3;
 }
+input[type="text"],
+input[type="number"],
+input[type="datetime-local"],
+input[type="email"],
+select{
+  border-top-style: none;
+  border-left-style: none;
+  border-right-style: none;
+  border-bottom: 2px solid gray;
+}
 *{
   box-sizing: content-box;
 }

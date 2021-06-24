@@ -1,10 +1,10 @@
 <template>
     <div class="container">
         <header class="gradient">
+            <button v-show="!isEdit" class="edit" @click="reverse()">修改資料</button>
+            <button v-show="isEdit" class="confirm" @click="confirm()">確認</button>
+            <button v-show="isEdit" class="cancel">取消</button><br>
             <h1>會員資料</h1>
-            <button class="edit" @click="reverse()">修改資料</button>
-            <button class="confirm" @click="confirm()">確認</button>
-            <button class="cancel">取消</button>
         </header>
         <form action="/action_page.php">
 
@@ -26,21 +26,28 @@
 
             <div class="form__text">
                 <label for="Email">帳號：</label>
-                <input type="email" id="Email" name="Email" v-model="member[0].email" :readonly="!isEdit"><br>
+                <input type="email" id="Email" name="Email" v-model="member.account" disabled="true"><br>
                 <label for="Name">名稱：</label>
-                <input type="text" id="Name" name="Name" v-model="member[0].name" :readonly="!isEdit"><br>
-                <div v-if="!isEdit"><label for="Sex">性別：{{sexToString[member[0].sex].value}}</label></div>
+                <input type="text" id="Name" name="Name" v-model="member.name" :disabled="!isEdit"><br>
+                <div v-if="!isEdit"><label for="Sex">性別：{{getGender(member.gender)}}</label></div>
                 <div v-else>
                     <label for="Sex">性別：</label>
                     <input type="radio" id="Male" name="Sex" value="M" class="checkBox">男
                     <input type="radio" id="Female" name="Sex" value="F" class="checkBox">女<br>
                 </div>
-                <label for="Birthday">生日：</label>
-                <input type="date" id="Birthday" name="Birthday" v-model="member[0].birth" :readonly="!isEdit"><br>
-                <div v-if="!isEdit"><label for="Location">居住城市：{{cityToString[member[0].city].value}}</label></div>
+
+                <div v-if="!isEdit">
+                    <label for="Birthday">生日：</label>
+                    <input type="date" id="Birthday" name="Birthday" :value=member.birth.slice(0,10) disabled><br>
+                </div>
+                <div v-else>
+                    <label for="Birthday">生日：</label>
+                    <input type="date" id="Birthday" name="Birthday" v-model="member.birth"><br>
+                </div>
+                <div v-if="!isEdit"><label for="Location">居住城市：{{getCity(member.cityId)}}</label></div>
                 <div v-else>
                     <label for="Location">居住城市：</label>
-                    <select name="Location" id="Location" v-model="member[0].city">
+                    <select name="Location" id="Location" v-model="member.cityId">
                         <optgroup label="北部地區">
                             <option value="0">基隆市</option>
                             <option value="1">台北市</option>
@@ -77,76 +84,48 @@
                 </div>
 
                 <div class="eventType__wrap">
-                    <label for="EventType">*感興趣的活動：</label>
-                    <section v-for="(type, index) in eventType" :key=type.eng>
-                        <input type="checkbox" 
-                                    :id="'EventType'+(index+1)" 
-                                    class="checkBox"
-                                    name="EventType" 
-                                    :value=type.eng 
-                                    v-model="eventCheck" >
-                        <label :for="'EventType'+(index+1)">{{type.zh}}</label>
-                    </section>
+                    <label for="EventType">感興趣的活動：
+
+                    </label>
+                    <span v-if="!isEdit">
+                        <span class="interest" v-for=" t in member.types" :key="t">
+                            {{getInterest(t)}}
+                        </span>
+                    </span>
+                    <span v-else>
+                        <section v-for="(type, index) in eventType" :key=type.eng>
+                            <input type="checkbox" 
+                                        v-model="member.types"
+                                        :id="'EventType'+(index+1)" 
+                                        class="checkBox"
+                                        name="EventType" 
+                                        :value=index>
+                            <label :for="'EventType'+(index+1)">{{type.zh}}</label>
+                        </section>
+                    </span>
                 </div>
 
                 <label for="JobType" class="gradient">工作類型：</label>
-                <input type="text" id="JobType" name="JobType" v-model="member[0].jobType" :readonly="!isEdit"><br>
+                <input type="text" id="JobType" name="JobType" v-model="member.category" :disabled="!isEdit"><br>
                 <label for="JobTitle" class="gradient">工作職稱：</label>
-                <input type="text" id="JobTitle" name="JobTitle" v-model="member[0].jobTitle" :readonly="!isEdit"><br>
+                <input type="text" id="JobTitle" name="JobTitle" v-model="member.jobTitle" :disabled="!isEdit"><br>
                 <label for="Intro" class="intro">自我介紹：</label><br>
-                <textarea name="Intro" id="Intro" style="font-size:1.5em" cols="70" rows="20" v-model="member[0].intro" :readonly="!isEdit"></textarea><br>
-
-                <input type="submit" class="submit" value="完成註冊">
+                <textarea name="Intro" id="Intro" style="font-size:1.5em" cols="70" rows="20" v-model="member.intro" :disabled="!isEdit"></textarea><br>
             </div>
         </form>
     </div>
 </template>
 
 <script>
+import { apiMemberGet, } from "../api"
+
 export default {
     data(){
         return{
             isEdit: false,
             preview: null,
             image: null,
-            sexToString: [
-                {value: "女" },
-                {value: "男"}
-            ],
-            cityToString:[
-                {value: "基隆市"},
-                {value: "台北市"},
-                {value: "新北市"},
-                {value: "桃園市"},
-                {value: "新竹市"},
-                {value: "新竹縣"},
-                {value: "苗栗縣"},
-                {value: "台中市"},
-                {value: "彰化市"},
-                {value: "南投市"},
-                {value: "雲林市"},
-                {value: "嘉義市"},
-                {value: "嘉義縣"},
-                {value: "台南市"},
-                {value: "高雄市"},
-                {value: "屏東市"},
-                {value: "台東市"},
-                {value: "花蓮市"},
-                {value: "宜蘭市"},
-                {value: "澎湖市"},
-                {value: "金門市"},
-                {value: "連江市"},
-            ],
-            member:[{
-                email: "xup6128",
-                name: "Ethan",
-                sex: "1",
-                city: "8",
-                birth: "1994-11-28",
-                jobType: "工程師",
-                jobTitle: "Junior",
-                intro: "27歲 男 射手座"
-            }],
+            member:[],
             eventType:[
                 { eng: 'travel', zh: '旅行出遊' },
                 { eng: 'fitness', zh: '運動健身' },
@@ -160,6 +139,17 @@ export default {
                 { eng: 'consult', zh: '命理諮商' },
             ]
         }
+    },
+    mounted(){
+        console.log($cookies.get('MemberId'))
+        apiMemberGet($cookies.get('MemberId'))
+        .then(res=>{
+            console.log(res.data)
+            this.member = res.data
+        })
+        .catch(err=>{
+            console.log(err)
+        })
     },
     methods: {
         previewImage: function(event) { 
@@ -178,6 +168,33 @@ export default {
         },
         confirm(){
             this.isEdit = false;
+        },
+        getCity(num){
+            const cities =["基隆市","台北市","新北市","桃園縣","新竹市","新竹縣","苗栗縣","台中市","彰化縣","南投縣","雲林縣","嘉義市","嘉義縣","台南市","高雄市","屏東縣","台東縣","花蓮縣","宜蘭縣","澎湖縣","金門縣","連江縣"]
+            return cities[num]
+        },
+        getGender(gender){
+            if(gender === "M"){
+                return "男"
+            }else if(gender ==="F"){
+                return "女"
+            }
+        },
+        getInterest(type){
+            // const eventTypes=[
+            //     { eng: 'travel', zh: '旅行出遊' },
+            //     { eng: 'fitness', zh: '運動健身' },
+            //     { eng: 'party', zh: '唱歌派對' },
+            //     { eng: 'show', zh: '影音展演' },
+            //     { eng: 'game', zh: '遊戲卡牌' },
+            //     { eng: 'meal', zh: '美食美酒' },
+            //     { eng: 'invest', zh: '商業投資' },
+            //     { eng: 'learn', zh: '體驗學習' },
+            //     { eng: 'beauty', zh: '美容時尚' },
+            //     { eng: 'consult', zh: '命理諮商' },
+            //     { eng: 'other', zh: '其他' },
+            // ]
+            return this.eventType[type].zh
         }
     }
 }
@@ -185,14 +202,27 @@ export default {
 
 <style scoped>
 .container{
-    width: 60%;
-    padding: 0 1.5em;
-    margin-left: auto;
-    margin-right: auto;
-    border: 1px solid black;
+    width: 40%;
+    background-color: #FFFFFF;
+    border-radius: 15px;
+    padding: 1em 2.5em;
+    margin: 3em auto;
 }
 header{
     text-align: center;
+}
+header button{
+    float: right;
+    margin-left: 1em;
+    border-radius: 5px;
+    padding: .5em 1em;
+    background-color: #FFF;
+    border: 1px solid;
+    font-size: .9em;
+}
+header button:hover{
+    background-color: #363636;
+    color: white;
 }
 label{
     font-size: 1.5em;
@@ -234,5 +264,24 @@ section{
     display: block;
     margin-left: auto;
     margin-right: auto;
+}
+.interest{
+    display: inline-block;
+    text-align: center;
+    padding: .3em;
+    margin-right: .5em;
+    margin-top: .5em;
+    width: 80px;
+    border-radius: 20px;
+    background-color: #FFD934;
+}
+textarea{
+    border: none;
+    background-color: #FFF;
+}
+input:disabled{
+    border: none;
+    color: black;
+    background-color: #FFF;
 }
 </style>

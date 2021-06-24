@@ -13,7 +13,8 @@
         <div class="container">
 
             <!-- Public Event List -->
-            <section class="public__wrap">
+
+            <!-- <section class="public__wrap">
                 <div v-for="n in 4" :key="n" class="event">
                     <figure class="event__img">
                         <img class="img--resp" src="https://www.tsc.taipei/wp-content/uploads/%E6%B4%BB%E5%8B%95%E5%9C%96%E6%A8%99.jpg" alt="">
@@ -22,7 +23,7 @@
                     <h5>(星期一) 六月14日 19：00</h5>
                     <h5>106台北市大安區師大路9號</h5>
                 </div>
-            </section>
+            </section> -->
 
 
             <!-- 篩選器 -->
@@ -104,10 +105,10 @@
                 <div v-if="filterNum == 5" class="filter__option__wrap">
                     <div class="filter__option">
                         <label>距離：
-                            <input type="radio" v-model="distance" value="500" name="distance" @change="retainRecord" @click="controlSingel($event)">500公尺以內
-                            <input type="radio" v-model="distance" value="1000" name="distance" @change="retainRecord" @click="controlSingel($event)">1公里以內
-                            <input type="radio" v-model="distance" value="3000" name="distance" @change="retainRecord" @click="controlSingel($event)">3公里以內
-                            <input type="radio" v-model="distance" value="5000" name="distance" @change="retainRecord" @click="controlSingel($event)">5公里以內
+                            <input type="radio" v-model="distance" value="500" name="distance" @change="retainRecord" @click="controlSingel">500公尺以內
+                            <input type="radio" v-model="distance" value="1000" name="distance" @change="retainRecord" @click="controlSingel">1公里以內
+                            <input type="radio" v-model="distance" value="3000" name="distance" @change="retainRecord" @click="controlSingel">3公里以內
+                            <input type="radio" v-model="distance" value="5000" name="distance" @change="retainRecord" @click="controlSingel">5公里以內
                         </label>
                     </div>
                 </div>
@@ -121,10 +122,10 @@
                 <div v-if="filterNum == 6" class="filter__option__wrap">
                     <div class="filter__option">
                         <label>日期：
-                            <input type="radio" v-model="day" value="0" name="day" @change="retainRecord" @click="controlSingel($event)">今天我想來點
-                            <input type="radio" v-model="day" value="1" name="day" @change="retainRecord" @click="controlSingel($event)">明天會更好
-                            <input type="radio" v-model="day" value="500" name="day" @change="retainRecord" @click="controlSingel($event)">週五找刺激
-                            <input type="radio" v-model="day" value="1000" name="day" @change="retainRecord" @click="controlSingel($event)">週末不一樣
+                            <input type="radio" v-model="day" value="0" name="day" @change="retainRecord" @click="controlSingel">今天我想來點
+                            <input type="radio" v-model="day" value="1" name="day" @change="retainRecord" @click="controlSingel">明天會更好
+                            <input type="radio" v-model="day" value="500" name="day" @change="retainRecord" @click="controlSingel">週五找刺激
+                            <input type="radio" v-model="day" value="1000" name="day" @change="retainRecord" @click="controlSingel">週末不一樣
                         </label>
                     </div>
                 </div>
@@ -134,10 +135,11 @@
             </section>
 
             <!-- Private Event List -->
-            <section class="private__wrap gradient">
-                <router-link :to="/Event/+e.eventId"
+            <section class="private__wrap">
+                <router-link :to="`/Event/${e.eventId}`"
                 v-for="e in eventList" 
-                :key="e.eventId">
+                :key="e.eventId"
+                class="event__router">
                     <div class="event">
                         <figure class="event__img">
                             <img class="img--resp" src="https://www.tsc.taipei/wp-content/uploads/%E6%B4%BB%E5%8B%95%E5%9C%96%E6%A8%99.jpg" alt="">
@@ -148,7 +150,6 @@
                     </div>
                 </router-link>
             </section>
-
         </div>
     </div>
 </template>
@@ -179,7 +180,7 @@ export default {
             group: null,
             distance: null,
             //Creat
-            eventList: null,
+            eventList: [],
             adsArr:[
                 { src:'https://imgcy.trivago.com/c_limit,d_dummy.jpeg,f_auto,h_1300,q_auto,w_2000/itemimages/19/79/197931_v3.jpeg', alt: 'beach'},
                 { src:'https://www.incimages.com/uploaded_files/image/1920x1080/getty_1141196125_411306.jpg', alt: 'hiking'},
@@ -221,7 +222,7 @@ export default {
             let self = e.target
             if(self.nodeName !== "LI"){return}
             let num = self.innerHTML
-            document.querySelector('.ad').style.marginLeft = -num*1000+'px';
+            document.querySelector('.ad').style.marginLeft = -num*100+'vw';
 
             this.pages[this.onPage].classList.remove('page--active')
             this.pages[num].classList.add('page--active')
@@ -233,7 +234,7 @@ export default {
             if(!this.pages[this.onPage]){return}
             this.pages[this.onPage].classList.remove('page--active')
             this.onPage++;
-            document.querySelector('.ad').style.marginLeft = this.onPage*-(1902)+'px';
+            document.querySelector('.ad').style.marginLeft = this.onPage*-(100)+'vw';
             if(this.onPage == this.pages.length){
                 this.onPage = 0;
                 document.querySelector('.ad').style.marginLeft = 0+'px';
@@ -266,9 +267,6 @@ export default {
         retainRecord(){
             this.changed = true
         },
-        //取得使用者位置
-
-        
         //跳轉前頁面傳參數：
         // goTo(item) {
         //     //storageData中數據用於跳轉到下一個頁面之後，進行返回時能夠返回到跳轉之前的頁面
@@ -420,13 +418,11 @@ export default {
     position: relative;
 }
 .public__wrap{
-
     display: flex;
     justify-content: space-between;
     padding: 1.5em 1em;
 }
 .private__wrap{
-
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
@@ -435,7 +431,11 @@ export default {
 .private__wrap .event{
     margin-bottom: 1.5em;
 }
-.event{
+a{
+    color: black;
+    text-decoration: none;
+}
+.event__router{
     height: 25vh;
     width: 20%;
     padding: .5em;
@@ -444,6 +444,15 @@ export default {
     overflow: hidden;
     background-color: white;
 }
+/* .event{
+    height: 25vh;
+    width: 20%;
+    padding: .5em;
+    border: 1px solid black;
+    border-radius: 1em;
+    overflow: hidden;
+    background-color: white;
+} */
 .event figure{
     margin: 0;
 }

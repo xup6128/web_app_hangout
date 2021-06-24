@@ -1,7 +1,6 @@
 import Login from './components/Login.vue';
 import Header from './components/Header.vue';
 import Home from './components/Home.vue';
-import UserInfo from './components/UserInfo.vue';
 import Signup from './components/Signup.vue';
 import HoldEvent from './components/HoldEvent.vue';
 import SignupInfo from './components/SignupInfo.vue';
@@ -31,7 +30,8 @@ export const routes = [
     }
   },
   {
-    path: '/signup/info',
+    path: '/signupInfo',
+    name:'signupInfo',
     components:{
       default: SignupInfo,
       nav: Header
@@ -48,16 +48,6 @@ export const routes = [
     },    
     meta:{
       isLogin:false
-    }
-  },
-  {
-    path: '/userInfo',
-    components: {
-      default: UserInfo,
-      nav: Header
-    },
-    meta:{
-      isLogin:true
     }
   },
   {
