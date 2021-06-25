@@ -4,13 +4,13 @@
 
             <!-- 主辦人 -->
             <div class="hoster">
-                <figure class="hoster__img">
+                <figure class="hoster__img" @click="$router.push(`/AccountInfo/${member.memberId}`)">
                     <img class="image--resp"
                     src="https://www.nicepng.com/png/full/136-1366211_group-of-10-guys-login-user-icon-png.png" alt="">
                 </figure>
                 <div class="hoster__info">
                     <h4>{{member.name}}</h4>
-                    <h5>{{getCity(member.addressId)}}、{{getAge(member.birth)}}、{{getGender(member.gender)}}</h5>
+                    <h5>{{getCity(member.cityId)}}、{{getAge(member.birth)}}、{{getGender(member.gender)}}</h5>
                 </div>
             </div>
             
@@ -40,13 +40,13 @@
 
             </div>
             <div>
-                <button type="button" class="join">參加</button>
+                <button type="button" class="button--red">參加</button>
                 <h4 class="deadline"><span>報名截止時間：</span>{{timeToString(event.deadline)}}</h4>
             </div>
             <p>{{event.eventContent}}</p>
-            <div class="comment">
+            <!-- <div class="comment">
                 活動評論
-            </div>
+            </div> -->
             <!-- <div class="message__wrap">
                 <h3>評論</h3>
                 <div class="message">
@@ -59,19 +59,21 @@
                 </div>
             </div> -->
             <div class="message__wrap">
-                <h3>留言</h3>
                 <div class="message">
-                    <h4>留言人<span>：</span></h4>
-                    <!-- <h5>4.5</h5>
-                    <figure class="message__star">
-                        <img src="../assets/Star.png" class="image--resp" alt="">
-                    </figure> -->
-                    <h5 class="message__text">留言內容</h5>
+                    <h4>留言人：</h4>
+                    <h4 class="message__text">留言內容</h4>
                 </div>
                 <div class="message__board">
                     <form action="">
-                        <textarea name="LeaveMessage" id="LeaveMessage" cols="50" rows="10"></textarea>
-                        <input type="submit" class="submit" value="留言">
+                        <h3>留言</h3>
+                        <textarea 
+                        name="LeaveMessage" 
+                        id="LeaveMessage" 
+                        v-model="inputString" 
+                        class="leaveMessage" 
+                        rows="10"
+                        placeholder="留下你的意見"></textarea><br>
+                        <input type="button" class="message__board__button button--transparent" @click="leaveMessage()" value="留言">
                     </form>
                 </div>
             </div>
@@ -80,13 +82,15 @@
 </template>
 
 <script>
-import { apiEventGet, apiMemberGet } from "../api"
+import { apiEventGet, apiMemberGet, apiMessagePost, apiMessageGet } from "../api"
 
 export default {
     data(){
        return{
             eventId: this.$route.params.eventId,
             event: null,
+            inputString:null,
+            message:[],
             member: null,
             participants: null,
        }
@@ -107,6 +111,8 @@ export default {
             .catch(err=>{
                 console.log(err)
             })
+
+            // apiMessageGet(this.event.messageIds)
         })
         .catch( err=>{
             console.log(err);
@@ -115,17 +121,6 @@ export default {
     },
     methods:{
         //將返回函數寫到methods中
-        goBackSheet() {
-            if(this.$route.query.goBackName === 'dataSearch'){
-                this.$router.push({
-                    name: this.pageName,
-                    query: {
-                        storageData: this.$route.query.storageData,
-                        isBackSelect: true,
-                    }
-                });
-            }
-        },
         timeToString(time){
             const monthList = ['一','二','三','四','五','六','七','八','九','十','十一','十二'] 
             const dayList = ['日','一','二','三','四','五','六']
@@ -157,12 +152,28 @@ export default {
             return cities[num]
         },
         getGender(gender){
-            if(gender === "M"){
+            if(gender === 2){
                 return "男"
-            }else if(gender === "F"){
+            }else if(gender === 1){
                 return "女"
             }
         },
+        leaveMessage(){
+
+            apiMessagePost({
+                "eventId": this.eventId,
+                "memberId": this.$cookies.get("MemberId"),
+                "messageContent": this.inputString,
+            })
+            .then(res =>{
+                console.log(res)
+            })
+            .catch(err=>{
+                console.log(err)
+            })
+
+            this.inputString = ""
+        }
     },
 }
 </script>
@@ -176,7 +187,8 @@ figure{
     /* border: 1px solid black; */
     width: 30%;
     margin-left: 15%;
-    padding: 16px 40px;
+    padding: 1em 2.5em;
+
 }
 .hoster{
     display: flex;
@@ -184,6 +196,7 @@ figure{
 .hoster__img{
     width: 80px;
     height: 80px;
+    cursor: pointer;
 }
 .image--resp{
     width: 100%;
@@ -205,14 +218,6 @@ figure{
 }
 .subInfo{
     width: 50px;
-}
-.join{
-    width: 400px;
-    background-color: pink;
-    font-size: 1.5em;
-    display: block;
-    margin: .5em auto;
-    border-radius: 999em;
 }
 .deadline{
     color: rgb(255, 27, 27);
@@ -242,8 +247,36 @@ a{
 .message__board{
     margin-top: 1em;
 }
-/* .submit{
-    display: block;
-    margin-left: auto;
-} */
+.leaveMessage{
+    resize: none;
+    width: 100%;
+    font-size: 1.5em;
+}
+.button--red{
+    color: white;
+    background-color: #ED1C40;
+    border-radius: 25px;
+    font-size: 1.5em;
+    width: 100%;
+    border: 0;
+    padding: .4em 0;
+    margin-top: .67em;
+}
+.button--red:hover{
+    background-color: #d81b3b;
+    cursor: pointer;
+}
+.button--transparent{
+    margin-left: 100%;
+    transform: translateX(-100%);
+    border-radius: 5px;
+    padding: .5em 1em;
+    background-color: #F3F3F3;
+    border: 1px solid;
+    font-size: .9em;
+}
+.button--transparent:hover{
+    background-color: #363636;
+    color: white;
+}
 </style>

@@ -249,7 +249,7 @@ export default {
             formData.append("CostTime", this.costTime);
             formData.append("PersonLimit", this.personLimit);
             formData.append("TypeId", this.typeId);
-            formData.append("MemberId", "67");
+            formData.append("MemberId", this.$cookies.get("MemberId"));
             // formData.append("MemberId", this.memberId);
             formData.append("Status", "true");
             formData.append("Parent", "");
@@ -267,7 +267,6 @@ export default {
             })
             .catch(err =>{
                 console.log(err)
-                this.$router.push({path:'/ManageEvent'})
             })
         }
     }

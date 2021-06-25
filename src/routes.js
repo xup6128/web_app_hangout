@@ -71,7 +71,7 @@ export const routes = [
     }
   },
   {
-    path: '/AccountInfo',
+    path: '/AccountInfo/:memberId?',
     components: {
       default: AccountInfo,
       nav: Header

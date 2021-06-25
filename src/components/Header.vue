@@ -11,7 +11,7 @@
                 @mouseleave="headsup" 
                 class="header__tool__li gradient">會員中心
                     <ul class="accountCenter">
-                        <li class="accountCenter__list"><router-link to="/AccountInfo">會員資料</router-link></li>
+                        <li class="accountCenter__list"><router-link :to="`/AccountInfo/${$cookies.get('MemberId')}`">會員資料</router-link></li>
                         <li class="accountCenter__list"><router-link to="/ManageEvent">管理活動</router-link></li>
                     </ul>
                 </li>

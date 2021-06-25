@@ -222,7 +222,7 @@ export default {
             let self = e.target
             if(self.nodeName !== "LI"){return}
             let num = self.innerHTML
-            document.querySelector('.ad').style.marginLeft = -num*100+'vw';
+            document.querySelector('.ad').style.marginLeft = -num*99.1+'vw';
 
             this.pages[this.onPage].classList.remove('page--active')
             this.pages[num].classList.add('page--active')
@@ -234,7 +234,9 @@ export default {
             if(!this.pages[this.onPage]){return}
             this.pages[this.onPage].classList.remove('page--active')
             this.onPage++;
-            document.querySelector('.ad').style.marginLeft = this.onPage*-(100)+'vw';
+            //待確認為何會出現null
+            if(document.querySelector('.ad') == null){return;}
+            document.querySelector('.ad').style.marginLeft = this.onPage*-(99.1)+'vw';
             if(this.onPage == this.pages.length){
                 this.onPage = 0;
                 document.querySelector('.ad').style.marginLeft = 0+'px';
@@ -329,7 +331,7 @@ export default {
 
 <style scoped>
 .container{
-    width: 60%;
+    width: 75%;
     margin-left: auto;
     margin-right: auto;
 }
@@ -370,16 +372,30 @@ export default {
     height: auto;
 }
 .filter__wrap{
-    border-top: 1px solid #F6F6F6;
-    border: 2px solid white;
+    border-radius: 10px;
+    border-left: 2px solid white;
+    border-right: 2px solid white;
+    border-bottom: 2px solid white;
     box-shadow: 0 4px 2px -2px gray;
-    background-color: #FFFAF2;
+    background-color: #FFF;
+    margin-top: 2em;
 }
 .filter__list{
     display: flex;
     justify-content: space-around;
     padding-left: 0;
     list-style-type: none;
+    padding: 8px;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+.filter__item{
+    border-radius: 25px;
+    padding: 8px 16px;
+    cursor: pointer;
+}
+.filter__item:hover{
+    background-color: #FFEEDF;
 }
 .arrow::after{
     content: "";
@@ -391,6 +407,9 @@ export default {
     transform: rotate(-135deg);
     transition: all .5s;
     margin-left: .3em;
+}
+.arrow--dropdown{
+    background-color: #FFEEDF;
 }
 .arrow--dropdown::after{
     transform: rotate(45deg);
@@ -443,6 +462,7 @@ a{
     border-radius: 1em;
     overflow: hidden;
     background-color: white;
+    margin-bottom: 2em;
 }
 /* .event{
     height: 25vh;

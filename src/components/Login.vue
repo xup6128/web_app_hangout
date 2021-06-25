@@ -1,6 +1,6 @@
 <template>
   <div class="login">
-    <h1>會員登入</h1>
+    <header><h1>會員登入</h1></header>
     <form @submit.prevent="login">
       <label for="Name">信箱</label><br>
       <input type="text" id="Name" name="Account" v-model="account" required ref="Account"><br>
@@ -10,8 +10,7 @@
         <input type="checkbox" v-model="remember"><p>記住帳號</p>
         <input type="checkbox" v-model="persistence"><p>保持登入狀態</p>
       </div>
-      <button type="submit">登入</button>
-      <button>取消</button><br>
+      <button type="button" class="button--red" @click="login()">登入</button><br>
       <p>還不是會員嗎？<span><router-link to="/signup">點我立即註冊</router-link></span></p>
     </form>
   </div>
@@ -24,8 +23,8 @@ import { apiMemberLogin } from "../api"
     inject:['reload'],
     data () {
       return {
-        account: 'xup6910631@gmail.com',
-        password: 'Cmoney1234',
+        account: '',
+        password: '',
         remember: '',
         persistence: '',
       }
@@ -36,6 +35,7 @@ import { apiMemberLogin } from "../api"
     },
     methods: {
       login(){
+
         apiMemberLogin({
             Account: this.account,
             Password: this.password
@@ -79,7 +79,7 @@ import { apiMemberLogin } from "../api"
   }
 </script>
 
-<style>
+<style scoped>
 .login{
   width: max-content;
   margin-left: auto;
@@ -90,15 +90,35 @@ import { apiMemberLogin } from "../api"
   border: 1px solid black;
   box-shadow: 5px 5px 5px 0 gray;
 }
-.login h1{
-  margin-top: 0;
-}
-.login input{
-  font-size: 1em;
-  line-height: 2em;
+header {
+  text-align: center;
 }
 .checkBoxs{
   display: flex;
   align-items: center;
+}
+input {
+  background-color: #FFF;
+  font-size: 1.5em;
+  height: 1em;
+  padding-top: 0.3em;
+}
+label {
+  font-size: 1.5em;
+  display: inline-block;
+  margin-top: 0.67em;
+}
+.button--red {
+  color: white;
+  background-color: #ed1c40;
+  font-size: 1.5em;
+  width: 100%;
+  border: 0;
+  padding: 0.4em 0;
+  margin-top: 0.67em;
+}
+.button--red:hover {
+  background-color: #d81b3b;
+  cursor: pointer;
 }
 </style>

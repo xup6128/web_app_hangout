@@ -2,7 +2,7 @@
   <div id="app">
     <router-view name="nav" v-if="isRouterAlive"></router-view>
 
-    <router-view/>
+    <router-view v-if="isRouterAlive" />
   </div>
 </template>
 
@@ -42,11 +42,15 @@ input[type="text"],
 input[type="number"],
 input[type="datetime-local"],
 input[type="email"],
+input[type="password"],
 select{
   border-top-style: none;
   border-left-style: none;
   border-right-style: none;
   border-bottom: 2px solid gray;
+}
+input:focus{
+  outline: none;
 }
 *{
   box-sizing: content-box;

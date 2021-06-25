@@ -3,20 +3,18 @@
         <header class="gradient">
             <button v-show="!isEdit" class="edit" @click="reverse()">修改資料</button>
             <button v-show="isEdit" class="confirm" @click="confirm()">確認</button>
-            <button v-show="isEdit" class="cancel">取消</button><br>
+            <button v-show="isEdit" class="cancel" @click="cancel()">取消</button><br>
             <h1>會員資料</h1>
         </header>
         <form action="/action_page.php">
 
             <div class="form__img gradient">
-                <label for="EvenImage">上傳活動照片：</label>
-                <input type="file" 
+                <label for="EvenImage">照片：</label>
+                <input type="file"
                 accept="image/*,.pdf" 
-                @change="previewImage" 
+                @change="previewImage($event), getFiles($event)" 
                 id="EventImage" 
-                name="EventImage" 
-                multiple
-                required><br>
+                name="EventImage" ><br>
                 <div class="previewImage" v-if="preview">
                     <img class="image--resp" :src="preview" />
                     <!-- <p>file name: {{ image.name }}</p>
@@ -32,8 +30,8 @@
                 <div v-if="!isEdit"><label for="Sex">性別：{{getGender(member.gender)}}</label></div>
                 <div v-else>
                     <label for="Sex">性別：</label>
-                    <input type="radio" id="Male" name="Sex" value="M" class="checkBox">男
-                    <input type="radio" id="Female" name="Sex" value="F" class="checkBox">女<br>
+                    <input type="radio" id="Male" name="Sex" value="2" class="checkBox">男
+                    <input type="radio" id="Female" name="Sex" value="1" class="checkBox">女<br>
                 </div>
 
                 <div v-if="!isEdit">
@@ -106,26 +104,32 @@
                 </div>
 
                 <label for="JobType" class="gradient">工作類型：</label>
-                <input type="text" id="JobType" name="JobType" v-model="member.category" :disabled="!isEdit"><br>
+                <input type="text" id="JobType" name="JobType" v-model="category" :disabled="!isEdit"><br>
                 <label for="JobTitle" class="gradient">工作職稱：</label>
-                <input type="text" id="JobTitle" name="JobTitle" v-model="member.jobTitle" :disabled="!isEdit"><br>
-                <label for="Intro" class="intro">自我介紹：</label><br>
-                <textarea name="Intro" id="Intro" style="font-size:1.5em" cols="70" rows="20" v-model="member.intro" :disabled="!isEdit"></textarea><br>
+                <input type="text" id="JobTitle" name="JobTitle" v-model="jobTitle" :disabled="!isEdit"><br>
+                <label for="Intro" class="intro">自我介紹</label><br>
+                <textarea name="Intro" id="Intro" style="font-size:1.5em"  rows="20" v-model="intro" :disabled="!isEdit"></textarea><br>
             </div>
         </form>
     </div>
 </template>
 
 <script>
-import { apiMemberGet, } from "../api"
+import { apiMemberGet, apiMemberPut} from "../api"
 
 export default {
+    inject:['reload'],
     data(){
         return{
+            memberId: this.$route.params.memberId,
             isEdit: false,
             preview: null,
             image: null,
-            member:[],
+            member:null,
+            category: null,
+            jobTitle: null,
+            intro: null,
+            files: null,
             eventType:[
                 { eng: 'travel', zh: '旅行出遊' },
                 { eng: 'fitness', zh: '運動健身' },
@@ -141,11 +145,14 @@ export default {
         }
     },
     mounted(){
-        console.log($cookies.get('MemberId'))
-        apiMemberGet($cookies.get('MemberId'))
+        // console.log($cookies.get('MemberId'))
+        apiMemberGet(this.memberId)
         .then(res=>{
             console.log(res.data)
             this.member = res.data
+            this.category = this.isNull(this.member.category)
+            this.jobTitle = this.isNull(this.member.jobTitle)
+            this.intro = this.isNull(this.member.intro)
         })
         .catch(err=>{
             console.log(err)
@@ -168,15 +175,49 @@ export default {
         },
         confirm(){
             this.isEdit = false;
+
+            let formData = new FormData();
+            formData.append("Account", this.member.account);
+            formData.append("Password", this.member.password);
+            formData.append("Name", this.member.name);
+            // formData.append("MemberPhoto", this.files);
+            formData.append("Gender", this.member.gender);
+            formData.append("Birth", this.member.birth.slice(0,10));
+            formData.append("CityId", this.member.cityId);
+            formData.append("Category", this.member.category);
+            formData.append("JobTitle", this.member.jobTitle);
+            formData.append("intro", this.member.intro);
+            
+            for( let i=0;i<this.member.types.length;i++){
+                formData.append("Type", this.member.types[i]);
+            }
+
+            for(let value of formData.values()){
+                console.log(value)
+            }
+
+            apiMemberPut(
+                formData,
+            )
+            .then(res =>{
+                console.log(res)
+            })
+            .catch(err =>{
+                console.log(err)
+            })
+        },
+        cancel(){
+            this.isEdit = false;
+            this.reload();
         },
         getCity(num){
             const cities =["基隆市","台北市","新北市","桃園縣","新竹市","新竹縣","苗栗縣","台中市","彰化縣","南投縣","雲林縣","嘉義市","嘉義縣","台南市","高雄市","屏東縣","台東縣","花蓮縣","宜蘭縣","澎湖縣","金門縣","連江縣"]
             return cities[num]
         },
         getGender(gender){
-            if(gender === "M"){
+            if(gender == 2){
                 return "男"
-            }else if(gender ==="F"){
+            }else if(gender == 1){
                 return "女"
             }
         },
@@ -195,6 +236,15 @@ export default {
             //     { eng: 'other', zh: '其他' },
             // ]
             return this.eventType[type].zh
+        },
+        getFiles(e){
+            this.files = e.target.files[0]
+        },
+        isNull(string){
+            if(string ==="null"){
+                return "暫無資訊"
+            }
+            return string
         }
     }
 }
@@ -276,8 +326,12 @@ section{
     background-color: #FFD934;
 }
 textarea{
-    border: none;
+    border: 1px solid black;
+    border-radius: 10px;
     background-color: #FFF;
+    width: 100%;
+    margin-top: 1em;
+    resize:none;
 }
 input:disabled{
     border: none;

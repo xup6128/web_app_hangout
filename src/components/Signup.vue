@@ -38,8 +38,7 @@
       </div>
       <br />
 
-      <!-- <router-link  to="/signup/info" class="nextStep" tag="button" >Continue</router-link> -->
-      <button @click.stop="check" type="button" class="nextStep">下一步</button>
+      <button @click.stop="check" type="button" class="button--red">下一步</button>
     </form>
   </div>
 </template>
@@ -145,12 +144,17 @@ export default {
   width: max-content;
   margin-left: auto;
   margin-right: auto;
+  padding: 2em;
+  background-color: white;
+  margin-top: 5%;
+  border: 1px solid black;
+  box-shadow: 5px 5px 5px 0 gray;
 }
-.signup__header {
+header {
   text-align: center;
 }
 input {
-  background-color: #fafafa;
+  background-color: #FFF;
   font-size: 1.5em;
   height: 1em;
   padding-top: 0.3em;
@@ -160,7 +164,7 @@ label {
   display: inline-block;
   margin-top: 0.67em;
 }
-.nextStep {
+.button--red {
   color: white;
   background-color: #ed1c40;
   font-size: 1.5em;
@@ -169,7 +173,7 @@ label {
   padding: 0.4em 0;
   margin-top: 0.67em;
 }
-.nextStep:hover {
+.button--red:hover {
   background-color: #d81b3b;
   cursor: pointer;
 }
