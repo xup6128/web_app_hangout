@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <header class="gradient">
-            <button v-show="!isEdit" class="edit" @click="reverse()">修改資料</button>
+            <button v-show="!isEdit && checkMember" class="edit" @click="reverse()">修改資料</button>
             <button v-show="isEdit" class="confirm" @click="confirm()">確認</button>
             <button v-show="isEdit" class="cancel" @click="cancel()">取消</button><br>
             <h1>會員資料</h1>
@@ -30,18 +30,15 @@
                 <div v-if="!isEdit"><label for="Sex">性別：{{getGender(member.gender)}}</label></div>
                 <div v-else>
                     <label for="Sex">性別：</label>
-                    <input type="radio" id="Male" name="Sex" value="2" class="checkBox">男
-                    <input type="radio" id="Female" name="Sex" value="1" class="checkBox">女<br>
+                    <input type="radio" id="Male" name="Sex" v-model="member.gender" value="2" class="checkBox">男
+                    <input type="radio" id="Female" name="Sex" v-model="member.gender" value="1" class="checkBox">女<br>
                 </div>
 
-                <div v-if="!isEdit">
+                <div>
                     <label for="Birthday">生日：</label>
-                    <input type="date" id="Birthday" name="Birthday" :value=member.birth.slice(0,10) disabled><br>
+                    <input type="date" id="Birthday" name="Birthday" v-model="birth" :disabled="!isEdit"><br>
                 </div>
-                <div v-else>
-                    <label for="Birthday">生日：</label>
-                    <input type="date" id="Birthday" name="Birthday" v-model="member.birth"><br>
-                </div>
+
                 <div v-if="!isEdit"><label for="Location">居住城市：{{getCity(member.cityId)}}</label></div>
                 <div v-else>
                     <label for="Location">居住城市：</label>
@@ -122,6 +119,7 @@ export default {
     data(){
         return{
             memberId: this.$route.params.memberId,
+            checkMember: null,
             isEdit: false,
             preview: null,
             image: null,
@@ -129,7 +127,9 @@ export default {
             category: null,
             jobTitle: null,
             intro: null,
+            birth:null,
             files: null,
+            // birthToDate: this.member.birth.slice(0,10),
             eventType:[
                 { eng: 'travel', zh: '旅行出遊' },
                 { eng: 'fitness', zh: '運動健身' },
@@ -145,7 +145,7 @@ export default {
         }
     },
     mounted(){
-        // console.log($cookies.get('MemberId'))
+        this.checkMember = $cookies.get('MemberId') === this.memberId
         apiMemberGet(this.memberId)
         .then(res=>{
             console.log(res.data)
@@ -153,6 +153,7 @@ export default {
             this.category = this.isNull(this.member.category)
             this.jobTitle = this.isNull(this.member.jobTitle)
             this.intro = this.isNull(this.member.intro)
+            this.birth = this.member.birth.slice(0,10)
         })
         .catch(err=>{
             console.log(err)
@@ -177,16 +178,16 @@ export default {
             this.isEdit = false;
 
             let formData = new FormData();
-            formData.append("Account", this.member.account);
-            formData.append("Password", this.member.password);
+            // formData.append("Account", this.member.account);
+            // formData.append("Password", this.member.password);
             formData.append("Name", this.member.name);
             // formData.append("MemberPhoto", this.files);
             formData.append("Gender", this.member.gender);
-            formData.append("Birth", this.member.birth.slice(0,10));
+            formData.append("Birth", this.birth);
             formData.append("CityId", this.member.cityId);
-            formData.append("Category", this.member.category);
-            formData.append("JobTitle", this.member.jobTitle);
-            formData.append("intro", this.member.intro);
+            formData.append("Category", this.category);
+            formData.append("JobTitle", this.jobTitle);
+            formData.append("intro", this.intro);
             
             for( let i=0;i<this.member.types.length;i++){
                 formData.append("Type", this.member.types[i]);
@@ -331,7 +332,6 @@ textarea{
     background-color: #FFF;
     width: 100%;
     margin-top: 1em;
-    resize:none;
 }
 input:disabled{
     border: none;

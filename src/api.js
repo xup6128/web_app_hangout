@@ -10,6 +10,9 @@ const memberRequest = axios.create({
 const messageRequest = axios.create({
   baseURL: '/api/Event/Message'
 })
+const partitionRequest = axios.create({
+  baseURL: '/api/Event/Partition'
+})
 const commentRequest = axios.create({
   baseURL: '/api/Comment'
 })
@@ -53,6 +56,12 @@ export function apiMessageDel(params) {
 }
 export function apiEventMessageGet(params) {
   return messageRequest.get('/EventId=' + params);
+}
+
+//Partition
+export const apiPartitionPost = data => partitionRequest.post("", data);
+export function apiEventGetPartition(params){
+  return apiPartition.get("/Event="+params)
 }
 
 //Comment

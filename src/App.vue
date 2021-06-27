@@ -38,6 +38,11 @@ body{
   margin: 0;
   background-color: #F3F3F3;
 }
+textarea{
+  width: 100%;
+  resize: none;
+  font-size: 1.5em;
+}
 input[type="text"],
 input[type="number"],
 input[type="datetime-local"],

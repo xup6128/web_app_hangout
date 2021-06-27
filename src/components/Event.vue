@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="gradient">
         <main class="container">
 
             <!-- 主辦人 -->
@@ -10,7 +10,10 @@
                 </figure>
                 <div class="hoster__info">
                     <h4>{{member.name}}</h4>
-                    <h5>{{getCity(member.cityId)}}、{{getAge(member.birth)}}、{{getGender(member.gender)}}</h5>
+                    <h5>{{getCity(member.cityId)}}、{{getAge(member.birth)}}歲、{{getGender(member.gender)}}</h5>
+                </div>
+                <div v-if="checkMember" class="hoster__button">
+                    <input type="button" class="button--transparent" @click="leaveMessage()" value="審核參加者">
                 </div>
             </div>
             
@@ -40,7 +43,15 @@
 
             </div>
             <div>
-                <button type="button" class="button--red">參加</button>
+                <button type="button" class="button--red" @click="showMotivationBoard()">參加活動</button>
+                <div class="motivation__wrap" @click="closeMotivationBoard($event)">
+                    <div class="motivation__board gradient">
+                        <header><h2>參加動機</h2></header>
+                        <textarea name="" id="" rows="10" v-model="motivationString" placeholder="簡單敘述你的參加動機吧" required class="motivation"></textarea>
+                        <button type="button" class="button--red" @click="join()">送出</button>
+                        <button type="button" class="button--close" @click="closeMotivationBoard()">X</button>
+                    </div>
+                </div>
                 <h4 class="deadline"><span>報名截止時間：</span>{{timeToString(event.deadline)}}</h4>
             </div>
             <p>{{event.eventContent}}</p>
@@ -59,9 +70,9 @@
                 </div>
             </div> -->
             <div class="message__wrap">
-                <div class="message">
-                    <h4>留言人：</h4>
-                    <h4 class="message__text">留言內容</h4>
+                <div class="message" v-for=" m in this.messages" :key="m.messageId">
+                    <h4>{{m.name}}：</h4>
+                    <h4 class="message__text">{{m.messageContent}}</h4>
                 </div>
                 <div class="message__board">
                     <form action="">
@@ -82,45 +93,79 @@
 </template>
 
 <script>
-import { apiEventGet, apiMemberGet, apiMessagePost, apiMessageGet } from "../api"
+import { apiEventGet, apiMemberGet, apiMessagePost, apiMessageGet, apiPartitionPost } from "../api"
 
 export default {
+inject:['reload'],
     data(){
        return{
             eventId: this.$route.params.eventId,
             event: null,
+            motivationString: null,
+            messages: [],
+            nameList:[],
             inputString:null,
             message:[],
             member: null,
             participants: null,
+            checkMember: null,
        }
     },
+    watch(){
+
+    },
     mounted(){
-        //查看是否已經參數是否傳至跳轉之後的頁面，若傳入，則根據需求進行調用
 
+        
+        
+        //獲得活動API
         apiEventGet(this.eventId)
-        .then( res =>{
-            this.event = res.data
-            console.log(this.event);
-
+        .then(res=>{
+            this.event = res.data;
+            this.checkMember = $cookies.get('MemberId') == this.event.memberId
+            console.log(this.event)
+            //透過活動API獲得主辦者會員API資料
             apiMemberGet(this.event.memberId)
-            .then(res=> {
+            .then(res=>{
                 this.member = res.data
-                console.log(this.member)
             })
             .catch(err=>{
                 console.log(err)
             })
+            
+            //透過活動API獲得留言API資料
+            const promiseList = this.event.messageIds.map(id => apiMessageGet(id))
+            Promise.all(promiseList)
+            .then(res=>{
+                //將API資料以陣列的方式儲存下來
+                this.messages = res.map(message => message.data)
+                console.log(this.messages)
 
-            // apiMessageGet(this.event.messageIds)
+                //透過留言API獲得留言者會員API資料
+                const names = this.messages.map(mesg => apiMemberGet(mesg.memberId))
+                Promise.all(names)
+                .then(res=>{
+                    this.nameList = res.map(name => name.data)
+
+                    //將API資料依序新增在messages陣列裡面
+                    this.messages.forEach( (mesg,index) =>{
+                        mesg.name = this.nameList[index].name
+                    })
+                    // console.log(this.messages)
+
+                })
+            })
+            .catch(err=>{
+                console.log(err)
+            })
         })
-        .catch( err=>{
-            console.log(err);
+        .catch(err=>{
+            console.log(err)
         })
+
 
     },
     methods:{
-        //將返回函數寫到methods中
         timeToString(time){
             const monthList = ['一','二','三','四','五','六','七','八','九','十','十一','十二'] 
             const dayList = ['日','一','二','三','四','五','六']
@@ -173,6 +218,33 @@ export default {
             })
 
             this.inputString = ""
+        },
+        join(){
+            if(this.member.memberId == this.$cookies.get("MemberId")){
+                console.log("return")
+                return
+            }
+
+            apiPartitionPost({
+                "eventId": this.eventId,
+                "participanter": this.$cookies.get("MemberId"),
+                "motivation": this.motivationString
+            })
+            .then(res =>{
+                console.log(res)
+            })
+            .catch(err=>{
+                console.log(err)
+            })
+        },
+        showMotivationBoard(){
+            document.querySelector(".motivation__wrap").style = "display:block" 
+        },
+        closeMotivationBoard(e){
+            if(e.target.classList.contains("motivation__wrap") || e.target.classList.contains("button--close")){
+                document.querySelector(".motivation__wrap").style = "display:none" 
+                document.querySelector(".motivation__wrap").style = `height:${document.documentElement.clientWidth}px` 
+            }
         }
     },
 }
@@ -188,7 +260,6 @@ figure{
     width: 30%;
     margin-left: 15%;
     padding: 1em 2.5em;
-
 }
 .hoster{
     display: flex;
@@ -207,6 +278,9 @@ figure{
 }
 .hoster h4{
     margin: 0;
+}
+.hoster__button{
+    margin-left: auto;
 }
 .eventImg{
     margin-top: 1em;
@@ -230,7 +304,7 @@ a{
     display: flex;
     align-items: center;
     border-bottom: 2px solid black;
-    margin-top: .3em;
+    margin-top: .67em;
 }
 .message h4, .message h5{
     margin-top: 0;
@@ -246,11 +320,6 @@ a{
 }
 .message__board{
     margin-top: 1em;
-}
-.leaveMessage{
-    resize: none;
-    width: 100%;
-    font-size: 1.5em;
 }
 .button--red{
     color: white;
@@ -279,4 +348,52 @@ a{
     background-color: #363636;
     color: white;
 }
+.motivation__wrap{
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 0;
+    background-color: #00000060;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+.motivation__board{
+    /* position: fixed; */
+    background-color: #F3F3F3;
+    width: 20%;
+    height: 40%;
+    padding: 1em 2.5em;
+    text-align: center;
+    left: 50%;
+    top: 50%;
+    border-radius: 15px;
+    border: 4px solid #E1E1E1;
+    transform: translate(-50%,-50%);
+}
+.motivation{
+    height: 70%;
+}
+.gradient{
+    position: relative;
+}
+.button--close{
+    position: absolute;
+    padding: 0;
+    right: -15px;
+    top: -15px;
+    width: 30px;
+    height: 30px;
+    border: 0;
+    font-size: 1.2em;
+    font-weight: bold;
+    border-radius: 9999em;
+    background-color: #ED1C40;
+    color: white;
+}
+.button--close:hover{
+    background-color: #d81b3b;
+    cursor: pointer;
+}
+
 </style>
