@@ -142,12 +142,12 @@
                 class="event__router">
                     <div class="event">
                         <figure class="event__img">
-                            <img class="img--resp" src="https://www.tsc.taipei/wp-content/uploads/%E6%B4%BB%E5%8B%95%E5%9C%96%E6%A8%99.jpg" alt="">
+                            <img class="img--resp" :src="getImg(e.cover)" alt="" width="">
                         </figure>
+                    </div>
                         <h4>{{e.eventName}}</h4>
                         <h5>{{timeToString(e.hostTime)}}</h5>
                         <h5>{{e.addressId}}</h5>
-                    </div>
                 </router-link>
             </section>
         </div>
@@ -269,6 +269,9 @@ export default {
         retainRecord(){
             this.changed = true
         },
+        getImg(url){
+            return `http://35.229.140.28/${url}`
+        }
         //跳轉前頁面傳參數：
         // goTo(item) {
         //     //storageData中數據用於跳轉到下一個頁面之後，進行返回時能夠返回到跳轉之前的頁面

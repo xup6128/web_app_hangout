@@ -9,16 +9,18 @@
         <form action="/action_page.php">
 
             <div class="form__img gradient">
-                <label for="EvenImage">照片：</label>
-                <input type="file"
-                accept="image/*,.pdf" 
-                @change="previewImage($event), getFiles($event)" 
-                id="EventImage" 
-                name="EventImage" ><br>
-                <div class="previewImage" v-if="preview">
-                    <img class="image--resp" :src="preview" />
+                <div class="previewImage" v-if="!isEdit">
+                    <img class="image--resp" :src="getCover(member.memberPhoto)" />
                     <!-- <p>file name: {{ image.name }}</p>
                     <p>size: {{ image.size/1024 }}KB</p> -->
+                </div>
+                <div v-else>
+                    <label for="EvenImage">上傳照片：</label>
+                    <input type="file"
+                    accept="image/*,.pdf" 
+                    @change="previewImage($event), getFiles($event)" 
+                    id="EventImage" 
+                    name="EventImage" ><br>
                 </div>
             </div>
 
@@ -246,6 +248,9 @@ export default {
                 return "暫無資訊"
             }
             return string
+        },
+        getCover(url){
+            return `http://35.229.140.28/${url}`
         }
     }
 }

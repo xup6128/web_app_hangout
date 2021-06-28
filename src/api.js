@@ -60,8 +60,15 @@ export function apiEventMessageGet(params) {
 
 //Partition
 export const apiPartitionPost = data => partitionRequest.post("", data);
+export function apiPartitionPutConfirm(params){
+  return partitionRequest.put("/"+params.participantId,{
+    "eventId": params.eventId,
+    "participanter": params.participanter,
+    "status": "1"
+  })
+}
 export function apiEventGetPartition(params){
-  return apiPartition.get("/Event="+params)
+  return partitionRequest.get("/Event ="+params)
 }
 
 //Comment

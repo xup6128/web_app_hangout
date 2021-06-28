@@ -1,5 +1,5 @@
 <template>
-    <div class="gradient">
+    <div>
         <main class="container">
 
             <!-- 主辦人 -->
@@ -13,7 +13,7 @@
                     <h5>{{getCity(member.cityId)}}、{{getAge(member.birth)}}歲、{{getGender(member.gender)}}</h5>
                 </div>
                 <div v-if="checkMember" class="hoster__button">
-                    <input type="button" class="button--transparent" @click="leaveMessage()" value="審核參加者">
+                    <input type="button" class="button--transparent" id="0" @click="showMarginBoard($event)" value="審核參加者">
                 </div>
             </div>
             
@@ -43,15 +43,7 @@
 
             </div>
             <div>
-                <button type="button" class="button--red" @click="showMotivationBoard()">參加活動</button>
-                <div class="motivation__wrap" @click="closeMotivationBoard($event)">
-                    <div class="motivation__board gradient">
-                        <header><h2>參加動機</h2></header>
-                        <textarea name="" id="" rows="10" v-model="motivationString" placeholder="簡單敘述你的參加動機吧" required class="motivation"></textarea>
-                        <button type="button" class="button--red" @click="join()">送出</button>
-                        <button type="button" class="button--close" @click="closeMotivationBoard()">X</button>
-                    </div>
-                </div>
+                <button type="button" class="button--red" id="1" @click="showMarginBoard($event)">參加活動</button>
                 <h4 class="deadline"><span>報名截止時間：</span>{{timeToString(event.deadline)}}</h4>
             </div>
             <p>{{event.eventContent}}</p>
@@ -89,11 +81,29 @@
                 </div>
             </div>
         </main>
+                <div id="1" class="marginBoard">
+                    <button type="button" class="button--close" @click="closeMargin()">X</button>
+                    <header><h2>審核參加者</h2></header>
+                    <div v-for="p in participanters" :key="p.participantId" class="participanter gradient">
+                        <h4 class="partitioner">{{p.participanter}}：</h4>
+                        <input type="button" class="button__partition agree" @click="partitionerConfirm(p)" value="確認">
+                        <!-- <input type="button" class="button__partition disagree" value="X"> -->
+                        <h4 class="message__text">{{p.motivation}}</h4>
+                    </div>
+                </div>
+
+                <div id="1" class="marginBoard">
+                    <button type="button" class="button--close" @click="closeMargin()">X</button>
+                    <header><h2>參加動機</h2></header>
+                    <textarea name="" id="" rows="10" v-model="motivationString" placeholder="簡單敘述你的參加動機吧" required class="motivation"></textarea>
+                    <button type="button" class="button--red" @click="join()">送出</button>
+                </div>
+
     </div>
 </template>
 
 <script>
-import { apiEventGet, apiMemberGet, apiMessagePost, apiMessageGet, apiPartitionPost } from "../api"
+import { apiEventGet, apiMemberGet, apiMessagePost, apiMessageGet, apiPartitionPost, apiEventGetPartition, apiPartitionPutConfirm } from "../api"
 
 export default {
 inject:['reload'],
@@ -109,6 +119,8 @@ inject:['reload'],
             member: null,
             participants: null,
             checkMember: null,
+            lastMarginBoard: null,
+            participanters:[],
        }
     },
     watch(){
@@ -158,6 +170,17 @@ inject:['reload'],
             .catch(err=>{
                 console.log(err)
             })
+        })
+        .catch(err=>{
+            console.log(err)
+        })
+
+        apiEventGetPartition(this.eventId)
+        .then(res=>{
+            console.log(res)
+            this.participanters = res.data
+            console.log(555)
+            console.log(this.participanters)
         })
         .catch(err=>{
             console.log(err)
@@ -237,14 +260,29 @@ inject:['reload'],
                 console.log(err)
             })
         },
-        showMotivationBoard(){
-            document.querySelector(".motivation__wrap").style = "display:block" 
-        },
-        closeMotivationBoard(e){
-            if(e.target.classList.contains("motivation__wrap") || e.target.classList.contains("button--close")){
-                document.querySelector(".motivation__wrap").style = "display:none" 
-                document.querySelector(".motivation__wrap").style = `height:${document.documentElement.clientWidth}px` 
+        showMarginBoard(e){
+            const boards = document.querySelectorAll(".marginBoard") 
+            if(this.lastMarginBoard){this.lastMarginBoard.classList.remove("marginBoard--show")}
+            if(this.lastMarginBoard == boards[e.target.id]){
+                this.closeMargin()
+                return
             }
+            boards[e.target.id].classList.add("marginBoard--show")
+            this.lastMarginBoard = boards[e.target.id]
+        },
+        closeMargin(){
+            this.lastMarginBoard.classList.remove("marginBoard--show")
+            this.lastMarginBoard = null
+        },
+        partitionerConfirm(p){
+            console.log(p)
+            apiPartitionPutConfirm(p)
+            .then(res =>{
+                console.log(res)
+            })
+            .catch(err =>{
+                console.log(err)
+            })
         }
     },
 }
@@ -348,7 +386,7 @@ a{
     background-color: #363636;
     color: white;
 }
-.motivation__wrap{
+/* .motivation__wrap{
     display: none;
     position: absolute;
     left: 0;
@@ -357,19 +395,23 @@ a{
     width: 100%;
     height: 100%;
     z-index: 1;
-}
-.motivation__board{
-    /* position: fixed; */
-    background-color: #F3F3F3;
+} */
+.marginBoard{
+    position: fixed;
+    background-color: white;
     width: 20%;
-    height: 40%;
+    height: 55%;
     padding: 1em 2.5em;
     text-align: center;
-    left: 50%;
+    left: 120%;
     top: 50%;
     border-radius: 15px;
     border: 4px solid #E1E1E1;
     transform: translate(-50%,-50%);
+    transition: all 1s;
+}
+.marginBoard--show{
+    left: 70%;
 }
 .motivation{
     height: 70%;
@@ -379,21 +421,58 @@ a{
 }
 .button--close{
     position: absolute;
-    padding: 0;
-    right: -15px;
-    top: -15px;
+    top: -10px;
+    right: -10px;
     width: 30px;
     height: 30px;
-    border: 0;
+    padding: 0;
     font-size: 1.2em;
-    font-weight: bold;
-    border-radius: 9999em;
-    background-color: #ED1C40;
+    border-radius: 999em;
+    border: 0;
     color: white;
+    background-color: #ED1C40;
 }
 .button--close:hover{
     background-color: #d81b3b;
     cursor: pointer;
 }
-
+.participanter{
+    text-align: left;
+    margin-top: 2px;
+    border-radius: 5px;
+    border: 4px solid #979797;
+    padding: .3em;
+    /* border-bottom: 1px solid black; */
+}
+.participanter h4{
+    margin: 0;
+}
+.button__partition{
+    position: absolute;
+    right: -2%;
+    top: -10%;
+    width: 10%;
+    padding: .3em 1em;
+    border-radius: 5px;
+}
+.agree{
+    background-color: #FF9100;
+    color: white;
+    border: 0;
+    
+}
+.agree:hover{
+    background-color: #FF7800;
+}
+.disagree{
+    color: #FF9100;
+    border: 1px solid #FF9100;
+    background-color: white;
+}
+.disagree:hover{
+    box-shadow: 0 0 5px #FF9100;
+}
+.partitioner{
+    display: inline-block;
+}
 </style>

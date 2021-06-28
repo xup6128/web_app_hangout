@@ -18,7 +18,7 @@
                 <li class="header__tool__li"><a href="" @click.prevent="logout">登出</a></li>
             </ul>
             <ul v-else class="header__tool__ul">
-                <li class="header__tool__li"><router-link to="/holdEvent">我要發起活動</router-link></li>
+                <li class="header__tool__li holdEvent"><router-link to="/holdEvent">我要發起活動</router-link></li>
                 <li class="header__tool__li"><router-link to="/login">登入</router-link></li>
                 <li class="header__tool__li"><router-link to="/signup">註冊</router-link></li>
             </ul>
@@ -106,5 +106,8 @@
     border-radius: 25px;
     padding: .67em 1.2em;
     background-color: #FFD934;
+}
+.holdEvent:hover{
+    background-color: #eecc34;
 }
 </style>
