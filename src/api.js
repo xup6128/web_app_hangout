@@ -13,6 +13,9 @@ const messageRequest = axios.create({
 const partitionRequest = axios.create({
   baseURL: '/api/Event/Partition'
 })
+const favoriteRequest = axios.create({
+  baseURL: '/api/Member/Favorite'
+})
 const commentRequest = axios.create({
   baseURL: '/api/Comment'
 })
@@ -38,8 +41,8 @@ export function apiMemberEventGet(params) {
 export function apiMemberGet(params) {
   return memberRequest.get('/' + params);
 };
-export const apiMemberGetHostEvent = data => memberRequest.get(`/${cookies.get("MemberId")}/HostEvent`, data);
-export const apiMemberGetJoinEvent = data => memberRequest.get(`/${cookies.get("MemberId")}/JoinEvent`, data);
+export const apiMemberGetHostEvent = () => memberRequest.get(`/${cookies.get("MemberId")}/HostEvent`);
+export const apiMemberGetJoinEvent = () => memberRequest.get(`/${cookies.get("MemberId")}/JoinEvent`);
 
 
 //Message
@@ -71,6 +74,10 @@ export function apiEventGetPartition(params){
   return partitionRequest.get("/Event ="+params)
 }
 
+//Favorite
+export const apiFavoritePost = data => favoriteRequest.post("", data);
+export const apiFavoriteEventGet = () => favoriteRequest.get(`/MemberId=${cookies.get("MemberId")}`);
+
 //Comment
 export const apiCommentPost = data => commentRequest.post('', data);
 export function apiCommentGet(params) {
@@ -79,6 +86,5 @@ export function apiCommentGet(params) {
 export function apiEventCommentGet(params) {
   return commentRequest.get('/EventId=' + params);
 }
-
 
 

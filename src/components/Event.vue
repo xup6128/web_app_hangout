@@ -6,21 +6,22 @@
             <div class="hoster">
                 <figure class="hoster__img" @click="$router.push(`/AccountInfo/${member.memberId}`)">
                     <img class="image--resp"
-                    src="https://www.nicepng.com/png/full/136-1366211_group-of-10-guys-login-user-icon-png.png" alt="">
+                    :src="getImg(member.memberPhoto)" alt="">
                 </figure>
                 <div class="hoster__info">
                     <h4>{{member.name}}</h4>
                     <h5>{{getCity(member.cityId)}}、{{getAge(member.birth)}}歲、{{getGender(member.gender)}}</h5>
                 </div>
-                <div v-if="checkMember" class="hoster__button">
-                    <input type="button" class="button--transparent" id="0" @click="showMarginBoard($event)" value="審核參加者">
+                <div class="collectEvent">
+                    <input v-if="checkCollect" type="button" class="collectEvent__button" @click="collectEvent()" value="收藏活動">
+                    <input v-else type="button" class="collectEvent__button" @click="removeCollect()" value="取消收藏">
                 </div>
             </div>
             
             <!-- 活動資訊 -->
             <figure class="eventImg">
                 <img class="image--resp"
-                src="https://www.tsc.taipei/wp-content/uploads/%E6%B4%BB%E5%8B%95%E5%9C%96%E6%A8%99.jpg" alt="">
+                :src="getImg(event.cover)" alt="">
             </figure>
             <h1>{{event.eventName}}</h1>
             <h2 class="location">{{event.addressId}}</h2>
@@ -39,33 +40,31 @@
                     <h4>{{event.personLimit}}<span>人</span></h4>
                 </div>
             </div>
-            <div class="attender">參加者資訊
-
+            
+            <div id="0" @click="showMarginBoardOfParticipanter()" class="attender">
+                <figure class="message__img" v-for="p in confirmer" :key="p.participantId">
+                    <img :src="getImg(p.memberPhoto)" alt="" class="image--resp">
+                </figure>
+                <h3>{{confirmer.length}} 人參加</h3>
             </div>
+
             <div>
-                <button type="button" class="button--red" id="1" @click="showMarginBoard($event)">參加活動</button>
+                <button v-if="this.checkMember" type="button" class="button--red" id="0" @click="showMarginBoard($event)">審核參加</button>
+                <button v-else type="button" class="button--red" id="1" @click="showMarginBoard($event)">參加活動</button>
                 <h4 class="deadline"><span>報名截止時間：</span>{{timeToString(event.deadline)}}</h4>
             </div>
             <p>{{event.eventContent}}</p>
-            <!-- <div class="comment">
-                活動評論
-            </div> -->
-            <!-- <div class="message__wrap">
-                <h3>評論</h3>
-                <div class="message">
-                    <h4>留言人<span>：</span></h4>
-                    <h5>4.5</h5>
-                    <figure class="message__star">
-                        <img src="../assets/Star.png" class="image--resp" alt="">
-                    </figure>
-                    <h5 class="message__text">留言內容</h5>
-                </div>
-            </div> -->
             <div class="message__wrap">
                 <div class="message" v-for=" m in this.messages" :key="m.messageId">
-                    <h4>{{m.name}}：</h4>
-                    <h4 class="message__text">{{m.messageContent}}</h4>
+                    <div class="message__member">
+                        <figure class="message__img">
+                            <img :src="getImg(m.memberPhoto)" alt="" class="image--resp">
+                        </figure>
+                        <h4>{{m.name}}：</h4>
+                    </div>
+                    <div class="message__text"><h4>{{m.messageContent}}</h4></div>
                 </div>
+            </div>
                 <div class="message__board">
                     <form action="">
                         <h3>留言</h3>
@@ -79,31 +78,49 @@
                         <input type="button" class="message__board__button button--transparent" @click="leaveMessage()" value="留言">
                     </form>
                 </div>
-            </div>
         </main>
-                <div id="1" class="marginBoard">
+                <div class="marginBoard">
                     <button type="button" class="button--close" @click="closeMargin()">X</button>
                     <header><h2>審核參加者</h2></header>
                     <div v-for="p in participanters" :key="p.participantId" class="participanter gradient">
-                        <h4 class="partitioner">{{p.participanter}}：</h4>
+                        <div class="message__member">
+                            <figure class="message__img">
+                                <img :src="getImg(p.memberPhoto)" alt="" class="image--resp">
+                            </figure>
+                            <h4>{{p.name}}：</h4>
+                        </div>
                         <input type="button" class="button__partition agree" @click="partitionerConfirm(p)" value="確認">
                         <!-- <input type="button" class="button__partition disagree" value="X"> -->
                         <h4 class="message__text">{{p.motivation}}</h4>
                     </div>
                 </div>
 
-                <div id="1" class="marginBoard">
+                <div class="marginBoard">
                     <button type="button" class="button--close" @click="closeMargin()">X</button>
                     <header><h2>參加動機</h2></header>
                     <textarea name="" id="" rows="10" v-model="motivationString" placeholder="簡單敘述你的參加動機吧" required class="motivation"></textarea>
                     <button type="button" class="button--red" @click="join()">送出</button>
                 </div>
 
+                <div class="marginBoard">
+                    <button type="button" class="button--close" @click="closeMargin()">X</button>
+                    <header><h2>參加者</h2></header>
+                    <div v-for="p in confirmer" :key="p.participantId" class="participanter gradient">
+                        <div class="message__member">
+                            <figure class="message__img">
+                                <img :src="getImg(p.memberPhoto)" alt="" class="image--resp">
+                            </figure>
+                            <h4>{{p.name}}：</h4>
+                        </div>
+                        <!-- <h4 class="message__text">{{p.motivation}}</h4> -->
+                    </div>
+                </div>
+
     </div>
 </template>
 
 <script>
-import { apiEventGet, apiMemberGet, apiMessagePost, apiMessageGet, apiPartitionPost, apiEventGetPartition, apiPartitionPutConfirm } from "../api"
+import { apiEventGet, apiMemberGet, apiMessagePost, apiMessageGet, apiPartitionPost, apiEventGetPartition, apiPartitionPutConfirm, apiFavoritePost, apiFavoriteEventGet } from "../api"
 
 export default {
 inject:['reload'],
@@ -113,82 +130,145 @@ inject:['reload'],
             event: null,
             motivationString: null,
             messages: [],
-            nameList:[],
+            participanters:[],
             inputString:null,
-            message:[],
             member: null,
             participants: null,
+            considers: null,
+            confirmer: null,
             checkMember: null,
+            checkCollect: true,
+            favoriteId: null,
             lastMarginBoard: null,
-            participanters:[],
        }
-    },
-    watch(){
-
     },
     mounted(){
 
-        
-        
-        //獲得活動API
         apiEventGet(this.eventId)
-        .then(res=>{
+        .then(res =>{
             this.event = res.data;
             this.checkMember = $cookies.get('MemberId') == this.event.memberId
             console.log(this.event)
+
             //透過活動API獲得主辦者會員API資料
-            apiMemberGet(this.event.memberId)
-            .then(res=>{
-                this.member = res.data
-            })
-            .catch(err=>{
-                console.log(err)
-            })
-            
+            this.getHosterApi(this.event.memberId)
             //透過活動API獲得留言API資料
-            const promiseList = this.event.messageIds.map(id => apiMessageGet(id))
-            Promise.all(promiseList)
-            .then(res=>{
-                //將API資料以陣列的方式儲存下來
-                this.messages = res.map(message => message.data)
-                console.log(this.messages)
-
-                //透過留言API獲得留言者會員API資料
-                const names = this.messages.map(mesg => apiMemberGet(mesg.memberId))
-                Promise.all(names)
-                .then(res=>{
-                    this.nameList = res.map(name => name.data)
-
-                    //將API資料依序新增在messages陣列裡面
-                    this.messages.forEach( (mesg,index) =>{
-                        mesg.name = this.nameList[index].name
-                    })
-                    // console.log(this.messages)
-
-                })
-            })
-            .catch(err=>{
-                console.log(err)
-            })
+            this.getMessagesApi()
+            //透過活動API獲得參加者API資料
+            this.getParticipanterApi()
         })
         .catch(err=>{
             console.log(err)
         })
 
-        apiEventGetPartition(this.eventId)
-        .then(res=>{
-            console.log(res)
-            this.participanters = res.data
-            console.log(555)
-            console.log(this.participanters)
+        apiFavoriteEventGet()
+        .then(res =>{
+            console.log(666)
+            console.log(res.data)
+            res.data.forEach(function(event) {
+                console.log(event.eventId)
+                // if(event.eventId == $route.params.eventId){
+                //     console.log("==false")
+                //     this.checkCollect = false
+                //     return
+                // }
+            })
         })
         .catch(err=>{
             console.log(err)
         })
-
-
     },
     methods:{
+        // async getHosterApi(memberId){
+        //     let {data} = await apiMemberGet(memberId)
+        //     this.member = data
+        //     console.log(this.member)
+        // },
+        getHosterApi(memberId){
+            apiMemberGet(memberId)
+            .then(res =>{
+                this.member = res.data
+                console.log(this.member)
+            })
+            .catch(err =>{
+                console.log(err)
+            })
+        },
+        async getMessagesApi(){
+            //獲得apiMessageGet回傳的promises陣列
+            const promises = this.event.messageIds.map(async id => {
+                const p = await apiMessageGet(id);
+                return p;
+            })
+            //將promises陣列解析成data陣列
+            const promise = await Promise.all(promises)
+            this.messages = promise.map( p =>{
+                return p.data
+            })
+
+            console.log(this.messages)
+            this.getMembersApi(this.messages)
+        },
+        getParticipanterApi(){
+            apiEventGetPartition(this.eventId)
+            .then(res=>{
+                console.log(res)
+                this.participanters = res.data
+                console.log(this.participanters)
+                this.getParticipanterMemberApi(this.participanters)
+            })
+            .catch(err=>{
+                console.log(err)
+            })
+        },
+        async getMembersApi(arrs){
+
+            const promises = arrs.map(async item => {
+                const p = await apiMemberGet(item.memberId);
+                return p;
+            })
+            //將promises陣列解析成data陣列
+            const promise = await Promise.all(promises)
+            const members = promise.map( p =>{
+                return p.data
+            })
+
+            //將API資料依序新增在陣列裡面
+            arrs.forEach( (item,index) =>{
+                // item.name = members[index].name
+                // item.memberPhoto = members[index].memberPhoto
+                this.$set(item, 'name',  members[index].name)
+                this.$set(item, 'memberPhoto',  members[index].memberPhoto)
+            })
+            console.log(arrs)
+        },
+        async getParticipanterMemberApi(arrs){
+
+            const promises = arrs.map(async item => {
+                const p = await apiMemberGet(item.participanter);
+                return p;
+            })
+            //將promises陣列解析成data陣列
+            const promise = await Promise.all(promises)
+            const members = promise.map( p =>{
+                return p.data
+            })
+
+            //將API資料依序新增在陣列裡面
+            arrs.forEach( (item,index) =>{
+                // item.name = members[index].name
+                // item.memberPhoto = members[index].memberPhoto
+                this.$set(item, 'name',  members[index].name)
+                this.$set(item, 'memberPhoto',  members[index].memberPhoto)
+            })
+            console.log(arrs)
+
+            this.considers = arrs.filter( p => p.status!=1)
+            this.confirmer = arrs.filter( p => p.status===1)
+        },
+        getImg(url){
+            return `http://35.229.140.28/${url}`
+        },
         timeToString(time){
             const monthList = ['一','二','三','四','五','六','七','八','九','十','十一','十二'] 
             const dayList = ['日','一','二','三','四','五','六']
@@ -270,6 +350,16 @@ inject:['reload'],
             boards[e.target.id].classList.add("marginBoard--show")
             this.lastMarginBoard = boards[e.target.id]
         },
+        showMarginBoardOfParticipanter(){
+            const boards = document.querySelectorAll(".marginBoard") 
+            if(this.lastMarginBoard){this.lastMarginBoard.classList.remove("marginBoard--show")}
+            if(this.lastMarginBoard == boards[0]){
+                this.closeMargin()
+                return
+            }
+            boards[0].classList.add("marginBoard--show")
+            this.lastMarginBoard = boards[0]
+        },
         closeMargin(){
             this.lastMarginBoard.classList.remove("marginBoard--show")
             this.lastMarginBoard = null
@@ -279,6 +369,19 @@ inject:['reload'],
             apiPartitionPutConfirm(p)
             .then(res =>{
                 console.log(res)
+            })
+            .catch(err =>{
+                console.log(err)
+            })
+        },
+        collectEvent(){
+            apiFavoritePost({
+                "memberId": this.$cookies.get("MemberId"),
+                "eventNum": this.eventId
+            })
+            .then(res =>{
+                console.log(res)
+                this.checkCollect = false
             })
             .catch(err =>{
                 console.log(err)
@@ -306,6 +409,8 @@ figure{
     width: 80px;
     height: 80px;
     cursor: pointer;
+    border-radius: 999em;
+    overflow: hidden;
 }
 .image--resp{
     width: 100%;
@@ -316,9 +421,6 @@ figure{
 }
 .hoster h4{
     margin: 0;
-}
-.hoster__button{
-    margin-left: auto;
 }
 .eventImg{
     margin-top: 1em;
@@ -339,22 +441,31 @@ a{
     color: rgb(35, 35, 182);
 }
 .message{
-    display: flex;
     align-items: center;
     border-bottom: 2px solid black;
     margin-top: .67em;
 }
-.message h4, .message h5{
+.message__member{
+    display: flex;
+    align-items: center;
+}
+.message__img{
+    width: 40px;
+    height: 40px;
+    border-radius: 999em;
+    overflow: hidden;
+    margin-right: .5em;
+}
+.message__text{
+    margin-top: .5em;
+}
+.message h4{
     margin-top: 0;
     margin-bottom: 0;
-    height: max-content;
 }
 .message__star{
     width: 25px;
     margin-left: .3em;
-}
-.message__text{
-    margin-left: .5em;
 }
 .message__board{
     margin-top: 1em;
@@ -381,6 +492,7 @@ a{
     background-color: #F3F3F3;
     border: 1px solid;
     font-size: .9em;
+    cursor: pointer;
 }
 .button--transparent:hover{
     background-color: #363636;
@@ -449,8 +561,8 @@ a{
 }
 .button__partition{
     position: absolute;
-    right: -2%;
-    top: -10%;
+    right: -1%;
+    top: 0;
     width: 10%;
     padding: .3em 1em;
     border-radius: 5px;
@@ -474,5 +586,29 @@ a{
 }
 .partitioner{
     display: inline-block;
+}
+.attender{
+    display: flex;
+    cursor: pointer;
+    width: max-content;
+    float: right;
+}
+.attender h3{
+    margin-top: 0;
+    margin-bottom: 0;
+}
+.collectEvent{
+    margin-left: auto;
+}
+.collectEvent__button{
+    color: #FF9100;
+    border: 1px solid #FF9100;
+    padding: .5em 1em;
+    font-size: .9em;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.collectEvent__button:hover{
+    box-shadow: 0 0 3px #FF9100;
 }
 </style>

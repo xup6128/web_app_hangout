@@ -145,9 +145,9 @@
                             <img class="img--resp" :src="getImg(e.cover)" alt="" width="">
                         </figure>
                     </div>
-                        <h4>{{e.eventName}}</h4>
-                        <h5>{{timeToString(e.hostTime)}}</h5>
-                        <h5>{{e.addressId}}</h5>
+                    <h4>{{e.eventName}}</h4>
+                    <h4>{{timeToString(e.hostTime)}}</h4>
+                    <h4>{{getCity(e.cityId)}}、{{e.road}}</h4>
                 </router-link>
             </section>
         </div>
@@ -271,7 +271,11 @@ export default {
         },
         getImg(url){
             return `http://35.229.140.28/${url}`
-        }
+        },
+        getCity(num){
+            const cities =["基隆市","台北市","新北市","桃園縣","新竹市","新竹縣","苗栗縣","台中市","彰化縣","南投縣","雲林縣","嘉義市","嘉義縣","台南市","高雄市","屏東縣","台東縣","花蓮縣","宜蘭縣","澎湖縣","金門縣","連江縣"]
+            return cities[num]
+        },
         //跳轉前頁面傳參數：
         // goTo(item) {
         //     //storageData中數據用於跳轉到下一個頁面之後，進行返回時能夠返回到跳轉之前的頁面
@@ -450,17 +454,24 @@ export default {
     justify-content: space-between;
     padding: 1.5em 1em;
 }
-.private__wrap .event{
+/* .private__wrap .event{
     margin-bottom: 1.5em;
-}
+} */
 a{
     color: black;
     text-decoration: none;
 }
 .event__router{
-    height: 25vh;
+    height: 40vh;
     width: 20%;
     padding: .5em;
+
+}
+.event__router h4,
+.event__router h5{
+    margin: .5em 0;
+}
+.event__img{
     border: 1px solid black;
     border-radius: 1em;
     overflow: hidden;
