@@ -124,7 +124,17 @@
                         </section> -->
                     </div>
 
-                    <label for="EventContent">活動說明：</label><br>
+                    <label for="EventContent">活動說明：</label>
+                    <button class="button--emoji" @click="toogleDialogEmoji">😃</button>
+                    <VEmojiPicker
+                    v-show="showDialog"
+                    :style="{ width: '440px', height: '200' }"
+                    class="emoji"
+                    labelSearch="Search"
+                    lang="pt-BR"
+                    @select="onSelectEmoji"
+                    /><br>
+                    
                     <textarea
                     class="eventContent" 
                     id="EventConten"
@@ -132,7 +142,8 @@
                     rows="10"
                     placeholder="請為你的活動做一點說明吧"
                     v-model="eventContent"
-                    ></textarea>
+                    >
+                    </textarea>
 
                     <br><br>
                     <button @click="holdEvent()" type="button" class="nextStep">註冊</button>
@@ -147,6 +158,8 @@
 <script>
 import {VueCropper} from 'vue-cropper'
 import { apiEventPost } from '../api'
+import { VEmojiPicker, emojisDefault, categoriesDefault } from "v-emoji-picker";
+import Moji from "./emoji.vue";
 
 export default {
     data() {
@@ -169,6 +182,7 @@ export default {
                 memberId: this.$cookies.get("MemberId"),
                 status: true,
                 parent: null,
+                showDialog: false,
 
                 preview: null,
                 eventType:[
@@ -188,9 +202,13 @@ export default {
     },
     components:{
         VueCropper,
+        VEmojiPicker,
+        Moji
     },
     mounted() {
         this.focusInput()
+        console.log(categoriesDefault);
+        console.log("Total emojis:", emojisDefault.length);
     },
     methods: {
         focusInput(){
@@ -268,6 +286,14 @@ export default {
             .catch(err =>{
                 console.log(err)
             })
+        },
+        toogleDialogEmoji() {
+            this.showDialog = !this.showDialog;
+        },
+        onSelectEmoji(emoji) {
+            this.eventContent += emoji.data;
+            // Optional
+            // this.toogleDialogEmoji();
         }
     }
 }
@@ -364,5 +390,16 @@ export default {
     .nextStep:hover{
         background-color: #d81b3b;
         cursor: pointer;
+    }
+    .button--emoji{
+        display: inline-block;
+        margin-right: 0;
+        cursor: pointer;
+        font-size: 1.2em;
+        background-color: white;
+        border: 1px solid black;
+    }
+    .emoji{
+        position: absolute;
     }
 </style>

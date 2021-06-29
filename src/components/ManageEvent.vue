@@ -28,6 +28,7 @@
 
 <script>
 import { apiMemberGetHostEvent, apiMemberGetJoinEvent, apiFavoriteEventGet} from '../api'
+
 export default {
     data(){
         return{

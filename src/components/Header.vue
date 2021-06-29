@@ -77,6 +77,7 @@
 }
 .header__tool__li{
     margin-left: 2.5em;
+    cursor: pointer;
 }
 .gradient{
     position: relative;
