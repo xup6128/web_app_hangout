@@ -25,8 +25,8 @@ export const apiEventPost = data => eventRequest.post('', data);
 export function apiEventGet(params) {
   return eventRequest.get('/' + params);
 };
-export const apiEventList = () => eventRequest.get('/date=' + new Date().toISOString().slice(0, 19).replace(/T/i, " "));
-// export const apiEventList = () => eventRequest.get('/date=2021-06-23');
+// export const apiEventList = () => eventRequest.get('/date=' + new Date().toISOString().slice(0, 19).replace(/T/i, " "));
+export const apiEventList = () => eventRequest.get('/date=2021-06-23');
 
 
 
@@ -51,11 +51,11 @@ export function apiMessageGet(params) {
   return messageRequest.get('/' + params);
 }
 //apiMessagePut
-export function apiMessagePut(message, member) {
-  messageRequest.put(message + '/' + member, data);
+export function apiMessagePut(message, data) {
+  return messageRequest.put(`${message}/${cookies.get("MemberId")}`, data);
 }
-export function apiMessageDel(params) {
-  return messageRequest.delete('/' + params);
+export function apiMessageDel(message) {
+  return messageRequest.delete(`${message}/${cookies.get("MemberId")}`);
 }
 export function apiEventMessageGet(params) {
   return messageRequest.get('/EventId=' + params);
@@ -76,6 +76,13 @@ export function apiEventGetPartition(params){
 
 //Favorite
 export const apiFavoritePost = data => favoriteRequest.post("", data);
+// export const apiFavoriteDel = data => favoriteRequest.delete("", data);
+export function apiFavoriteDel(memberId,eventId){
+  return favoriteRequest.delete(`/${memberId}/${eventId}`, {
+    "memberId": memberId,
+    "eventId": eventId
+  });
+}
 export const apiFavoriteEventGet = () => favoriteRequest.get(`/MemberId=${cookies.get("MemberId")}`);
 
 //Comment

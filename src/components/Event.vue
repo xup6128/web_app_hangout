@@ -53,7 +53,23 @@
                 <button v-else type="button" class="button--red" id="1" @click="showMarginBoard($event)">參加活動</button>
                 <h4 class="deadline"><span>報名截止時間：</span>{{timeToString(event.deadline)}}</h4>
             </div>
+
             <p>{{event.eventContent}}</p>
+
+            <div class="message__board">
+                <form action="">
+                    <h3>留言</h3>
+                    <textarea 
+                    name="LeaveMessage" 
+                    id="LeaveMessage" 
+                    v-model="inputString" 
+                    class="leaveMessage" 
+                    rows="10"
+                    placeholder="留下你的意見"></textarea><br>
+                    <input type="button" class="message__board__button button--transparent" @click="leaveMessage()" value="留言">
+                </form>
+            </div>
+
             <div class="message__wrap">
                 <div class="message" v-for=" m in this.messages" :key="m.messageId">
                     <div class="message__member">
@@ -61,23 +77,15 @@
                             <img :src="getImg(m.memberPhoto)" alt="" class="image--resp">
                         </figure>
                         <h4>{{m.name}}：</h4>
+                        <div v-if="m.memberId == selfId" class="message__button">
+                            <input type="button" class="button--transparent__small" value="修改">
+                            <input type="button" class="button--transparent__small" @click="delMessage(m.messageId)" value="刪除">
+                        </div>
                     </div>
                     <div class="message__text"><h4>{{m.messageContent}}</h4></div>
                 </div>
             </div>
-                <div class="message__board">
-                    <form action="">
-                        <h3>留言</h3>
-                        <textarea 
-                        name="LeaveMessage" 
-                        id="LeaveMessage" 
-                        v-model="inputString" 
-                        class="leaveMessage" 
-                        rows="10"
-                        placeholder="留下你的意見"></textarea><br>
-                        <input type="button" class="message__board__button button--transparent" @click="leaveMessage()" value="留言">
-                    </form>
-                </div>
+
         </main>
                 <div class="marginBoard">
                     <button type="button" class="button--close" @click="closeMargin()">X</button>
@@ -120,13 +128,15 @@
 </template>
 
 <script>
-import { apiEventGet, apiMemberGet, apiMessagePost, apiMessageGet, apiPartitionPost, apiEventGetPartition, apiPartitionPutConfirm, apiFavoritePost, apiFavoriteEventGet } from "../api"
+import { apiEventGet, apiMemberGet, apiMessagePost, apiMessageGet, apiPartitionPost, apiEventGetPartition, 
+apiPartitionPutConfirm, apiFavoritePost, apiFavoriteEventGet, apiFavoriteDel, apiMessagePut,  apiMessageDel} from "../api"
 
 export default {
 inject:['reload'],
     data(){
        return{
             eventId: this.$route.params.eventId,
+            selfId: $cookies.get('MemberId'),
             event: null,
             motivationString: null,
             messages: [],
@@ -165,14 +175,12 @@ inject:['reload'],
         .then(res =>{
             console.log(666)
             console.log(res.data)
-            res.data.forEach(function(event) {
-                console.log(event.eventId)
-                // if(event.eventId == $route.params.eventId){
-                //     console.log("==false")
-                //     this.checkCollect = false
-                //     return
-                // }
-            })
+            for(let i=0;i<res.data.length;i++){
+                if(res.data[i].eventId == this.eventId){
+                this.checkCollect = false
+                return
+                }
+            }
         })
         .catch(err=>{
             console.log(err)
@@ -307,7 +315,6 @@ inject:['reload'],
             }
         },
         leaveMessage(){
-
             apiMessagePost({
                 "eventId": this.eventId,
                 "memberId": this.$cookies.get("MemberId"),
@@ -321,6 +328,26 @@ inject:['reload'],
             })
 
             this.inputString = ""
+        },
+        delMessage(messageId){
+            apiMessageDel(messageId)
+            .then(res=>{
+                console.log(res)
+            })
+            .catch(err =>{
+                console.log(err)
+            })
+        },
+        editMessage(messageId){
+            apiMessagePut(messageId, {
+                "messageContent":""
+            })
+            .then(res=>{
+                console.log(res)
+            })
+            .catch(err =>{
+                console.log(err)
+            })
         },
         join(){
             if(this.member.memberId == this.$cookies.get("MemberId")){
@@ -382,6 +409,15 @@ inject:['reload'],
             .then(res =>{
                 console.log(res)
                 this.checkCollect = false
+            })
+            .catch(err =>{
+                console.log(err)
+            })
+        },
+        removeCollect(){
+            apiFavoriteDel(this.selfId,this.eventId)
+            .then(res =>{
+                console.log(res)
             })
             .catch(err =>{
                 console.log(err)
@@ -459,6 +495,10 @@ a{
 .message__text{
     margin-top: .5em;
 }
+.message__button{
+    display: inline-block;
+    margin-left: auto;
+}
 .message h4{
     margin-top: 0;
     margin-bottom: 0;
@@ -494,7 +534,15 @@ a{
     font-size: .9em;
     cursor: pointer;
 }
-.button--transparent:hover{
+.button--transparent__small{
+    border-radius: 999px;
+    background-color: #F3F3F3;
+    border: 1px solid;
+    font-size: .9em;
+    cursor: pointer;
+}
+.button--transparent:hover,
+.button--transparent__small:hover{
     background-color: #363636;
     color: white;
 }
