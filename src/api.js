@@ -10,8 +10,8 @@ const memberRequest = axios.create({
 const messageRequest = axios.create({
   baseURL: '/api/Event/Message'
 })
-const partitionRequest = axios.create({
-  baseURL: '/api/Event/Partition'
+const participantRequest = axios.create({
+  baseURL: '/api/Event/participant'
 })
 const favoriteRequest = axios.create({
   baseURL: '/api/Member/Favorite'
@@ -61,17 +61,17 @@ export function apiEventMessageGet(params) {
   return messageRequest.get('/EventId=' + params);
 }
 
-//Partition
-export const apiPartitionPost = data => partitionRequest.post("", data);
-export function apiPartitionPutConfirm(params){
-  return partitionRequest.put("/"+params.participantId,{
+//participant
+export const apiparticipantPost = data => participantRequest.post("", data);
+export function apiparticipantPutConfirm(params){
+  return participantRequest.put("/"+params.participantId,{
     "eventId": params.eventId,
     "participanter": params.participanter,
     "status": "1"
   })
 }
-export function apiEventGetPartition(params){
-  return partitionRequest.get("/Event ="+params)
+export function apiEventGetparticipant(params){
+  return participantRequest.get("/Event ="+params)
 }
 
 //Favorite

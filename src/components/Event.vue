@@ -42,7 +42,7 @@
             </div>
             
             <div id="0" @click="showMarginBoardOfParticipanter()" class="attender">
-                <figure class="message__img" v-for="p in confirmer" :key="p.participantId">
+                <figure class="member__img" v-for="p in confirmer" :key="p.participantId">
                     <img :src="getImg(p.memberPhoto)" alt="" class="image--resp">
                 </figure>
                 <h3>{{confirmer.length}} 人參加</h3>
@@ -73,7 +73,7 @@
             <div class="message__wrap">
                 <div class="message" v-for=" m in this.messages" :key="m.messageId">
                     <div class="message__member">
-                        <figure class="message__img">
+                        <figure class="member__img">
                             <img :src="getImg(m.memberPhoto)" alt="" class="image--resp">
                         </figure>
                         <h4>{{m.name}}：</h4>
@@ -92,13 +92,13 @@
                     <header><h2>審核參加者</h2></header>
                     <div v-for="p in participanters" :key="p.participantId" class="participanter gradient">
                         <div class="message__member">
-                            <figure class="message__img">
+                            <figure class="member__img">
                                 <img :src="getImg(p.memberPhoto)" alt="" class="image--resp">
                             </figure>
                             <h4>{{p.name}}：</h4>
                         </div>
-                        <input type="button" class="button__partition agree" @click="partitionerConfirm(p)" value="確認">
-                        <!-- <input type="button" class="button__partition disagree" value="X"> -->
+                        <input type="button" class="button__participant agree" @click="participanterConfirm(p)" value="確認">
+                        <!-- <input type="button" class="button__participant disagree" value="X"> -->
                         <h4 class="message__text">{{p.motivation}}</h4>
                     </div>
                 </div>
@@ -115,7 +115,7 @@
                     <header><h2>參加者</h2></header>
                     <div v-for="p in confirmer" :key="p.participantId" class="participanter gradient">
                         <div class="message__member">
-                            <figure class="message__img">
+                            <figure class="member__img">
                                 <img :src="getImg(p.memberPhoto)" alt="" class="image--resp">
                             </figure>
                             <h4>{{p.name}}：</h4>
@@ -128,8 +128,8 @@
 </template>
 
 <script>
-import { apiEventGet, apiMemberGet, apiMessagePost, apiMessageGet, apiPartitionPost, apiEventGetPartition, 
-apiPartitionPutConfirm, apiFavoritePost, apiFavoriteEventGet, apiFavoriteDel, apiMessagePut,  apiMessageDel} from "../api"
+import { apiEventGet, apiMemberGet, apiMessagePost, apiMessageGet, apiparticipantPost, apiEventGetparticipant, 
+apiparticipantPutConfirm, apiFavoritePost, apiFavoriteEventGet, apiFavoriteDel, apiMessagePut,  apiMessageDel} from "../api"
 
 export default {
 inject:['reload'],
@@ -218,7 +218,7 @@ inject:['reload'],
             this.getMembersApi(this.messages)
         },
         getParticipanterApi(){
-            apiEventGetPartition(this.eventId)
+            apiEventGetparticipant(this.eventId)
             .then(res=>{
                 console.log(res)
                 this.participanters = res.data
@@ -355,7 +355,7 @@ inject:['reload'],
                 return
             }
 
-            apiPartitionPost({
+            apiparticipantPost({
                 "eventId": this.eventId,
                 "participanter": this.$cookies.get("MemberId"),
                 "motivation": this.motivationString
@@ -391,9 +391,9 @@ inject:['reload'],
             this.lastMarginBoard.classList.remove("marginBoard--show")
             this.lastMarginBoard = null
         },
-        partitionerConfirm(p){
+        participanterConfirm(p){
             console.log(p)
-            apiPartitionPutConfirm(p)
+            apiparticipantPutConfirm(p)
             .then(res =>{
                 console.log(res)
             })
@@ -445,6 +445,7 @@ figure{
     width: 80px;
     height: 80px;
     cursor: pointer;
+    border: 2px solid #E1E1E1;
     border-radius: 999em;
     overflow: hidden;
 }
@@ -485,9 +486,10 @@ a{
     display: flex;
     align-items: center;
 }
-.message__img{
+.member__img{
     width: 40px;
     height: 40px;
+    border: 1px solid #cfcfcf;
     border-radius: 999em;
     overflow: hidden;
     margin-right: .5em;
@@ -607,7 +609,7 @@ a{
 .participanter h4{
     margin: 0;
 }
-.button__partition{
+.button__participant{
     position: absolute;
     right: -1%;
     top: 0;
@@ -632,7 +634,7 @@ a{
 .disagree:hover{
     box-shadow: 0 0 5px #FF9100;
 }
-.partitioner{
+.participanter{
     display: inline-block;
 }
 .attender{

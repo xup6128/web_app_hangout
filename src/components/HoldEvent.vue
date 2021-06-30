@@ -6,18 +6,28 @@
                 
                 <div class="article__img">
 
-                    <div class="previewImage" v-if="preview">
+                    <div class="previewImage gradient" @click="addFile()">
                         <img class="image--resp" :src="preview" />
                         <!-- <p>file name: {{ image.name }}</p>
                         <p>size: {{ image.size/1024 }}KB</p> -->
+                        <label for="EvenImage">上傳活動照片</label>
+                        <input type="file" 
+                        id="EventImage" 
+                        class="eventImage"
+                        accept="image/*,.pdf" 
+                        @change="previewImage($event), getFiles($event)" 
+                        name="EvenImage" 
+                        required>
                     </div>
 
-                    <label for="EvenImage">上傳活動照片：</label>
+                    <!-- <label for="EvenImage" class="">上傳活動照片：</label>
                     <input type="file" 
+                    id="EventImage" 
+                    class="eventImage"
                     accept="image/*,.pdf" 
-                    @change="previewImage($event), getFiles($event)" id="EventImage" 
+                    @change="previewImage($event), getFiles($event)" 
                     name="EvenImage" 
-                    required><br>
+                    required><br> -->
 
 
                     <!-- <div style="width:500px; height:500px">
@@ -294,6 +304,9 @@ export default {
             this.eventContent += emoji.data;
             // Optional
             // this.toogleDialogEmoji();
+        },
+        addFile(){
+            document.getElementById("EventImage").click();
         }
     }
 }
@@ -334,12 +347,29 @@ export default {
         font-size: 1em;
     }
     .previewImage{
+        margin-left: auto;
+        margin-right: auto;
         width: 400px;
         height: 400px;
+        /* border: 5px dashed #FF9100; */
+        border: 5px dashed #E1E1E1;
+        cursor: pointer;
+    }
+    .previewImage label{
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%,-50%);
+        cursor: pointer;
+        z-index: -1;
     }
     .image--resp{
         width: 100%;
-        height: 100%;
+        max-height: 100%;
+        /* height: 100%; */
+    }
+    .eventImage{
+        display: none;
     }
     .eventType input{
         width: 1em;

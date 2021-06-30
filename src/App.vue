@@ -38,6 +38,9 @@ body{
   margin: 0;
   background-color: #F3F3F3;
 }
+.gradient{
+  position: relative;
+}
 textarea{
   width: 100%;
   resize: none;

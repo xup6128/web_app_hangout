@@ -1,8 +1,10 @@
 <template>
     <div>
 
-        <div class="serch__box">
-            <input class="serch__engine" type="text" v-model.lazy="keyword" placeholder="搜尋關鍵字">
+        <div class="serch__box gradient">
+            <div class="search__icon"></div>
+            <input class="search__engine" type="text" v-model.lazy="keyword" placeholder="搜尋關鍵字">
+            <button v-show="keyword" class="search__button--cancel" @click="searchCancel()">X</button>
         </div>
 
         <section class="ads__wrap gradient">
@@ -50,6 +52,10 @@
                                     v-model="checkEventTypes" >
                                     {{type.zh}}
                         </label>
+                    </div>
+                    <div class="filter__option filter__option__button">
+                        <button class="button--transparent" @click="selectAll()">全部選取</button>
+                        <button class="button--transparent" @click="unselectAll()">全部取消</button>
                     </div>
                 </div>
                 <div v-if="filterNum == 2" class="filter__option__wrap">
@@ -147,7 +153,7 @@
                 class="event__router">
                     <div class="event">
                         <figure class="event__img">
-                            <img class="img--resp" :src="getImg(e.cover)" alt="" width="">
+                            <!-- <img class="img--resp" :src="getImg(e.cover)" alt="" width=""> -->
                         </figure>
                     </div>
                     <h4>{{e.eventName}}</h4>
@@ -405,19 +411,28 @@ export default {
         },
         getLatLng(addr){
             let geocoder = new google.maps.Geocoder();
+            let vm = this
             geocoder.geocode({
                 "address": addr
             },function (res, status){
                 if(status == "OK"){
                     vm.getDistance(res[0].geometry.location.lat(),res[0].geometry.location.lng())
-                    console.log(res[0].geometry.location.lat())
-                    console.log(res[0].geometry.location.lng())
-                    
+                    // console.log(res[0].geometry.location.lat())
+                    // console.log(res[0].geometry.location.lng())
                 }else{
                     console.log("error")
                 }
             })
         },
+        searchCancel(){
+            this.keyword = ""
+        },
+        selectAll(){
+            this.checkEventTypes = [0,1,2,3,4,5,6,7,8,9,10,11]
+        },
+        unselectAll(){
+            this.checkEventTypes = []
+        }
     },
     created(){
 
@@ -628,7 +643,72 @@ input[type=checkbox]{
     top: 3.5%;
     left: 18%;
 }
-.serch__engine{
+.search__engine{
     font-size: 1em;
+    background-color: transparent;
+}
+.search__button--cancel{
+    border: 0;
+    background-color: #36363680;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 999em;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    /* position: absolute;
+    right: 0; */
+    cursor: pointer;
+}
+.search__button--cancel:hover{
+    background-color: #363636;
+}
+.search__icon {
+    position: absolute;
+    transform: translateX(-120%);
+    font-size: .67em;
+}
+.search__icon:before {
+  width: 1em;
+  height: 1em;
+  border-radius: 1em;
+  border: 0.2em solid #36363680;
+  content:"";
+  display: block;
+  margin-left: .3em;
+}
+.search__icon:after {
+  display: block;
+  content: "";
+  width: .2em;
+  height: 0.8em;
+  background-color: #36363680;
+  transform:rotate(45deg);
+  -ms-transform:rotate(45deg); 
+  -moz-transform:rotate(45deg); 
+  -webkit-transform:rotate(45deg); 
+  margin-top: -.4em;
+  margin-left: .2em;
+}
+.filter__option__button{
+    width: max-content;
+    padding-top: 0;
+    /* padding-bottom: 0; */
+    margin-left: 100%;
+    transform: translateX(-100%);
+}
+.button--transparent{
+    border-radius: 5px;
+    padding: .5em 1em;
+    background-color: transparent;
+    border: 1px solid;
+    font-size: .9em;
+    cursor: pointer;
+    margin-left: 2em;
+}
+.button--transparent:hover{
+    background-color: #363636;
+    color: white;
 }
 </style>

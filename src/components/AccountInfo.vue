@@ -307,10 +307,11 @@ section{
 }
 .previewImage{
     position: absolute;
-    left: 50%;
+    right: 0;
     /* float: right; */
     width: 250px;
     height: 250px;
+    border: 1px solid black;
 }
 .image--resp{
     width: 100%;
