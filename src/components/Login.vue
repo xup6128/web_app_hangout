@@ -36,9 +36,9 @@ import { apiMemberLogin } from "../api"
     methods: {
       login(){
 
-        this.$cookies.set("token","isLogin");
-        this.$cookies.set("MemberId", "67", 60*60*24*30);
-        return
+        // this.$cookies.set("token","isLogin");
+        // this.$cookies.set("MemberId", "67", 60*60*24*30);
+        // return
 
         apiMemberLogin({
             Account: this.account,

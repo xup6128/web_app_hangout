@@ -7,6 +7,9 @@ const eventRequest = axios.create({
 const memberRequest = axios.create({
   baseURL: '/api/Member'
 })
+const followMemberRequest = axios.create({
+  baseURL: '/api/Member/Follow'
+})
 const messageRequest = axios.create({
   baseURL: '/api/Event/Message'
 })
@@ -43,6 +46,16 @@ export function apiMemberGet(params) {
 };
 export const apiMemberGetHostEvent = () => memberRequest.get(`/${cookies.get("MemberId")}/HostEvent`);
 export const apiMemberGetJoinEvent = () => memberRequest.get(`/${cookies.get("MemberId")}/JoinEvent`);
+
+//Follow Member
+export const apiFollowMemberPost = data => followMemberRequest.post("", data);
+export function apiFollowMemberDelete(memberId,objectId){
+  return  followMemberRequest.delete(`/${memberId}/${objectId}`, {
+    "memberId": memberId,
+    "objectId": objectId
+  })
+}
+export const apiFollowGet = () => memberRequest.get(`/Follow/MemberId=${cookies.get("MemberId")}`);
 
 
 //Message

@@ -24,8 +24,22 @@
                 :src="getImg(event.cover)" alt="">
             </figure>
             <h1>{{event.eventName}}</h1>
-            <h2 class="location">{{event.addressId}}</h2>
+            <h2 class="location">{{getCity(event.cityId)}}{{event.road}}</h2>
             <h2 class="hostTime">{{timeToString(event.hostTime)}}</h2>
+
+            <div id="0" @click="showMarginBoardOfParticipanter()" class="attender">
+                <figure class="member__img" v-for="p in confirmer" :key="p.participantId">
+                    <img :src="getImg(p.memberPhoto)" alt="" class="image--resp">
+                </figure>
+                <h3>{{confirmer.length}} 人參加</h3>
+            </div>
+
+            <div>
+                <button v-if="this.checkMember" type="button" class="button--red" id="0" @click="showMarginBoard($event)">審核參加</button>
+                <button v-else type="button" class="button--red" id="1" @click="showMarginBoard($event)">參加活動</button>
+                <h4 class="deadline"><span>報名截止時間：</span>{{timeToString(event.deadline)}}</h4>
+            </div>
+
             <div class="subInfo__wrap">
                 <div class="subInfo">
                     <img src="../assets/Time.png" width="400" height="400" class="image--resp" alt="">
@@ -41,18 +55,6 @@
                 </div>
             </div>
             
-            <div id="0" @click="showMarginBoardOfParticipanter()" class="attender">
-                <figure class="member__img" v-for="p in confirmer" :key="p.participantId">
-                    <img :src="getImg(p.memberPhoto)" alt="" class="image--resp">
-                </figure>
-                <h3>{{confirmer.length}} 人參加</h3>
-            </div>
-
-            <div>
-                <button v-if="this.checkMember" type="button" class="button--red" id="0" @click="showMarginBoard($event)">審核參加</button>
-                <button v-else type="button" class="button--red" id="1" @click="showMarginBoard($event)">參加活動</button>
-                <h4 class="deadline"><span>報名截止時間：</span>{{timeToString(event.deadline)}}</h4>
-            </div>
 
             <p>{{event.eventContent}}</p>
 
@@ -145,7 +147,7 @@ inject:['reload'],
             member: null,
             participants: null,
             considers: null,
-            confirmer: null,
+            confirmer: [],
             checkMember: null,
             checkCollect: true,
             favoriteId: null,
@@ -243,8 +245,6 @@ inject:['reload'],
 
             //將API資料依序新增在陣列裡面
             arrs.forEach( (item,index) =>{
-                // item.name = members[index].name
-                // item.memberPhoto = members[index].memberPhoto
                 this.$set(item, 'name',  members[index].name)
                 this.$set(item, 'memberPhoto',  members[index].memberPhoto)
             })
@@ -264,8 +264,6 @@ inject:['reload'],
 
             //將API資料依序新增在陣列裡面
             arrs.forEach( (item,index) =>{
-                // item.name = members[index].name
-                // item.memberPhoto = members[index].memberPhoto
                 this.$set(item, 'name',  members[index].name)
                 this.$set(item, 'memberPhoto',  members[index].memberPhoto)
             })
@@ -305,7 +303,7 @@ inject:['reload'],
         },
         getCity(num){
             const cities =["基隆市","台北市","新北市","桃園縣","新竹市","新竹縣","苗栗縣","台中市","彰化縣","南投縣","雲林縣","嘉義市","嘉義縣","台南市","高雄市","屏東縣","台東縣","花蓮縣","宜蘭縣","澎湖縣","金門縣","連江縣"]
-            return cities[num]
+            return cities[num-1]
         },
         getGender(gender){
             if(gender === 2){
@@ -380,12 +378,12 @@ inject:['reload'],
         showMarginBoardOfParticipanter(){
             const boards = document.querySelectorAll(".marginBoard") 
             if(this.lastMarginBoard){this.lastMarginBoard.classList.remove("marginBoard--show")}
-            if(this.lastMarginBoard == boards[0]){
+            if(this.lastMarginBoard == boards[2]){
                 this.closeMargin()
                 return
             }
-            boards[0].classList.add("marginBoard--show")
-            this.lastMarginBoard = boards[0]
+            boards[2].classList.add("marginBoard--show")
+            this.lastMarginBoard = boards[2]
         },
         closeMargin(){
             this.lastMarginBoard.classList.remove("marginBoard--show")
@@ -438,16 +436,32 @@ figure{
     margin-left: 15%;
     padding: 1em 2.5em;
 }
+.container h1,
+.container h2{
+    margin-top: .3em;
+    margin-bottom: .3em;
+}
 .hoster{
     display: flex;
+    align-items: center;
+}
+.hoster h4,
+.hoster h5{
+    margin-top: .3em;
+    margin-bottom: .3em;
 }
 .hoster__img{
-    width: 80px;
-    height: 80px;
+    width: 50px;
+    height: 50px;
     cursor: pointer;
     border: 2px solid #E1E1E1;
     border-radius: 999em;
     overflow: hidden;
+}
+.hoster__info{
+    height: max-content;
+    /* margin-top: auto;
+    margin-bottom: auto; */
 }
 .image--resp{
     width: 100%;
@@ -460,7 +474,9 @@ figure{
     margin: 0;
 }
 .eventImg{
-    margin-top: 1em;
+    margin: 1em auto 0 auto;
+    width: 300px;
+
 }
 .subInfo__wrap{
     display: flex;

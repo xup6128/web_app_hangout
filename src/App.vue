@@ -41,6 +41,10 @@ body{
 .gradient{
   position: relative;
 }
+.image--resp{
+  width: 100%;
+  max-height:100%;
+}
 textarea{
   width: 100%;
   resize: none;
@@ -48,6 +52,7 @@ textarea{
 }
 input[type="text"],
 input[type="number"],
+input[type="date"],
 input[type="datetime-local"],
 input[type="email"],
 input[type="password"],

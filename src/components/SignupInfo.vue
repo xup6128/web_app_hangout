@@ -3,19 +3,31 @@
         <header><h1>會員資料填寫</h1></header>
         <form action="/action_page.php">
 
-            <div class="form__img gradient">
-                <label for="EvenImage">*上傳個人照片：</label>
-                <input type="file" 
-                accept="image/*,.pdf" 
-                @change="previewImage($event), getFiles($event)"
-                id="EventImage" 
-                name="EventImage" 
-                required><br>
-                <div class="previewImage" v-if="preview">
+            <div class="form__img">
+
+                <div v-if="!isCropping" class="previewImage gradient" @click="addFile()">
                     <img class="image--resp" :src="preview" />
-                    <!-- <p>file name: {{ image.name }}</p>
-                    <p>size: {{ image.size/1024 }}KB</p> -->
+
+                    <label v-if="!preview" for="Image" class="imageUpload__text">上傳照片</label>
+                    <input type="file" 
+                    id="Image" 
+                    class="imageUpload__button"
+                    accept="image/*,.pdf" 
+                    @change="previewImage($event), getFiles($event)" 
+                    name="EvenImage" 
+                    required>
                 </div>
+
+                <div v-else class="previewImage gradient">
+                    <vue-cropper 
+                    ref="cropper" 
+                    autoCrop 
+                    :img="preview" 
+                    centerBox 
+                    fixed :fixedNumber="[1,1]"/>
+                    <button @click="getData()" class="button--transparent">裁剪圖片</button>
+                </div>
+                
             </div>
 
             <div class="form__text">
@@ -29,36 +41,36 @@
                 <label for="Location">*居住城市：</label>
                 <select v-model="city" name="Location" id="Location" required>
                     <optgroup label="北部地區">
-                        <option value="0">基隆市</option>
-                        <option value="1">台北市</option>
-                        <option value="2">新北市</option>
-                        <option value="3">桃園縣</option>
-                        <option value="4">新竹市</option>
-                        <option value="5">新竹縣</option>
-                        <option value="6">苗栗縣</option>
+                        <option value="1">基隆市</option>
+                        <option value="2">台北市</option>
+                        <option value="3">新北市</option>
+                        <option value="4">桃園縣</option>
+                        <option value="5">新竹市</option>
+                        <option value="6">新竹縣</option>
+                        <option value="7">苗栗縣</option>
                     </optgroup>
                     <optgroup label="中部地區">
-                        <option value="7">台中市</option>
-                        <option value="8">彰化縣</option>
-                        <option value="9">南投縣</option>
+                        <option value="8">台中市</option>
+                        <option value="9">彰化縣</option>
+                        <option value="10">南投縣</option>
                     </optgroup>
                     <optgroup label="南部地區">
-                        <option value="10">雲林縣</option>
-                        <option value="11">嘉義市</option>
-                        <option value="12">嘉義縣</option>
-                        <option value="13">台南市</option>
-                        <option value="14">高雄市</option>
-                        <option value="15">屏東縣</option>
+                        <option value="11">雲林縣</option>
+                        <option value="12">嘉義市</option>
+                        <option value="13">嘉義縣</option>
+                        <option value="14">台南市</option>
+                        <option value="15">高雄市</option>
+                        <option value="16">屏東縣</option>
                     </optgroup>
                     <optgroup label="東部地區">
-                        <option value="16">台東縣</option>
-                        <option value="17">花蓮縣</option>
-                        <option value="18">宜蘭縣</option>
+                        <option value="17">台東縣</option>
+                        <option value="18">花蓮縣</option>
+                        <option value="19">宜蘭縣</option>
                     </optgroup>
                     <optgroup label="離島地區">
-                        <option value="19">澎湖縣</option>
-                        <option value="20">金門縣</option>
-                        <option value="21">連江縣</option>
+                        <option value="20">澎湖縣</option>
+                        <option value="21">金門縣</option>
+                        <option value="22">連江縣</option>
                     </optgroup>
                 </select><br>
 
@@ -80,10 +92,10 @@
                 <label for="JobTitle" class="gradient">工作職稱：</label>
                 <input type="text" v-model="jobtitle" id="JobTitle" name="JobTitle" placeholder="(選填)"><br>
                 <label for="Intro" class="intro">*自我介紹：</label><br>
-                <textarea name="Intro" v-model="intro" id="Intro" style="font-size:1.5em" cols="70" rows="20" placeholder="幫助大家更快速了解你自己" required></textarea><br>
+                <textarea name="Intro" v-model="intro" id="Intro" style="font-size:1.5em" cols="70" rows="15" placeholder="幫助大家更快速了解你自己" required></textarea><br>
 
                 <!-- <input type="submit" class="submit" value="完成註冊" @click="Signup()"> -->
-                <button @click="signup()" type="button" class="nextStep">註冊</button>
+                <button @click="signup()" type="button" class="button--red">註冊</button>
             </div>
         </form>
     </div>
@@ -91,13 +103,14 @@
 
 <script>
 import { apiMemberSignUp } from "../api"
+import { VueCropper }  from 'vue-cropper' 
 
 export default {
     data(){
         return{
             email: this.$route.params.email,
             password: this.$route.params.password,
-            files: null,
+            photo: null,
             preview: null,
             name: null,
             gender: null,
@@ -107,6 +120,7 @@ export default {
             category: null,
             jobtitle: null,
             intro: null,
+            isCropping: false,
             eventType:[
                 { eng: 'travel', zh: '旅行出遊' },
                 { eng: 'fitness', zh: '運動健身' },
@@ -121,13 +135,20 @@ export default {
             ]
         }
     },
+    components:{
+        VueCropper
+    },
     methods: {
+        addFile(){
+            document.getElementById("Image").click();
+        },
         previewImage(event) { 
             let input = event.target;
             if (input.files) {
                 let reader = new FileReader();
                 reader.onload = (e) => {
                     this.preview = e.target.result;
+                    this.isCropping = true;
                 }
                 this.image=input.files[0];
                 //Test
@@ -136,7 +157,29 @@ export default {
             }
         },
         getFiles(e){
-            this.files = e.target.files[0]
+            console.log(e)
+            console.log( e.target.files[0])
+            this.photo = e.target.files[0]
+        },
+        dataURLtoFile(dataurl, filename) { 
+            let arr = dataurl.split(','),
+                mime = arr[0].match(/:(.*?);/)[1],
+                bstr = atob(arr[1]),
+                n = bstr.length,
+                u8arr = new Uint8Array(n);
+            while (n--) {
+                u8arr[n] = bstr.charCodeAt(n);
+            }
+            this.photo = new File([u8arr], filename, { type: mime });
+
+        },
+        getData(){
+            this.$refs.cropper.getCropData((data) => {
+            this.preview = data
+            this.dataURLtoFile(data, this.image.name)
+            })
+
+            this.isCropping = false;
         },
         signup(){
 
@@ -144,7 +187,7 @@ export default {
             formData.append("Account", this.email);
             formData.append("Password", this.password);
             formData.append("Name", this.name);
-            formData.append("MemberPhoto", this.files);
+            formData.append("MemberPhoto", this.photo);
             formData.append("Gender", this.gender);
             formData.append("Birth", this.birth);
             formData.append("CityId", this.city);
@@ -165,14 +208,11 @@ export default {
                 formData,
             )
             .then(res =>{
-                console.log(res,data)
-                console.log(1)
+                console.log(res)
                 this.$router.push({path: '/Login'})
             })
             .catch(err =>{
                 console.log(err)
-                console.log(2)
-                this.$router.push({path: '/Login'})
             })
         }
     }
@@ -181,11 +221,11 @@ export default {
 
 <style scoped>
 .container{
-    width: 60%;
-    padding: 0 1.5em;
-    margin-left: auto;
-    margin-right: auto;
-    border: 1px solid black;
+    width: 40%;
+    background-color: #FFFFFF;
+    border-radius: 15px;
+    padding: 1em 2.5em;
+    margin: 3em auto;
 }
 header{
     text-align: center;
@@ -208,40 +248,60 @@ section{
 .form__img{
     display: flex;
 }
-#EventImage{
-    height: max-content;
-    margin-top: auto;
-}
 .gradient{
     position: relative;
 }
 .previewImage{
-    position: absolute;
-    left: 50%;
-    /* float: right; */
-    width: 250px;
-    height: 250px;
-}
-.image--resp{
-    width: 100%;
-    height: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    width: 400px;
+    height: 400px;
+    border: 3px dashed #E1E1E1;
+    /* border-radius: 50%;
+    overflow: hidden; */
+    cursor: pointer;
 }
 .submit{
     display: block;
     margin-left: auto;
     margin-right: auto;
 }
-.nextStep{
-  color: white;
-  background-color: #ED1C40;
-  font-size: 1.5em;
-  width: 100%;
-  border: 0;
-  padding: .4em 0;
-  margin-top: .67em;
+.button--red{
+    color: white;
+    background-color: #ED1C40;
+    border-radius: 25px;
+    font-size: 1.5em;
+    width: 100%;
+    border: 0;
+    padding: .4em 0;
+    margin-top: .67em;
 }
-.nextStep:hover{
-  background-color: #d81b3b;
-  cursor: pointer;
+.button--red:hover{
+    background-color: #d81b3b;
+    cursor: pointer;
+}
+.imageUpload__text{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    cursor: pointer;
+    z-index: 1;
+}
+.imageUpload__button{
+    display: none;
+}
+.button--transparent{
+    border-radius: 5px;
+    padding: .5em 1em;
+    /* background-color: transparent; */
+    background-color: #363636;
+    color: white;
+    border: 1px solid;
+    font-size: .9em;
+    cursor: pointer;
+    width: max-content;
+    margin-left: 100%;
+    transform: translateX(-100%);
 }
 </style>

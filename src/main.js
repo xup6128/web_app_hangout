@@ -10,6 +10,8 @@ import VueCookies from 'vue-cookies'
 Vue.config.productionTip = false
 Vue.use(VueRouter)
 Vue.use(VueCookies)
+// Vue.use(window['vue-cropper'].default)
+
 
 
 const router = new VueRouter({

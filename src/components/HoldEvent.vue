@@ -1,4 +1,5 @@
 <template>
+<div @click="closeemoji($event)">
     <div class="event container">
             <header class="event__header"><h1>馬上來舉辦一場活動吧！</h1></header>
 
@@ -6,11 +7,10 @@
                 
                 <div class="article__img">
 
-                    <div class="previewImage gradient" @click="addFile()">
+                    <div v-if="!isCropping" class="previewImage gradient" @click="addFile()">
                         <img class="image--resp" :src="preview" />
-                        <!-- <p>file name: {{ image.name }}</p>
-                        <p>size: {{ image.size/1024 }}KB</p> -->
-                        <label for="EvenImage">上傳活動照片</label>
+
+                        <label v-if="!preview" for="EvenImage" class="imageUpload__text">上傳活動照片</label>
                         <input type="file" 
                         id="EventImage" 
                         class="eventImage"
@@ -20,28 +20,15 @@
                         required>
                     </div>
 
-                    <!-- <label for="EvenImage" class="">上傳活動照片：</label>
-                    <input type="file" 
-                    id="EventImage" 
-                    class="eventImage"
-                    accept="image/*,.pdf" 
-                    @change="previewImage($event), getFiles($event)" 
-                    name="EvenImage" 
-                    required><br> -->
-
-
-                    <!-- <div style="width:500px; height:500px">
-                        <vueCropper
-                        ref="cropper"
-                        autoCrop
-                        centerBox
-                        fixed :fixedNumber="[1,1]"
-                        canScale
-                        :img=preview
-                        ></vueCropper>
+                    <div v-else class="previewImage gradient">
+                        <vue-cropper 
+                        ref="cropper" 
+                        autoCrop 
+                        :img="preview" 
+                        centerBox 
+                        fixed :fixedNumber="[1,1]"/>
+                        <button @click="getData()" class="button--transparent">裁剪圖片</button>
                     </div>
-                    <button @click="getCropData()" ref="cropper" >確定</button>
-                    <button @click="getData()" class="btn">download(base64)</button> -->
                     
                 </div>
 
@@ -102,14 +89,14 @@
                         </select>
                     </span>
                     <input class="overnight" type="checkbox" id="Overnight" name="Overnight" v-model="overnight">
-                    <label for="Overnight">過夜</label><br>
+                    <label for="Overnight" class="pointer">過夜</label><br>
 
                     <label for="EventPrice">活動花費：</label>
                     <span v-show="!isFree">
                         <input type="number" id="EventPrice" name="" value="100" v-model="eventPrice"> 元
                     </span>
                     <input class="isFree" type="checkbox" id="IsFree" name="IsFree" v-model="isFree">
-                    <label for="IsFree">免費</label><br>
+                    <label for="IsFree" class="pointer">免費</label><br>
                     <br>
 
                     <label for="PeopleLimit">聚會上限人數：</label>
@@ -156,17 +143,17 @@
                     </textarea>
 
                     <br><br>
-                    <button @click="holdEvent()" type="button" class="nextStep">註冊</button>
+                    <button @click="holdEvent()" type="button" class="button--red">註冊</button>
                 </form>
                 </div>
 
             </article>
     </div>
-
+</div>
 </template>
 
 <script>
-import {VueCropper} from 'vue-cropper'
+import { VueCropper }  from 'vue-cropper' 
 import { apiEventPost } from '../api'
 import { VEmojiPicker, emojisDefault, categoriesDefault } from "v-emoji-picker";
 import Moji from "./emoji.vue";
@@ -182,7 +169,7 @@ export default {
                 eventPrice:200,
                 isFree:false,
                 cover:null,
-                eventContent:null,
+                eventContent:"",
                 costTime:null,
                 costHours:2,
                 costMinutes:0,
@@ -193,6 +180,7 @@ export default {
                 status: true,
                 parent: null,
                 showDialog: false,
+                isCropping: false,
 
                 preview: null,
                 eventType:[
@@ -213,7 +201,7 @@ export default {
     components:{
         VueCropper,
         VEmojiPicker,
-        Moji
+        Moji,
     },
     mounted() {
         this.focusInput()
@@ -230,23 +218,29 @@ export default {
                 let reader = new FileReader();
                 reader.onload = (e) => {
                     this.preview = e.target.result;
+                    this.isCropping = true;
+                    // console.log(this.preview)
                 }
                 this.image=input.files[0];
                 reader.readAsDataURL(input.files[0]);
             }
         },
         getFiles(e){
+            console.log(e)
+            console.log( e.target.files[0])
             this.cover = e.target.files[0]
         },
-        getCropData() {
-            this.$refs.cropper.getCropData(data => {
-                console.log(data)
-            })
-        },
-        getData() {
-            this.$refs.cropper.getCropData((baseUrl) => {
-                this.cropperUrl = baseUrl
-            })
+        dataURLtoFile(dataurl, filename) { 
+            let arr = dataurl.split(','),
+                mime = arr[0].match(/:(.*?);/)[1],
+                bstr = atob(arr[1]),
+                n = bstr.length,
+                u8arr = new Uint8Array(n);
+            while (n--) {
+                u8arr[n] = bstr.charCodeAt(n);
+            }
+            this.cover = new File([u8arr], filename, { type: mime });
+
         },
         checkOvernight(){
             if(this.overnight){
@@ -299,6 +293,7 @@ export default {
         },
         toogleDialogEmoji() {
             this.showDialog = !this.showDialog;
+            // document.querySelector(".button--emoji").style = "background-color: black"
         },
         onSelectEmoji(emoji) {
             this.eventContent += emoji.data;
@@ -307,6 +302,21 @@ export default {
         },
         addFile(){
             document.getElementById("EventImage").click();
+        },
+        getData(){
+            this.$refs.cropper.getCropData((data) => {
+            this.preview = data
+            this.dataURLtoFile(data, this.image.name)
+            })
+
+            this.isCropping = false;
+        },
+        closeemoji(e){
+            if(this.showDialog){
+                console.log(e.target.classList[0])
+                if(e.target.classList[0].includes("emoji") || e.target.classList[0] == "category"){return}
+                this.showDialog = false
+            }
         }
     }
 }
@@ -352,21 +362,20 @@ export default {
         width: 400px;
         height: 400px;
         /* border: 5px dashed #FF9100; */
-        border: 5px dashed #E1E1E1;
+        border: 3px dashed #E1E1E1;
         cursor: pointer;
     }
-    .previewImage label{
+    .imageUpload__text{
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%,-50%);
         cursor: pointer;
-        z-index: -1;
+        z-index: 1;
     }
     .image--resp{
         width: 100%;
         max-height: 100%;
-        /* height: 100%; */
     }
     .eventImage{
         display: none;
@@ -407,7 +416,7 @@ export default {
         height: 1em;
         margin-left: .67em;
     }
-    .nextStep{
+    .button--red{
         color: white;
         background-color: #ED1C40;
         border-radius: 25px;
@@ -417,7 +426,7 @@ export default {
         padding: .4em 0;
         margin-top: .67em;
     }
-    .nextStep:hover{
+    .button--red:hover{
         background-color: #d81b3b;
         cursor: pointer;
     }
@@ -429,7 +438,30 @@ export default {
         background-color: white;
         border: 1px solid black;
     }
+    .button--emoji:hover{
+        background-color: #363636;
+    }
     .emoji{
         position: absolute;
+    }
+    .pointer{
+        cursor: pointer;
+    }
+    .button--transparent{
+        border-radius: 5px;
+        padding: .5em 1em;
+        /* background-color: transparent; */
+        background-color: #363636;
+        color: white;
+        border: 1px solid;
+        font-size: .9em;
+        cursor: pointer;
+        width: max-content;
+        margin-left: 100%;
+        transform: translateX(-100%);
+    }
+    .button--transparent:hover{
+        background-color: #3636365e;
+        /* color: white; */
     }
 </style>

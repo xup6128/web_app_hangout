@@ -3,7 +3,7 @@
 
         <div class="serch__box gradient">
             <div class="search__icon"></div>
-            <input class="search__engine" type="text" v-model.lazy="keyword" placeholder="搜尋關鍵字">
+            <input class="search__engine" type="text" v-model.lazy="keyword" placeholder="搜尋">
             <button v-show="keyword" class="search__button--cancel" @click="searchCancel()">X</button>
         </div>
 
@@ -153,7 +153,7 @@
                 class="event__router">
                     <div class="event">
                         <figure class="event__img">
-                            <!-- <img class="img--resp" :src="getImg(e.cover)" alt="" width=""> -->
+                            <img class="img--resp" :src="getImg(e.cover)" alt="" width="">
                         </figure>
                     </div>
                     <h4>{{e.eventName}}</h4>
@@ -384,7 +384,7 @@ export default {
         },
         getCity(num){
             const cities =["基隆市","台北市","新北市","桃園縣","新竹市","新竹縣","苗栗縣","台中市","彰化縣","南投縣","雲林縣","嘉義市","嘉義縣","台南市","高雄市","屏東縣","台東縣","花蓮縣","宜蘭縣","澎湖縣","金門縣","連江縣"]
-            return cities[num]
+            return cities[num-1]
         },
         getDistance(lat2, lon2) {
 
@@ -594,39 +594,22 @@ export default {
     justify-content: space-between;
     padding: 1.5em 1em;
 }
-/* .private__wrap .event{
-    margin-bottom: 1.5em;
-} */
 a{
     color: black;
     text-decoration: none;
 }
 .event__router{
-    height: 40vh;
-    width: 20%;
-    padding: .5em;
-
+    height: max-content;
+    width: 21%;
+    border-radius: 1em;
+    background-color: white;
+    overflow: hidden;
+    margin-bottom: 7vh;
 }
 .event__router h4,
 .event__router h5{
-    margin: .5em 0;
+    margin: .5em;
 }
-.event__img{
-    border: 1px solid black;
-    border-radius: 1em;
-    overflow: hidden;
-    background-color: white;
-    margin-bottom: 2em;
-}
-/* .event{
-    height: 25vh;
-    width: 20%;
-    padding: .5em;
-    border: 1px solid black;
-    border-radius: 1em;
-    overflow: hidden;
-    background-color: white;
-} */
 .event figure{
     margin: 0;
 }
