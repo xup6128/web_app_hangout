@@ -1,22 +1,6 @@
 <template>
     <div>
-        <main class="container">
-
-            <!-- 主辦人 -->
-            <div class="hoster">
-                <figure class="hoster__img" @click="$router.push(`/AccountInfo/${member.memberId}`)">
-                    <img class="image--resp"
-                    :src="getImg(member.memberPhoto)" alt="">
-                </figure>
-                <div class="hoster__info">
-                    <h4>{{member.name}}</h4>
-                    <h5>{{getCity(member.cityId)}}、{{getAge(member.birth)}}歲、{{getGender(member.gender)}}</h5>
-                </div>
-                <div class="collectEvent">
-                    <input v-if="checkCollect" type="button" class="collectEvent__button" @click="collectEvent()" value="收藏活動">
-                    <input v-else type="button" class="collectEvent__button" @click="removeCollect()" value="取消收藏">
-                </div>
-            </div>
+        <main class="container container__left--fixed">
             
             <!-- 活動資訊 -->
             <figure class="eventImg">
@@ -34,9 +18,15 @@
                 <h3>{{confirmer.length}} 人參加</h3>
             </div>
 
-            <div>
-                <button v-if="this.checkMember" type="button" class="button--red" id="0" @click="showMarginBoard($event)">審核參加</button>
+            <div v-if="!notExpired">
+                <button v-if="this.checkHoster" type="button" class="button--red" id="0" @click="showMarginBoard($event)">審核參加者</button>
                 <button v-else type="button" class="button--red" id="1" @click="showMarginBoard($event)">參加活動</button>
+                <h4 class="deadline"><span>報名截止時間：</span>{{timeToString(event.deadline)}}</h4>
+            </div>
+
+            <div v-else>
+                <button v-if="this.checkMember" type="button" class="button--red" id="" @click="showMarginBoard($event)">評論參加者</button>
+                <button v-else type="button" class="button--red" disabled="true">活動已結束</button>
                 <h4 class="deadline"><span>報名截止時間：</span>{{timeToString(event.deadline)}}</h4>
             </div>
 
@@ -54,9 +44,50 @@
                     <h4>{{event.personLimit}}<span>人</span></h4>
                 </div>
             </div>
-            
 
-            <p>{{event.eventContent}}</p>
+        </main>
+
+        <main class="container container__right">
+
+            <div class="hoster">
+                <figure class="hoster__img" @click="$router.push(`/AccountInfo/${member.memberId}`)">
+                    <img class="image--resp"
+                    :src="getImg(member.memberPhoto)" alt="">
+                </figure>
+                <div class="hoster__info">
+                    <h4>{{member.name}}</h4>
+                    <h4>{{getCity(member.cityId)}}、{{getAge(member.birth)}}歲、{{getGender(member.gender)}}</h4>
+                </div>
+
+                <div v-if="checkMember" class="collectEvent">
+                    <input v-show="checkCollect" type="button" class="collectEvent__button" @click="collectEvent()" value="收藏活動">
+                    <input v-show="!checkCollect" type="button" class="collectEvent__button" @click="removeCollect()" value="取消收藏">
+                </div>
+            </div>
+                        
+            <textarea name="Intro" id="Intro" class="intro" rows="15" v-model="event.eventContent"></textarea>
+            <!-- <p>{{event.eventContent}}</p> -->
+
+            <div class="message__wrap">
+                <Message v-for="m in this.messages" :key="m.messageId" :m="m" @update="delMesg" />
+                <!-- <div class="message" v-for=" (m, index) in this.messages" :key="m.messageId">
+                    <div class="message__member">
+                        <figure class="member__img">
+                            <img :src="getImg(m.memberPhoto)" alt="" class="image--resp">
+                        </figure>
+                        <h4>{{m.name}}：</h4>
+                        <div v-if="m.memberId == selfId" class="message__button">
+                            <input type="button" v-show="!isEdit" class="button--transparent__small" @click="editing(index)" value="修改">
+                            <input type="button" v-show="isEdit" class="button--transparent__small"  value="取消">
+                            <input type="button" v-show="isEdit" class="button--transparent__small" @click="editMessage(index)"  value="確認">
+                            <input type="button" v-show="!isEdit" class="button--transparent__small" @click="delMessage(m.messageId)" value="刪除">
+                        </div>
+                    </div>
+                    <div class="message__text">
+                        <textarea name="" id="m.messageId" rows="3" disabled="true" class="message__input" v-model="m.messageContent" ></textarea>
+                    </div>
+                </div> -->
+            </div>
 
             <div class="message__board">
                 <form action="">
@@ -72,36 +103,30 @@
                 </form>
             </div>
 
-            <div class="message__wrap">
-                <div class="message" v-for=" m in this.messages" :key="m.messageId">
-                    <div class="message__member">
-                        <figure class="member__img">
-                            <img :src="getImg(m.memberPhoto)" alt="" class="image--resp">
-                        </figure>
-                        <h4>{{m.name}}：</h4>
-                        <div v-if="m.memberId == selfId" class="message__button">
-                            <input type="button" class="button--transparent__small" value="修改">
-                            <input type="button" class="button--transparent__small" @click="delMessage(m.messageId)" value="刪除">
-                        </div>
-                    </div>
-                    <div class="message__text"><h4>{{m.messageContent}}</h4></div>
-                </div>
-            </div>
 
         </main>
                 <div class="marginBoard">
-                    <button type="button" class="button--close" @click="closeMargin()">X</button>
-                    <header><h2>審核參加者</h2></header>
-                    <div v-for="p in participanters" :key="p.participantId" class="participanter gradient">
-                        <div class="message__member">
-                            <figure class="member__img">
-                                <img :src="getImg(p.memberPhoto)" alt="" class="image--resp">
-                            </figure>
-                            <h4>{{p.name}}：</h4>
+                    <div v-if="!notExpired">
+                    <!-- <div v-if="notExpired"> -->
+                        <button type="button" class="button--close" @click="closeMargin()">X</button>
+                        <header><h2>審核參加者</h2></header>
+                        <div v-for="p in participanters" :key="p.participantId" class="participanter gradient">
+                            <div class="message__member">
+                                <figure class="member__img">
+                                    <img :src="getImg(p.memberPhoto)" alt="" class="image--resp">
+                                </figure>
+                                <h4>{{p.name}}：</h4>
+                            </div>
+                            <input type="button" class="button__participant agree" @click="participanterConfirm(p)" value="確認">
+                            <!-- <input type="button" class="button__participant disagree" value="X"> -->
+                            <h4 class="message__text">{{p.motivation}}</h4>
                         </div>
-                        <input type="button" class="button__participant agree" @click="participanterConfirm(p)" value="確認">
-                        <!-- <input type="button" class="button__participant disagree" value="X"> -->
-                        <h4 class="message__text">{{p.motivation}}</h4>
+                    </div>
+
+                    <div v-else>
+                        <button type="button" class="button--close" @click="closeMargin()">X</button>
+                        <header><h2>評論參加者</h2></header>
+                        <Comment v-for="p in umCommenter" :key="p.participantId" :participanters="p" />
                     </div>
                 </div>
 
@@ -131,7 +156,10 @@
 
 <script>
 import { apiEventGet, apiMemberGet, apiMessagePost, apiMessageGet, apiparticipantPost, apiEventGetparticipant, 
-apiparticipantPutConfirm, apiFavoritePost, apiFavoriteEventGet, apiFavoriteDel, apiMessagePut,  apiMessageDel} from "../api"
+apiparticipantPutConfirm, apiFavoritePost, apiFavoriteEventGet, apiFavoriteDel } from "../api"
+
+import Comment from "./Comment.vue"
+import Message from "./Message.vue"
 
 export default {
 inject:['reload'],
@@ -148,19 +176,32 @@ inject:['reload'],
             participants: null,
             considers: null,
             confirmer: [],
+            umCommenter: [],
+            checkHoster: null,
             checkMember: null,
             checkCollect: true,
+            notExpired: null,
             favoriteId: null,
             lastMarginBoard: null,
+            isEdit: false
        }
+    },
+    components:{
+        Comment,
+        Message
     },
     mounted(){
 
         apiEventGet(this.eventId)
         .then(res =>{
             this.event = res.data;
-            this.checkMember = $cookies.get('MemberId') == this.event.memberId
+            this.checkHoster = $cookies.get('MemberId') == this.event.memberId
             console.log(this.event)
+
+            // console.log(Date.parse(Date.parse(this.event.deadline)).valueOf())
+            // console.log(Date.parse(Date.parse(new Date())).valueOf())
+            //檢查活動是否過期
+            this.notExpired = (Date.parse(this.event.deadline)).valueOf() < (Date.parse(new Date())).valueOf()
 
             //透過活動API獲得主辦者會員API資料
             this.getHosterApi(this.event.memberId)
@@ -175,7 +216,6 @@ inject:['reload'],
 
         apiFavoriteEventGet()
         .then(res =>{
-            console.log(666)
             console.log(res.data)
             for(let i=0;i<res.data.length;i++){
                 if(res.data[i].eventId == this.eventId){
@@ -224,6 +264,7 @@ inject:['reload'],
             .then(res=>{
                 console.log(res)
                 this.participanters = res.data
+                this.checkMember = this.participanters.includes($cookies.get("MemberId"))
                 console.log(this.participanters)
                 this.getParticipanterMemberApi(this.participanters)
             })
@@ -261,16 +302,19 @@ inject:['reload'],
             const members = promise.map( p =>{
                 return p.data
             })
+            console.log(members)
 
             //將API資料依序新增在陣列裡面
             arrs.forEach( (item,index) =>{
                 this.$set(item, 'name',  members[index].name)
                 this.$set(item, 'memberPhoto',  members[index].memberPhoto)
+                this.$set(item, 'star',  0)
             })
             console.log(arrs)
 
             this.considers = arrs.filter( p => p.status!=1)
-            this.confirmer = arrs.filter( p => p.status===1)
+            this.confirmer = arrs.filter( p => p.status===1 && p.status===2)
+            this.umCommenter = arrs.filter( p => p.status===1)
         },
         getImg(url){
             return `http://35.229.140.28/${url}`
@@ -320,6 +364,7 @@ inject:['reload'],
             })
             .then(res =>{
                 console.log(res)
+                this.renewMessageApi()
             })
             .catch(err=>{
                 console.log(err)
@@ -327,23 +372,15 @@ inject:['reload'],
 
             this.inputString = ""
         },
-        delMessage(messageId){
-            apiMessageDel(messageId)
-            .then(res=>{
-                console.log(res)
+        renewMessageApi(){
+            apiEventGet(this.eventId)
+            .then(res =>{
+            
+            this.event = res.data;
+            //透過活動API獲得留言API資料
+            this.getMessagesApi()
             })
-            .catch(err =>{
-                console.log(err)
-            })
-        },
-        editMessage(messageId){
-            apiMessagePut(messageId, {
-                "messageContent":""
-            })
-            .then(res=>{
-                console.log(res)
-            })
-            .catch(err =>{
+            .catch(err=>{
                 console.log(err)
             })
         },
@@ -420,6 +457,10 @@ inject:['reload'],
             .catch(err =>{
                 console.log(err)
             })
+        },
+        delMesg(messageId){
+
+            this.messages = this.messages.filter( m => m.messageId !== messageId)
         }
     },
 }
@@ -433,8 +474,20 @@ figure{
 .container{
     /* border: 1px solid black; */
     width: 30%;
-    margin-left: 15%;
     padding: 1em 2.5em;
+}
+.container__left--fixed{
+    position: fixed;
+    left: 15%;
+}
+.container__right{
+    margin-left: 55%;
+    background-color: #FFFFFF;
+    border-radius: 15px;
+
+    padding: 1em 2.5em;
+    margin-top: 3em;
+    margin-bottom: 3em;
 }
 .container h1,
 .container h2{
@@ -445,14 +498,9 @@ figure{
     display: flex;
     align-items: center;
 }
-.hoster h4,
-.hoster h5{
-    margin-top: .3em;
-    margin-bottom: .3em;
-}
 .hoster__img{
-    width: 50px;
-    height: 50px;
+    width: 80px;
+    height: 80px;
     cursor: pointer;
     border: 2px solid #E1E1E1;
     border-radius: 999em;
@@ -469,9 +517,6 @@ figure{
 }
 .hoster__info{
     margin-left: 40px;
-}
-.hoster h4{
-    margin: 0;
 }
 .eventImg{
     margin: 1em auto 0 auto;
@@ -495,7 +540,7 @@ a{
 }
 .message{
     align-items: center;
-    border-bottom: 2px solid black;
+    /* border-bottom: 2px solid black; */
     margin-top: .67em;
 }
 .message__member{
@@ -512,6 +557,14 @@ a{
 }
 .message__text{
     margin-top: .5em;
+}
+.message__input{
+    width: 100%;
+    font-size: 1.5em;
+    border-top: 0;
+    border-left: 0;
+    border-right: 0;
+    background-color: transparent;
 }
 .message__button{
     display: inline-block;
@@ -547,14 +600,14 @@ a{
     transform: translateX(-100%);
     border-radius: 5px;
     padding: .5em 1em;
-    background-color: #F3F3F3;
+    background-color: transparent;
     border: 1px solid;
     font-size: .9em;
     cursor: pointer;
 }
 .button--transparent__small{
     border-radius: 999px;
-    background-color: #F3F3F3;
+    background-color: transparent;
     border: 1px solid;
     font-size: .9em;
     cursor: pointer;
@@ -578,7 +631,7 @@ a{
     position: fixed;
     background-color: white;
     width: 20%;
-    height: 55%;
+    /* height: 55%; */
     padding: 1em 2.5em;
     text-align: center;
     left: 120%;
@@ -637,7 +690,7 @@ a{
     background-color: #FF9100;
     color: white;
     border: 0;
-    
+    cursor: pointer;
 }
 .agree:hover{
     background-color: #FF7800;
@@ -649,9 +702,6 @@ a{
 }
 .disagree:hover{
     box-shadow: 0 0 5px #FF9100;
-}
-.participanter{
-    display: inline-block;
 }
 .attender{
     display: flex;
@@ -669,6 +719,7 @@ a{
 .collectEvent__button{
     color: #FF9100;
     border: 1px solid #FF9100;
+    background-color: transparent;
     padding: .5em 1em;
     font-size: .9em;
     border-radius: 5px;
@@ -676,5 +727,13 @@ a{
 }
 .collectEvent__button:hover{
     box-shadow: 0 0 3px #FF9100;
+}
+.intro{
+    border: 1px solid black;
+    border-radius: 10px;
+    background-color: #FFF;
+    width: 100%;
+    margin-top: 1em;
+    font-size: 1.5em;
 }
 </style>

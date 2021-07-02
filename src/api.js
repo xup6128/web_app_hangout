@@ -20,7 +20,13 @@ const favoriteRequest = axios.create({
   baseURL: '/api/Member/Favorite'
 })
 const commentRequest = axios.create({
-  baseURL: '/api/Comment'
+  baseURL: '/api/Member/Comment'
+})
+const relationshipRequest = axios.create({
+  baseURL: '/api/Event/Relationship'
+})
+const inviteRequest = axios.create({
+  baseURL: '/api/Event/Invite'
 })
 
 //Event
@@ -46,6 +52,8 @@ export function apiMemberGet(params) {
 };
 export const apiMemberGetHostEvent = () => memberRequest.get(`/${cookies.get("MemberId")}/HostEvent`);
 export const apiMemberGetJoinEvent = () => memberRequest.get(`/${cookies.get("MemberId")}/JoinEvent`);
+export const apiMemberGetInviteEvent = () => memberRequest.get(`/${cookies.get("MemberId")}/InviteEvent`);
+
 
 //Follow Member
 export const apiFollowMemberPost = data => followMemberRequest.post("", data);
@@ -83,6 +91,13 @@ export function apiparticipantPutConfirm(params){
     "status": "1"
   })
 }
+export function apiparticipantPutComment(params){
+  return participantRequest.put("/"+params.participantId,{
+    "eventId": params.eventId,
+    "participanter": params.memberId,
+    "status": "2"
+  })
+}
 export function apiEventGetparticipant(params){
   return participantRequest.get("/Event ="+params)
 }
@@ -99,12 +114,23 @@ export function apiFavoriteDel(memberId,eventId){
 export const apiFavoriteEventGet = () => favoriteRequest.get(`/MemberId=${cookies.get("MemberId")}`);
 
 //Comment
-export const apiCommentPost = data => commentRequest.post('', data);
-export function apiCommentGet(params) {
-  return commentRequest.get('/' + params);
-}
-export function apiEventCommentGet(params) {
-  return commentRequest.get('/EventId=' + params);
+export const apiCommentPost = data => commentRequest.post("", data);
+export function apiCommentGet(memberId) {
+  return commentRequest.get(`/ObjectId=${memberId}`);
 }
 
+//Relationship
+export function apiRelationshipPost(EventId){
+  return relationshipRequest.post(`/${EventId}`, {
+    "EventId": EventId
+  });
+}
+export function apiRelationshipGet(MemberId){
+  return relationshipRequest.get(`/MemberId =${MemberId}`)
+}
 
+//Invite
+export const apiInvitePost = data => inviteRequest.post("", data)
+export function apiInviteDelete(EventId){
+  return inviteRequest.delete(`/${cookies.get("MemberId")}/${EventId}`)
+}

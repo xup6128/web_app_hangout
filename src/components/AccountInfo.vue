@@ -4,7 +4,7 @@
         <input @click="changePage(0)" class="option__button option__button--red" type="button" value="會員資料">
         <input @click="changePage(1)" class="option__button option__button--red" type="button" :value="`追蹤人數(${this.followeds.length})`">
         <input @click="changePage(2)" class="option__button option__button--blue" type="button" :value="`粉絲人數(${this.followers.length})`">
-        <input @click="changePage(3)" class="option__button option__button--orange" type="button" value="評論">
+        <input @click="changePage(3)" class="option__button option__button--orange" type="button" :value="`★${this.avergaRate}評論(${this.comments.length})`">
     </div>
 
     <div class="container page--middle">
@@ -119,8 +119,8 @@
                     <input type="text" id="JobType" name="JobType" v-model="category" :disabled="!isEdit"><br>
                     <label for="JobTitle" class="gradient">工作職稱：</label>
                     <input type="text" id="JobTitle" name="JobTitle" v-model="jobTitle" :disabled="!isEdit"><br>
-                    <label for="Intro" class="intro">自我介紹</label><br>
-                    <textarea name="Intro" id="Intro" style="font-size:1.5em"  rows="20" v-model="intro" :disabled="!isEdit"></textarea><br>
+                    <label for="Intro">自我介紹</label><br>
+                    <textarea name="Intro" id="Intro" class="intro"  rows="15" v-model="intro" :disabled="!isEdit"></textarea><br>
                 </div>
             </form>
         </div>
@@ -160,7 +160,7 @@
 </template>
 
 <script>
-import { apiMemberGet, apiMemberPut, apiFollowMemberPost, apiFollowGet, apiFollowMemberDelete} from "../api"
+import { apiMemberGet, apiMemberPut, apiFollowMemberPost, apiFollowGet, apiFollowMemberDelete, apiCommentGet} from "../api"
 
 export default {
     inject:['reload'],
@@ -172,6 +172,7 @@ export default {
             isFollow: null,
             followers:[],
             followeds:[],
+            comments:[],
             isEdit: false,
             preview: null,
             image: null,
@@ -181,6 +182,7 @@ export default {
             intro: null,
             birth:null,
             files: null,
+            avergaRate: 0,
             // birthToDate: this.member.birth.slice(0,10),
             eventType:[
                 { eng: 'travel', zh: '旅行出遊' },
@@ -230,6 +232,24 @@ export default {
             console.log(err)
         })
 
+        //獲取評論
+        apiCommentGet(this.memberId)
+        .then(res => {
+            console.log(res.data)
+            this.comments = res.data
+
+            let avg = 0;
+            this.comments.forEach( r =>{
+                console.log(r.rate)
+                avg += r.rate
+            })
+            this.avergaRate = (avg/this.comments.length).toFixed(1)
+            this.getCommentsApi(res.data)
+        })
+        .catch(err =>{
+            console.log(err)
+        })
+
     },
     methods: {
         async getFollowersApi(arrs){
@@ -259,6 +279,26 @@ export default {
             })
 
             this.followeds = members
+        },
+        async getCommentsApi(arrs){
+
+            const promises = arrs.map(async member => {
+                const p = await apiMemberGet(member.memberId);
+                return p;
+            })
+            //將promises陣列解析成data陣列
+            const promise = await Promise.all(promises)
+            const members = promise.map( p =>{
+                return p.data
+            })
+
+            //將API資料依序新增在陣列裡面
+            arrs.forEach( (item,index) =>{
+                this.$set(item, 'name',  members[index].name)
+                this.$set(item, 'memberPhoto',  members[index].memberPhoto)
+                this.$set(item, 'memberPhoto',  members[index].memberPhoto)
+            })
+            console.log(this.comments)
         },
         previewImage: function(event) { 
             let input = event.target;
@@ -394,7 +434,7 @@ export default {
             pages[num].classList.remove("offPage")
             this.pageOn = num
 
-        }
+        },
     }
 }
 </script>
@@ -508,12 +548,13 @@ section{
     border-radius: 20px;
     background-color: #FFD934;
 }
-textarea{
+.intro{
     border: 1px solid black;
     border-radius: 10px;
     background-color: #FFF;
     width: 100%;
     margin-top: 1em;
+    font-size: 1.5em;
 }
 input:disabled{
     border: none;
