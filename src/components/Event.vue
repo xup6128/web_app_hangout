@@ -11,7 +11,7 @@
             <h2 class="location">{{getCity(event.cityId)}}{{event.road}}</h2>
             <h2 class="hostTime">{{timeToString(event.hostTime)}}</h2>
 
-            <div id="0" @click="showMarginBoardOfParticipanter()" class="attender">
+            <div @click="showMarginBoardOfParticipanter()" class="attender">
                 <figure class="member__img" v-for="p in confirmer" :key="p.participantId">
                     <img :src="getImg(p.memberPhoto)" alt="" class="image--resp">
                 </figure>
@@ -25,7 +25,7 @@
             </div>
 
             <div v-else>
-                <button v-if="this.checkMember" type="button" class="button--red" id="" @click="showMarginBoard($event)">評論參加者</button>
+                <button v-if="this.checkMember" type="button" class="button--red" id="0" @click="showMarginBoard($event)">評論參加者</button>
                 <button v-else type="button" class="button--red" disabled="true">活動已結束</button>
                 <h4 class="deadline"><span>報名截止時間：</span>{{timeToString(event.deadline)}}</h4>
             </div>
@@ -52,17 +52,23 @@
             <div class="hoster">
                 <figure class="hoster__img" @click="$router.push(`/AccountInfo/${member.memberId}`)">
                     <img class="image--resp"
-                    :src="getImg(member.memberPhoto)" alt="">
+                    :src="getImg(member.memberPhoto[0])" alt="">
                 </figure>
                 <div class="hoster__info">
                     <h4>{{member.name}}</h4>
                     <h4>{{getCity(member.cityId)}}、{{getAge(member.birth)}}歲、{{getGender(member.gender)}}</h4>
                 </div>
 
-                <div v-if="checkMember" class="collectEvent">
+                <div v-if="!checkMember || !checkHoster" class="collectEvent">
                     <input v-show="checkCollect" type="button" class="collectEvent__button" @click="collectEvent()" value="收藏活動">
                     <input v-show="!checkCollect" type="button" class="collectEvent__button" @click="removeCollect()" value="取消收藏">
                 </div>
+
+                <!-- 下方驚嘆號記得拿掉 -->
+                <div v-if="!checkMember" class="collectEvent">
+                    <input type="button" class="collectEvent__button" id="3" @click="showMarginBoard($event)" value="邀請夥伴">
+                </div>
+
             </div>
                         
             <textarea name="Intro" id="Intro" class="intro" rows="15" v-model="event.eventContent"></textarea>
@@ -73,7 +79,7 @@
                 <!-- <div class="message" v-for=" (m, index) in this.messages" :key="m.messageId">
                     <div class="message__member">
                         <figure class="member__img">
-                            <img :src="getImg(m.memberPhoto)" alt="" class="image--resp">
+                            <img :src="getImg(m.memberPhoto[0])" alt="" class="image--resp">
                         </figure>
                         <h4>{{m.name}}：</h4>
                         <div v-if="m.memberId == selfId" class="message__button">
@@ -151,12 +157,26 @@
                     </div>
                 </div>
 
+                <div class="marginBoard">
+                    <button type="button" class="button--close" @click="closeMargin()">X</button>
+                    <header><h2>邀請夥伴</h2></header>
+                        <div v-for="p in inviter" :key="p.protagonistId" class="participanter gradient">
+                            <div class="message__member">
+                                <figure class="member__img">
+                                    <img :src="getImg(p.memberPhoto)" alt="" class="image--resp">
+                                </figure>
+                                <h4>{{p.name}}：</h4>
+                            </div>
+                            <input type="button" class="button__participant agree" @click="invite(p.protagonistId)"  value="邀請">
+                        </div>
+                </div>
+
     </div>
 </template>
 
 <script>
 import { apiEventGet, apiMemberGet, apiMessagePost, apiMessageGet, apiparticipantPost, apiEventGetparticipant, 
-apiparticipantPutConfirm, apiFavoritePost, apiFavoriteEventGet, apiFavoriteDel } from "../api"
+apiparticipantPutConfirm, apiFavoritePost, apiFavoriteEventGet, apiFavoriteDel, apiRelationshipGet, apiInvitePost } from "../api"
 
 import Comment from "./Comment.vue"
 import Message from "./Message.vue"
@@ -177,6 +197,8 @@ inject:['reload'],
             considers: null,
             confirmer: [],
             umCommenter: [],
+            inviter: [],
+            familiar: [],
             checkHoster: null,
             checkMember: null,
             checkCollect: true,
@@ -227,13 +249,57 @@ inject:['reload'],
         .catch(err=>{
             console.log(err)
         })
+
     },
     methods:{
-        // async getHosterApi(memberId){
-        //     let {data} = await apiMemberGet(memberId)
-        //     this.member = data
-        //     console.log(this.member)
-        // },
+        getInviter(){
+
+            apiRelationshipGet($cookies.get("MemberId"))
+            .then(res =>{
+                console.log(res)
+                this.getInviterMemberApi(res.data)
+            })
+            .catch(err =>{
+                console.log(err)
+            })
+        },
+        async getInviterMemberApi(arrs){
+
+            const promises = arrs.map(async item => {
+                const p = await apiMemberGet(item.protagonistId);
+                return p;
+            })
+            //將promises陣列解析成data陣列
+            const promise = await Promise.all(promises)
+            const members = promise.map( p =>{
+                return p.data
+            })
+            console.log(members)
+
+            //將API資料依序新增在陣列裡面
+            arrs.forEach( (item,index) =>{
+                this.$set(item, 'name',  members[index].name)
+                this.$set(item, 'memberPhoto',  members[index].memberPhoto[0])
+            })
+            console.log(arrs)
+            this.inviter = arrs
+
+        },
+        invite(memberId){
+
+            apiInvitePost({
+                "protagonistId": $cookies.get("MemberId"),
+                "objectId": memberId,
+                "eventId": this.eventId
+            })
+            .then(res =>{
+                console.log(res)
+            })
+            .catch(err =>{
+                console.log(err)
+            })
+
+        },
         getHosterApi(memberId){
             apiMemberGet(memberId)
             .then(res =>{
@@ -265,6 +331,10 @@ inject:['reload'],
                 console.log(res)
                 this.participanters = res.data
                 this.checkMember = this.participanters.includes($cookies.get("MemberId"))
+                // if(this.checkMember){
+                //     this.getInviter()
+                // }
+                this.getInviter()
                 console.log(this.participanters)
                 this.getParticipanterMemberApi(this.participanters)
             })
@@ -287,7 +357,7 @@ inject:['reload'],
             //將API資料依序新增在陣列裡面
             arrs.forEach( (item,index) =>{
                 this.$set(item, 'name',  members[index].name)
-                this.$set(item, 'memberPhoto',  members[index].memberPhoto)
+                this.$set(item, 'memberPhoto',  members[index].memberPhoto[0])
             })
             console.log(arrs)
         },
@@ -307,7 +377,7 @@ inject:['reload'],
             //將API資料依序新增在陣列裡面
             arrs.forEach( (item,index) =>{
                 this.$set(item, 'name',  members[index].name)
-                this.$set(item, 'memberPhoto',  members[index].memberPhoto)
+                this.$set(item, 'memberPhoto',  members[index].memberPhoto[0])
                 this.$set(item, 'star',  0)
             })
             console.log(arrs)

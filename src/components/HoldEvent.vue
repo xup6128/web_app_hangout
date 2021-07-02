@@ -143,7 +143,7 @@
                     </textarea>
 
                     <br><br>
-                    <button @click="holdEvent()" type="button" class="button--red">註冊</button>
+                    <button @click="getLatLng()" type="button" class="button--red">註冊</button>
                 </form>
                 </div>
 
@@ -181,6 +181,9 @@ export default {
                 parent: null,
                 showDialog: false,
                 isCropping: false,
+                lat: 0,
+                lng: 0,
+                geo: null,
 
                 preview: null,
                 eventType:[
@@ -254,10 +257,32 @@ export default {
                 this.eventPrice = 0;
             }
         },
-        holdEvent(){
-            
+        getCity(num){
+            const cities =["基隆市","台北市","新北市","桃園縣","新竹市","新竹縣","苗栗縣","台中市","彰化縣","南投縣","雲林縣","嘉義市","嘉義縣","台南市","高雄市","屏東縣","台東縣","花蓮縣","宜蘭縣","澎湖縣","金門縣","連江縣"]
+            return cities[num-1]
+        },
+        getLatLng(){
+            let addr = this.getCity(this.cityId)+this.road
+            let geocoder = new google.maps.Geocoder();
+
+            let vm = this
+            geocoder.geocode({
+                "address": addr
+            },function (res, status){
+                if(status == "OK"){
+                    vm.holdEvent(res[0].geometry.location.lat(), res[0].geometry.location.lng())
+                    // vm.save(res[0].geometry.location.lat(),res[0].geometry.location.lng())
+                }else{
+                    console.log("error")
+                }
+            })
+
+        },
+        holdEvent(lat, lng){
+
             this.checkOvernight();
             this.checkFree();
+
 
             let formData = new FormData();
             formData.append("EventName", this.eventName);
@@ -272,9 +297,10 @@ export default {
             formData.append("PersonLimit", this.personLimit);
             formData.append("TypeId", this.typeId);
             formData.append("MemberId", this.$cookies.get("MemberId"));
-            // formData.append("MemberId", this.memberId);
-            formData.append("Status", "true");
-            formData.append("Parent", "");
+            // formData.append("Status", "true");
+            // formData.append("Parent", "");
+            formData.append("Lat", lat);
+            formData.append("Lng", lng);
 
             for(let value of formData.values()){
                 console.log(value)

@@ -115,11 +115,11 @@
                 </div>
                 <div v-if="filterNum == 5" class="filter__option__wrap">
                     <div class="filter__option">
-                        <label>距離：
-                            <input type="radio" v-model="distance" value="500" name="distance" @change="retainRecord" @click="controlDistanceSingel($event)">500公尺以內
-                            <input type="radio" v-model="distance" value="1000" name="distance" @change="retainRecord" @click="controlDistanceSingel($event)">1公里以內
-                            <input type="radio" v-model="distance" value="3000" name="distance" @change="retainRecord" @click="controlDistanceSingel($event)">3公里以內
-                            <input type="radio" v-model="distance" value="5000" name="distance" @change="retainRecord" @click="controlDistanceSingel($event)">5公里以內
+                        <label>距離(以內)：
+                            <input type="radio" v-model="distance" value="500" name="distance" @change="retainRecord" @click="controlDistanceSingel($event)">500公尺
+                            <input type="radio" v-model="distance" value="1000" name="distance" @change="retainRecord" @click="controlDistanceSingel($event)">1公里
+                            <input type="radio" v-model="distance" value="3000" name="distance" @change="retainRecord" @click="controlDistanceSingel($event)">3公里
+                            <input type="radio" v-model="distance" value="5000" name="distance" @change="retainRecord" @click="controlDistanceSingel($event)">5公里
                         </label>
                     </div>
                 </div>
@@ -150,7 +150,7 @@
                 <router-link :to="`/Event/${e.eventId}`"
                 v-for="e in showEvents" 
                 :key="e.eventId"
-                class="event__router">
+                class="event__router gradient">
                     <div class="event">
                         <figure class="event__img">
                             <img class="img--resp" :src="getImg(e.cover)" alt="" width="">
@@ -159,6 +159,7 @@
                     <h4>{{e.eventName}}</h4>
                     <h4>{{timeToString(e.hostTime)}}</h4>
                     <h4>{{getCity(e.cityId)}}、{{e.road}}</h4>
+                    <span v-if="getDistance(e.lat, e.lng)" class="event__distance"><h4 class="event__distance__text">{{getDistance(e.lat, e.lng)}}公里</h4></span>
                 </router-link>
             </section>
         </div>
@@ -388,8 +389,8 @@ export default {
         },
         getDistance(lat2, lon2) {
 
-            if ((this.lat1 == lat2) && (this.lon1 == lon2)) {
-                return 0;
+            if ( !lat2 && !lon2) {
+                return;
             }
 
             let radlat1 = Math.PI * this.lat1/180;
@@ -404,25 +405,11 @@ export default {
             dist = dist * 180/Math.PI;
             dist = dist * 60 * 1.1515;
             dist = dist * 1.609344;
+            dist = dist.toFixed(1);
             // if (unit=="K") { dist = dist * 1.609344 }
             // if (unit=="N") { dist = dist * 0.8684 }
             console.log(dist)
             return dist;
-        },
-        getLatLng(addr){
-            let geocoder = new google.maps.Geocoder();
-            let vm = this
-            geocoder.geocode({
-                "address": addr
-            },function (res, status){
-                if(status == "OK"){
-                    vm.getDistance(res[0].geometry.location.lat(),res[0].geometry.location.lng())
-                    // console.log(res[0].geometry.location.lat())
-                    // console.log(res[0].geometry.location.lng())
-                }else{
-                    console.log("error")
-                }
-            })
         },
         searchCancel(){
             this.keyword = ""
@@ -455,12 +442,6 @@ export default {
             this.eventList = res.data
             this.showEvents = this.eventList.map( e => e)
             console.log(this.eventList);
-
-            // res.data.forEach(e => {
-            //     let addr = this.getCity(e.cityId)+e.road
-            //     console.log(addr)
-            //     this.getLatLng(addr)
-            // });
         })
         .catch( err=>{
             console.log(err);
@@ -603,15 +584,17 @@ a{
     width: 21%;
     border-radius: 1em;
     background-color: white;
-    overflow: hidden;
+    /* overflow: hidden; */
     margin-bottom: 7vh;
 }
 .event__router h4,
 .event__router h5{
     margin: .5em;
 }
-.event figure{
+.event__img{
     margin: 0;
+    border-radius: 1em 1em 0 0;
+    overflow: hidden;
 }
 .event h4, .event h5{
     margin-top: .5em;
@@ -693,5 +676,17 @@ input[type=checkbox]{
 .button--transparent:hover{
     background-color: #363636;
     color: white;
+}
+.event__distance{
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    transform: translateY(100%);
+    text-align: right;
+}
+.event__distance__text{
+    margin: 0;
+    color: gray;
+    text-align: right;
 }
 </style>

@@ -3,7 +3,7 @@
 
     <div class="message__member">
       <figure class="member__img">
-        <img :src="getImg(participanters.memberPhoto)" alt="" class="image--resp">
+        <img :src="getImg(participanters.memberPhoto[0])" alt="" class="image--resp">
       </figure>
       <h4>{{participanters.name}}</h4>
       <div class="star_box gradient">

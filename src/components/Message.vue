@@ -3,7 +3,7 @@
 
         <div class="message__member">
             <figure class="member__img">
-                <img :src="getImg(m.memberPhoto)" alt="" class="image--resp">
+                <img :src="getImg(m.memberPhoto[0])" alt="" class="image--resp">
             </figure>
             <h4>{{m.name}}：</h4>
             <div v-if="m.memberId == selfId" class="message__button">

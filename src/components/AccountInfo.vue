@@ -25,7 +25,7 @@
 
                 <div class="form__img gradient">
                     <div class="previewImage">
-                        <img class="image--resp" :src="getCover(member.memberPhoto)" />
+                        <img class="image--resp" :src="getCover(member.memberPhoto[0])" />
                     </div>
                     <!-- <div v-else>
                         <label for="EvenImage">上傳照片：</label>
@@ -131,7 +131,7 @@
                 <router-link v-for=" p in followeds" :key="p.memberId" :to="/AccountInfo/+p.memberId">
                     <div class="member" >
                         <figure class="member__img">
-                            <img :src="getCover(p.memberPhoto)" alt="" class="image--resp">
+                            <img :src="getCover(p.memberPhoto[0])" alt="" class="image--resp">
                         </figure>
                         <div class="member__text">
                             <h4>{{p.name}}</h4>
@@ -295,8 +295,8 @@ export default {
             //將API資料依序新增在陣列裡面
             arrs.forEach( (item,index) =>{
                 this.$set(item, 'name',  members[index].name)
-                this.$set(item, 'memberPhoto',  members[index].memberPhoto)
-                this.$set(item, 'memberPhoto',  members[index].memberPhoto)
+                this.$set(item, 'memberPhoto',  members[index].memberPhoto[0])
+                this.$set(item, 'memberPhoto',  members[index].memberPhoto[0])
             })
             console.log(this.comments)
         },

@@ -1,4 +1,11 @@
 <template>
+<div>
+
+    <div class="control__board">
+        <header><h2>邀請夥伴</h2></header>
+    </div>
+    
+
     <div class="container">
         <header><h1>管理活動</h1></header>
         <router-link v-for="(e,index) in showEvents" :key="index"  :to="/Event/+e.eventId">
@@ -12,30 +19,33 @@
 
                 <div>
                     <div class="event__button">
-                        <input v-if="e.type==0" type="button" class="button--transparent" @click="verify()" value="審核參加者">
-                        <input v-if="e.type==0 || e.type==1" type="button" class="button--transparent" @click="invite()" value="邀請夥伴">
-                        <input v-if="e.type==2" type="button" class="button--transparent" @click="unfollow()" value="取消收藏">
-                        <input v-if="e.type==3" type="button" class="button--transparent" @click="join()" value="報名參加">
+                        <input v-if="e.type==0" type="button" class="button--transparent" @click.prevent="verify()" value="審核參加者">
+                        <input v-if="e.type==0 || e.type==1" type="button" class="button--transparent" @click.prevent="controller(1)" value="邀請夥伴">
+                        <input v-if="e.type==2" type="button" class="button--transparent" @click.prevent="unfollow()" value="取消收藏">
+                        <input v-if="e.type==3" type="button" class="button--transparent" @click.prevent="join()" value="報名參加">
                         <input v-if="e.type==3" type="button" class="button--transparent" @click.prevent="decline(e.eventId)" value="含淚婉拒">
                     </div>
                     <div class="event__text">
                         <h3>{{e.eventName}}</h3>
-                        <h4>{{timeToString(e.hostTime)}}</h4>
-                        <h4>{{getCity(e.addressId)}}{{e.road}}</h4>
+                        <h3>{{timeToString(e.hostTime)}}</h3>
+                        <h3>{{getCity(e.addressId)}}{{e.road}}</h3>
+                        <h4 class="ellipsis">{{e.eventContent}}</h4>
                     </div>
                 </div>
             </div>
         </router-link>
 
-        <div class="filter__wrap">
-            <input @click="switchEvents(0)" class="filter__button filter__button--red" type="button" value="舉辦的活動">
-            <input @click="switchEvents(1)" class="filter__button filter__button--blue" type="button" value="參加的活動">
-            <input @click="switchEvents(2)" class="filter__button filter__button--orange" type="button" value="收藏的活動">
-            <input @click="switchEvents(3)" class="filter__button filter__button--yellow" type="button" value="受邀請的活動">
-            <input @click="switchEvents(9)" class="filter__button filter__button--black" type="button" value="展開全部">
-        </div>
-
     </div>
+
+    <div class="filter__wrap">
+        <input @click="switchEvents(0)" class="filter__button filter__button--red" type="button" value="舉辦的活動">
+        <input @click="switchEvents(1)" class="filter__button filter__button--blue" type="button" value="參加的活動">
+        <input @click="switchEvents(2)" class="filter__button filter__button--orange" type="button" value="收藏的活動">
+        <input @click="switchEvents(3)" class="filter__button filter__button--yellow" type="button" value="受邀的活動">
+        <input @click="switchEvents(9)" class="filter__button filter__button--black" type="button" value="展開全部">
+    </div>
+
+</div>
 </template>
 
 <script>
@@ -98,6 +108,11 @@ export default {
             .catch(err =>{
                 console.log(err)
             })
+        },
+        controller(){
+            document.querySelector(".container").classList.add("margin--left")
+            // document.querySelector(".control__board").style.display = "block"
+            // setTimeout(function(){document.querySelector(".control__board").style.display = "block"}, 100)
         }
     },
     created(){
@@ -202,18 +217,53 @@ export default {
 header{
     text-align: center;
 }
+.control__board{
+
+    /* position: absolute; */
+    /* top: 131px;
+    left: 49%; */
+    width: 20%;
+    height: 50vh;
+    background-color: #FFFFFF;
+    border-radius: 15px;
+    padding: 1em 2.5em;
+    margin-top: 3em;
+    margin-bottom: 3em;
+    margin-left: 48%;
+    /* transform: translateX(-50%); */
+}
 .container{
+    z-index: 1;
     width: 40%;
     background-color: #FFFFFF;
     border-radius: 15px;
     padding: 1em 2.5em;
-    margin: 3em auto;
+    margin-top: -29%;
+    margin-bottom: 3em;
+    margin-left: 50%;
+    transform: translateX(-50%);
+    transition: all 1s;
+}
+.margin--left{
+    margin-left: 25%;
+    transform: translateX(-50%);
+    /* transition: all 1s; */
 }
 .event{
     display: flex;
     margin-top: 10px;
     /* border-radius: 15px; */
     /* border-radius: 40px 10px; */
+}
+.event__text{
+    height: max-content;
+    margin-top: auto;
+    margin-bottom: 0;
+}
+.event__text h3,
+.event__text h4,
+.event__text h5{
+    margin: .5em;
 }
 .border--host{
     border-left: 6px solid rgba(255, 0, 0, 0.5);
@@ -232,12 +282,8 @@ header{
     /* border-right: 6px solid #fffc2d; */
 }
 .event__img{
+    min-width: 250px;
     width: 250px;
-    /* height: 250px; */
-}
-.image--resp{
-    width: 100%;
-    height: auto;
 }
 a{
     color: black;
@@ -281,8 +327,9 @@ a{
     font-size: .9em;
 }
 .event__button{
-    margin-left: auto;
+    /* margin-left: auto; */
     width: max-content;
+    margin-bottom: auto;
     /* position: absolute;
     right: 0;
     top: 0; */
@@ -299,4 +346,12 @@ a{
     background-color: #363636;
     color: white;
 }
+.ellipsis {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 </style>
