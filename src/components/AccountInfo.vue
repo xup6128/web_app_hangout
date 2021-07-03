@@ -23,18 +23,28 @@
             </header>
             <form action="/action_page.php">
 
-                <div class="form__img gradient">
-                    <div class="previewImage">
-                        <img class="image--resp" :src="getCover(member.memberPhoto[0])" />
-                    </div>
-                    <!-- <div v-else>
-                        <label for="EvenImage">上傳照片：</label>
-                        <input type="file"
+                <div class="form__img" @click="addFile()">
+                    <div v-if="!isCropping" class="previewImage gradient">
+                        <img class="image--resp" :src="preview" />
+                        <h3 class="image__text">管理照片</h3>
+                        <input type="file" 
+                        id="UploadImage" 
+                        class="uploadImage"
                         accept="image/*,.pdf" 
                         @change="previewImage($event), getFiles($event)" 
-                        id="EventImage" 
-                        name="EventImage" ><br>
-                    </div> -->
+                        name="EvenImage" 
+                        required>
+                    </div>
+                    
+                    <div v-else class="previewImage gradient">
+                        <vue-cropper 
+                        ref="cropper" 
+                        autoCrop 
+                        :img="preview" 
+                        centerBox 
+                        fixed :fixedNumber="[1,1]"/>
+                        <button @click.stop="getData()" class="button--transparent">裁剪圖片</button>
+                    </div>
                 </div>
 
                 <div class="form__text">
@@ -156,11 +166,13 @@
 
 
     </div>
+
 </div>
 </template>
 
 <script>
-import { apiMemberGet, apiMemberPut, apiFollowMemberPost, apiFollowGet, apiFollowMemberDelete, apiCommentGet} from "../api"
+import { apiMemberGet, apiMemberPut, apiFollowMemberPost, apiFollowGet, apiFollowMemberDelete, apiCommentGet, apiMemberPhotoPut} from "../api"
+import { VueCropper }  from 'vue-cropper' 
 
 export default {
     inject:['reload'],
@@ -182,6 +194,7 @@ export default {
             intro: null,
             birth:null,
             files: null,
+            isCropping: false,
             avergaRate: 0,
             // birthToDate: this.member.birth.slice(0,10),
             eventType:[
@@ -198,6 +211,9 @@ export default {
             ]
         }
     },
+    components:{
+        VueCropper
+    },
     mounted(){
         this.checkMember = $cookies.get('MemberId') === this.memberId
         apiMemberGet(this.memberId)
@@ -208,6 +224,7 @@ export default {
             this.jobTitle = this.isNull(this.member.jobTitle)
             this.intro = this.isNull(this.member.intro)
             this.birth = this.member.birth.slice(0,10)
+            this.preview = this.getCover(this.member.memberPhoto[0])
         })
         .catch(err=>{
             console.log(err)
@@ -240,7 +257,6 @@ export default {
 
             let avg = 0;
             this.comments.forEach( r =>{
-                console.log(r.rate)
                 avg += r.rate
             })
             this.avergaRate = (avg/this.comments.length).toFixed(1)
@@ -300,46 +316,75 @@ export default {
             })
             console.log(this.comments)
         },
-        previewImage: function(event) { 
+        previewImage(event) {
             let input = event.target;
             if (input.files) {
                 let reader = new FileReader();
                 reader.onload = (e) => {
                     this.preview = e.target.result;
+                    this.isCropping = true;
+                    // console.log(this.preview)
                 }
                 this.image=input.files[0];
                 reader.readAsDataURL(input.files[0]);
             }
+        },
+        getFiles(e){
+            console.log(e)
+            console.log( e.target.files[0])
+            this.cover = e.target.files[0]
+        },
+        getData(){
+            this.$refs.cropper.getCropData((data) => {
+            this.preview = data
+            this.dataURLtoFile(data, this.image.name)
+            })
+
+            this.isCropping = false;
+        },
+        dataURLtoFile(dataurl, filename) { 
+            let arr = dataurl.split(','),
+                mime = arr[0].match(/:(.*?);/)[1],
+                bstr = atob(arr[1]),
+                n = bstr.length,
+                u8arr = new Uint8Array(n);
+            while (n--) {
+                u8arr[n] = bstr.charCodeAt(n);
+            }
+            this.files = new File([u8arr], filename, { type: mime });
+            this.memberPhotoPut()
+        },
+        memberPhotoPut(){
+
+            let formData = new FormData();
+            formData.append("MemberPhoto", this.files);
+            
+            console.log(666)
+            apiMemberPhotoPut(
+                formData
+            )
+            .then(res =>{
+                console.log(res)
+            })
+            .catch(err =>{
+                console.log(err)
+            })
         },
         reverse(){
             this.isEdit = true;
         },
         confirm(){
             this.isEdit = false;
-
-            let formData = new FormData();
-            // formData.append("Account", this.member.account);
-            // formData.append("Password", this.member.password);
-            formData.append("Name", this.member.name);
-            // formData.append("MemberPhoto", this.files);
-            formData.append("Gender", this.member.gender);
-            formData.append("Birth", this.birth);
-            formData.append("CityId", this.member.cityId);
-            formData.append("Category", this.category);
-            formData.append("JobTitle", this.jobTitle);
-            formData.append("intro", this.intro);
             
-            for( let i=0;i<this.member.types.length;i++){
-                formData.append("Type", this.member.types[i]);
-            }
-
-            for(let value of formData.values()){
-                console.log(value)
-            }
-
-            apiMemberPut(
-                formData,
-            )
+            apiMemberPut({
+                "Name": this.member.name,
+                "Gender": this.member.gender,
+                "Birth": this.birth,
+                "CityId": this.member.cityId,
+                "Category": this.category,
+                "JobTitle": this.jobTitle,
+                "intro": this.intro
+            })
             .then(res =>{
                 console.log(res)
             })
@@ -353,7 +398,7 @@ export default {
         },
         getCity(num){
             const cities =["基隆市","台北市","新北市","桃園縣","新竹市","新竹縣","苗栗縣","台中市","彰化縣","南投縣","雲林縣","嘉義市","嘉義縣","台南市","高雄市","屏東縣","台東縣","花蓮縣","宜蘭縣","澎湖縣","金門縣","連江縣"]
-            return cities[num-1]
+            return cities[num]
         },
         getGender(gender){
             if(gender == 2){
@@ -390,9 +435,6 @@ export default {
                 : 0);
 
             return age;
-        },
-        getFiles(e){
-            this.files = e.target.files[0]
         },
         isNull(string){
             if(string ==="null"){
@@ -433,7 +475,9 @@ export default {
             pages[this.pageOn].classList.add("offPage")
             pages[num].classList.remove("offPage")
             this.pageOn = num
-
+        },
+        addFile(){
+            document.getElementById("UploadImage").click();
         },
     }
 }
@@ -511,6 +555,24 @@ section{
 }
 .form__img{
     display: flex;
+    cursor: pointer;
+}
+.form__img:hover 
+.image__text{
+    display: block;
+}
+.image__text{
+    display: none;
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
+    font-size: 1.7em;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.26);
 }
 #EventImage{
     height: max-content;
@@ -521,7 +583,7 @@ section{
 }
 .previewImage{
     position: absolute;
-    right: 0;
+    right: 40px;
     /* float: right; */
     width: 250px;
     height: 250px;
@@ -581,5 +643,28 @@ input:disabled{
     border-radius: 999em;
     overflow: hidden;
     border: 3px solid #E1E1E1;
+}
+.uploadImage{
+    display: none;
+}
+.button--transparent{
+    position: absolute;
+    top: 90%;
+    left: 50%;
+    border-radius: 5px;
+    padding: .5em 1em;
+    /* background-color: transparent; */
+    background-color: #363636;
+    color: white;
+    border: 1px solid;
+    font-size: .9em;
+    cursor: pointer;
+    width: max-content;
+    /* margin-left: 100%; */
+    transform: translate(-50%, -50%);
+}
+.button--transparent:hover{
+    background-color: #3636365e;
+    /* color: white; */
 }
 </style>

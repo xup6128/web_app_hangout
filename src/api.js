@@ -53,7 +53,9 @@ export function apiMemberGet(params) {
 export const apiMemberGetHostEvent = () => memberRequest.get(`/${cookies.get("MemberId")}/HostEvent`);
 export const apiMemberGetJoinEvent = () => memberRequest.get(`/${cookies.get("MemberId")}/JoinEvent`);
 export const apiMemberGetInviteEvent = () => memberRequest.get(`/${cookies.get("MemberId")}/InviteEvent`);
-
+export function apiMemberPhotoPut( data ){
+  return memberRequest.put(`/${cookies.get("MemberId")}/0`, data)
+} 
 
 //Follow Member
 export const apiFollowMemberPost = data => followMemberRequest.post("", data);
