@@ -116,10 +116,10 @@
                 <div v-if="filterNum == 5" class="filter__option__wrap">
                     <div class="filter__option">
                         <label>距離(以內)：
-                            <input type="radio" v-model="distance" value="500" name="distance" @change="retainRecord" @click="controlDistanceSingel($event)">500公尺
-                            <input type="radio" v-model="distance" value="1000" name="distance" @change="retainRecord" @click="controlDistanceSingel($event)">1公里
-                            <input type="radio" v-model="distance" value="3000" name="distance" @change="retainRecord" @click="controlDistanceSingel($event)">3公里
-                            <input type="radio" v-model="distance" value="5000" name="distance" @change="retainRecord" @click="controlDistanceSingel($event)">5公里
+                            <input type="radio" v-model="distance" :value="0.5" name="distance" @change="retainRecord" @click="controlDistanceSingel($event)">500公尺
+                            <input type="radio" v-model="distance" :value="1" name="distance" @change="retainRecord" @click="controlDistanceSingel($event)">1公里
+                            <input type="radio" v-model="distance" :value="3" name="distance" @change="retainRecord" @click="controlDistanceSingel($event)">3公里
+                            <input type="radio" v-model="distance" :value="5" name="distance" @change="retainRecord" @click="controlDistanceSingel($event)">5公里
                         </label>
                     </div>
                 </div>
@@ -133,10 +133,11 @@
                 <div v-if="filterNum == 6" class="filter__option__wrap">
                     <div class="filter__option">
                         <label>日期：
-                            <input type="radio" v-model="day" :value="0" name="day" @change="retainRecord" @click="controlDaySingel($event)">今天我想來點
-                            <input type="radio" v-model="day" :value="1" name="day" @change="retainRecord" @click="controlDaySingel($event)">明天會更好
-                            <input type="radio" v-model="day" :value="500" name="day" @change="retainRecord" @click="controlDaySingel($event)">週五找刺激
-                            <input type="radio" v-model="day" :value="1000" name="day" @change="retainRecord" @click="controlDaySingel($event)">週末不一樣
+                            <input type="radio" v-model="day" :value="0" name="day" @change="retainRecord" @click="controlDaySingel($event)">今天及時行樂
+                            <input type="radio" v-model="day" :value="1" name="day" @change="retainRecord" @click="controlDaySingel($event)">明天預先安排
+                            <input type="radio" v-model="day" :value="5" name="day" @change="retainRecord" @click="controlDaySingel($event)">週五尋找刺激
+                            <input type="radio" v-model="day" :value="6" name="day" @change="retainRecord" @click="controlDaySingel($event)">週末可以不一樣
+                            <br><br>選擇特定日期<input type="date" v-model="day" name="day" >
                         </label>
                     </div>
                 </div>
@@ -159,7 +160,7 @@
                     <h4>{{e.eventName}}</h4>
                     <h4>{{timeToString(e.hostTime)}}</h4>
                     <h4>{{getCity(e.cityId)}}、{{e.road}}</h4>
-                    <span v-if="getDistance(e.lat, e.lng)" class="event__distance"><h4 class="event__distance__text">{{getDistance(e.lat, e.lng)}}公里</h4></span>
+                    <span v-if="e.lat && e.lng" class="event__distance"><h4 class="event__distance__text">{{getDistance(e.lat, e.lng)}}公里</h4></span>
                 </router-link>
             </section>
         </div>
@@ -220,13 +221,15 @@ export default {
     },
     computed:{
         listenChange(){
-            const { cities, checkEventTypes, expense, group, keyword } = this
+            const { cities, checkEventTypes, expense, group, keyword, distance, day } = this
             return{
                 cities,
                 checkEventTypes,
                 expense,
                 group,
-                keyword
+                keyword,
+                distance,
+                day
             }
         }
     },
@@ -269,6 +272,14 @@ export default {
 
             } )
 
+            // 篩選距離
+            this.showEvents = this.showEvents.filter( e => {
+                if(this.distance == null){
+                    return true
+                }
+                return this.distance >= this.getDistance(e.lat, e.lng)
+            } )
+
             // 關鍵字搜尋
             this.showEvents = this.showEvents.filter( e => {
                 if(this.keyword == null || this.keyword == ""){
@@ -277,9 +288,38 @@ export default {
                 return e.eventName.includes(this.keyword)
             } )
 
-
             // 篩選日期
-            // 篩選距離
+            let now =null
+            if(this.day.length){
+                now = (new Date(this.day)).getTime()
+            }else{
+                now = (new Date()).getTime()
+            }
+
+            this.showEvents = this.showEvents.filter( e => {
+                if(this.day == null){
+                    return true
+                }
+                
+                let t = new Date(e.hostTime)
+                let timeDiff = t.getTime() - now
+                let dayDiff = Math.floor(timeDiff / (24 * 3600 * 1000))
+                console.log(dayDiff)
+                switch(this.day){
+                    case 0:
+                        return dayDiff ==0
+                    case 1:
+                        return dayDiff ==1
+                    case 5:
+                        return t.getUTCDay() == 5
+                    case 6:
+                        return t.getUTCDay() ==0 || t.getUTCDay() == 6
+                    default:
+                        return dayDiff ==0
+                }
+
+            } )
+
         },
     },
     methods:{
@@ -390,7 +430,7 @@ export default {
         getDistance(lat2, lon2) {
 
             if ( !lat2 && !lon2) {
-                return;
+                return "無地理資訊";
             }
 
             let radlat1 = Math.PI * this.lat1/180;
@@ -439,6 +479,13 @@ export default {
 
         apiEventList({})
         .then( res =>{
+
+            console.log(res)
+            if (!Array.isArray(res.data)) {
+              console.log("IS NOT ARRAY", res.data)
+              return;
+          }
+
             this.eventList = res.data
             this.showEvents = this.eventList.map( e => e)
             console.log(this.eventList);

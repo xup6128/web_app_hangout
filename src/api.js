@@ -28,6 +28,9 @@ const relationshipRequest = axios.create({
 const inviteRequest = axios.create({
   baseURL: '/api/Event/Invite'
 })
+const noticeRequest = axios.create({
+  baseURL: '/api/Notice'
+})
 
 //Event
 export const apiEventPost = data => eventRequest.post('', data);
@@ -53,14 +56,14 @@ export function apiMemberGet(params) {
 export const apiMemberGetHostEvent = () => memberRequest.get(`/${cookies.get("MemberId")}/HostEvent`);
 export const apiMemberGetJoinEvent = () => memberRequest.get(`/${cookies.get("MemberId")}/JoinEvent`);
 export const apiMemberGetInviteEvent = () => memberRequest.get(`/${cookies.get("MemberId")}/InviteEvent`);
-export function apiMemberPhotoPut( data ){
+export function apiMemberPhotoPut(data) {
   return memberRequest.put(`/${cookies.get("MemberId")}/0`, data)
-} 
+}
 
 //Follow Member
 export const apiFollowMemberPost = data => followMemberRequest.post("", data);
-export function apiFollowMemberDelete(memberId,objectId){
-  return  followMemberRequest.delete(`/${memberId}/${objectId}`, {
+export function apiFollowMemberDelete(memberId, objectId) {
+  return followMemberRequest.delete(`/${memberId}/${objectId}`, {
     "memberId": memberId,
     "objectId": objectId
   })
@@ -86,28 +89,28 @@ export function apiEventMessageGet(params) {
 
 //participant
 export const apiparticipantPost = data => participantRequest.post("", data);
-export function apiparticipantPutConfirm(params){
-  return participantRequest.put("/"+params.participantId,{
+export function apiparticipantPutConfirm(params) {
+  return participantRequest.put("/" + params.participantId, {
     "eventId": params.eventId,
     "participanter": params.participanter,
     "status": "1"
   })
 }
-export function apiparticipantPutComment(params){
-  return participantRequest.put("/"+params.participantId,{
+export function apiparticipantPutComment(params) {
+  return participantRequest.put("/" + params.participantId, {
     "eventId": params.eventId,
     "participanter": params.memberId,
     "status": "2"
   })
 }
-export function apiEventGetparticipant(params){
-  return participantRequest.get("/Event ="+params)
+export function apiEventGetparticipant(params) {
+  return participantRequest.get("/Event =" + params)
 }
 
 //Favorite
 export const apiFavoritePost = data => favoriteRequest.post("", data);
 // export const apiFavoriteDel = data => favoriteRequest.delete("", data);
-export function apiFavoriteDel(memberId,eventId){
+export function apiFavoriteDel(memberId, eventId) {
   return favoriteRequest.delete(`/${memberId}/${eventId}`, {
     "memberId": memberId,
     "eventId": eventId
@@ -122,17 +125,27 @@ export function apiCommentGet(memberId) {
 }
 
 //Relationship
-export function apiRelationshipPost(EventId){
+export function apiRelationshipPost(EventId) {
   return relationshipRequest.post(`/${EventId}`, {
     "EventId": EventId
   });
 }
-export function apiRelationshipGet(MemberId){
+export function apiRelationshipGet(MemberId) {
   return relationshipRequest.get(`/MemberId =${MemberId}`)
 }
 
 //Invite
 export const apiInvitePost = data => inviteRequest.post("", data)
-export function apiInviteDelete(EventId){
+export function apiInviteDelete(EventId) {
   return inviteRequest.delete(`/${cookies.get("MemberId")}/${EventId}`)
+}
+
+//Notice
+export const apiNoticeGet = () => {
+  return noticeRequest.get(`/${cookies.get("MemberId")}`)
+}
+export function apiNoticePut(id){
+  return noticeRequest.put(`/${id}`, {
+    "status": "1"
+  })
 }

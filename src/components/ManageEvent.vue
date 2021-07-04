@@ -1,9 +1,9 @@
 <template>
 <div>
 
-    <div class="control__board">
+    <!-- <div class="control__board">
         <header><h2>邀請夥伴</h2></header>
-    </div>
+    </div> -->
     
 
     <div class="container">
@@ -18,13 +18,13 @@
                 </figure>
 
                 <div>
-                    <div class="event__button">
+                    <!-- <div class="event__button">
                         <input v-if="e.type==0" type="button" class="button--transparent" @click.prevent="verify()" value="審核參加者">
                         <input v-if="e.type==0 || e.type==1" type="button" class="button--transparent" @click.prevent="controller(1)" value="邀請夥伴">
                         <input v-if="e.type==2" type="button" class="button--transparent" @click.prevent="unfollow()" value="取消收藏">
                         <input v-if="e.type==3" type="button" class="button--transparent" @click.prevent="join()" value="報名參加">
                         <input v-if="e.type==3" type="button" class="button--transparent" @click.prevent="decline(e.eventId)" value="含淚婉拒">
-                    </div>
+                    </div> -->
                     <div class="event__text">
                         <h3>{{e.eventName}}</h3>
                         <h3>{{timeToString(e.hostTime)}}</h3>
@@ -238,7 +238,8 @@ header{
     background-color: #FFFFFF;
     border-radius: 15px;
     padding: 1em 2.5em;
-    margin-top: -29%;
+    /* margin-top: -29%; */
+    margin-top: 3em;
     margin-bottom: 3em;
     margin-left: 50%;
     transform: translateX(-50%);

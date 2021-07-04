@@ -182,7 +182,7 @@ import Comment from "./Comment.vue"
 import Message from "./Message.vue"
 
 export default {
-inject:['reload'],
+
     data(){
        return{
             eventId: this.$route.params.eventId,

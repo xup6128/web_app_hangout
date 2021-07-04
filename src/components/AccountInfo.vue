@@ -23,7 +23,7 @@
             </header>
             <form action="/action_page.php">
 
-                <div class="form__img" @click="addFile()">
+                <div v-if="checkMember" class="form__img" @click="addFile()">
                     <div v-if="!isCropping" class="previewImage gradient">
                         <img class="image--resp" :src="preview" />
                         <h3 class="image__text">管理照片</h3>
@@ -44,6 +44,13 @@
                         centerBox 
                         fixed :fixedNumber="[1,1]"/>
                         <button @click.stop="getData()" class="button--transparent">裁剪圖片</button>
+                    </div>
+                </div>
+
+                <div v-else class="form__img">
+                    <div v-if="!isCropping" class="previewImage gradient">
+                        <img class="image--resp" :src="preview" />
+                        <h3 class="image__text">觀看相簿</h3>
                     </div>
                 </div>
 
@@ -139,7 +146,7 @@
             <header><h1>追蹤清單</h1></header>
             <div class="member__wrap">
                 <router-link v-for=" p in followeds" :key="p.memberId" :to="/AccountInfo/+p.memberId">
-                    <div class="member" >
+                    <div class="member" @click="reload">
                         <figure class="member__img">
                             <img :src="getCover(p.memberPhoto[0])" alt="" class="image--resp">
                         </figure>
@@ -155,13 +162,39 @@
 
         <div class="page offPage">
             <header><h1>粉絲清單</h1></header>
-            <div v-for=" p in followers" :key="p.memberId">
-            
+            <div class="member__wrap">
+                <router-link v-for=" p in followers" :key="p.memberId" :to="/AccountInfo/+p.memberId">
+                    <div class="member" @click="reload">
+                        <figure class="member__img">
+                            <!-- <img :src="getCover(p.memberPhoto[0])" alt="" class="image--resp"> -->
+                        </figure>
+                        <div class="member__text">
+                            <h4>{{p.name}}</h4>
+                            <h4>{{getCity(p.cityId)}}、{{getAge(p.birth)}}歲</h4>
+                            <h4>{{p.category}}{{p.jobTitle}}</h4>
+                        </div>
+                    </div>
+                </router-link>
             </div>
         </div>
 
         <div class="page offPage">
             <header><h1>評論清單</h1></header>
+            <div class="member__wrap">
+                <router-link v-for=" p in comments" :key="p.commentId" :to="/AccountInfo/+p.memberId">
+                    <div class="member" @click="reload">
+                        <figure class="member__img">
+                            <!-- <img :src="getCover(p.memberPhoto[0])" alt="" class="image--resp"> -->
+                        </figure>
+                        <div class="member__text">
+                            <h4>{{p.name}}</h4>
+                            <!-- <h4>{{getCity(p.cityId)}}、{{getAge(p.birth)}}歲</h4>
+                            <h4>{{p.category}}{{p.jobTitle}}</h4> -->
+                            <textarea class="comment" name="" id="" disabled rows="5" v-model="p.commentContent"></textarea>
+                        </div>
+                    </div>
+                </router-link>
+            </div>
         </div>
 
 
@@ -242,8 +275,8 @@ export default {
         //獲取追蹤與粉絲資料
         apiFollowGet(this.memberId)
         .then(res => {
-            this.followeds = this.getFollowedsApi(res.data.followeds)
-            this.followers = this.getFollowersApi(res.data.followers)
+            this.getFollowedsApi(res.data.followeds)
+            this.getFollowersApi(res.data.followers)
         })
         .catch(err =>{
             console.log(err)
@@ -311,8 +344,11 @@ export default {
             //將API資料依序新增在陣列裡面
             arrs.forEach( (item,index) =>{
                 this.$set(item, 'name',  members[index].name)
-                this.$set(item, 'memberPhoto',  members[index].memberPhoto[0])
-                this.$set(item, 'memberPhoto',  members[index].memberPhoto[0])
+                this.$set(item, 'memberPhoto',  members[index].memberPhoto)
+                this.$set(item, 'cityId',  members[index].cityId)
+                this.$set(item, 'birth',  members[index].birth)
+                this.$set(item, 'category',  members[index].category)
+                this.$set(item, 'jobTitle',  members[index].jobTitle)
             })
             console.log(this.comments)
         },
@@ -666,5 +702,8 @@ input:disabled{
 .button--transparent:hover{
     background-color: #3636365e;
     /* color: white; */
+}
+.member__text{
+    width: 100%;
 }
 </style>

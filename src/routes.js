@@ -62,6 +62,7 @@ export const routes = [
   },
   {
     path: '/Event/:eventId?',
+    name:'Event',
     components: {
       default: Event,
       nav: Header
