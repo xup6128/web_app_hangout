@@ -2,34 +2,54 @@ import axios from "axios";
 import cookies from 'vue-cookies'
 
 const eventRequest = axios.create({
-  baseURL: '/api/Event'
+  baseURL: '/api/Event',
+  headers: { 'Content-Type': 'application/json' },
+  timeout: 20000
 })
 const memberRequest = axios.create({
-  baseURL: '/api/Member'
+  baseURL: '/api/Member',
+  headers: { 'Content-Type': 'application/json' },
+  timeout: 20000
 })
 const followMemberRequest = axios.create({
-  baseURL: '/api/Member/Follow'
+  baseURL: '/api/Member/Follow',
+  headers: { 'Content-Type': 'application/json' },
+  timeout: 20000
 })
 const messageRequest = axios.create({
-  baseURL: '/api/Event/Message'
+  baseURL: '/api/Event/Message',
+  headers: { 'Content-Type': 'application/json' },
+  timeout: 20000
 })
 const participantRequest = axios.create({
-  baseURL: '/api/Event/participant'
+  baseURL: '/api/Event/participant',
+  headers: { 'Content-Type': 'application/json' },
+  timeout: 20000
 })
 const favoriteRequest = axios.create({
-  baseURL: '/api/Member/Favorite'
+  baseURL: '/api/Member/Favorite',
+  headers: { 'Content-Type': 'application/json' },
+  timeout: 20000
 })
 const commentRequest = axios.create({
-  baseURL: '/api/Member/Comment'
+  baseURL: '/api/Member/Comment',
+  headers: { 'Content-Type': 'application/json' },
+  timeout: 20000
 })
 const relationshipRequest = axios.create({
-  baseURL: '/api/Event/Relationship'
+  baseURL: '/api/Event/Relationship',
+  headers: { 'Content-Type': 'application/json' },
+  timeout: 20000
 })
 const inviteRequest = axios.create({
-  baseURL: '/api/Event/Invite'
+  baseURL: '/api/Event/Invite',
+  headers: { 'Content-Type': 'application/json' },
+  timeout: 20000
 })
 const noticeRequest = axios.create({
-  baseURL: '/api/Notice'
+  baseURL: '/api/Notice',
+  headers: { 'Content-Type': 'application/json' },
+  timeout: 20000
 })
 
 //Event

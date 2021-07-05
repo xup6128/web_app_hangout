@@ -105,10 +105,15 @@ export default {
               console.log("IS NOT ARRAY", res.data)
               return;
           }
+          console.log("apiNoticeGet", res.data)
 
           //過濾掉自己對自己發送的通知
           this.notices = res.data.filter( n => n.protagonistId != this.$cookies.get("MemberId"))
-          console.log("apiNoticeGet", res)
+
+          this.notices.sort(function (a, b) {
+              return a.noticeId<b.noticeId?1:-1;
+          });
+
           this.getMembersApi(this.notices);
         })
         .catch((err) => {

@@ -59,13 +59,13 @@
                     <h4>{{getCity(member.cityId)}}、{{getAge(member.birth)}}歲、{{getGender(member.gender)}}</h4>
                 </div>
 
-                <div v-if="!checkMember || !checkHoster" class="eventButton">
+                <div v-if="!checkMember && !checkHoster" class="eventButton">
                     <input v-show="checkCollect" type="button" class="collectEvent__button" @click="collectEvent()" value="收藏活動">
                     <input v-show="!checkCollect" type="button" class="collectEvent__button" @click="removeCollect()" value="取消收藏">
                 </div>
 
                 <!-- 下方驚嘆號記得拿掉 -->
-                <div v-if="!checkMember" class="eventButton">
+                <div v-if="checkMember || checkHoster" class="eventButton">
                     <input type="button" class="collectEvent__button" id="3" @click="showMarginBoard($event)" value="邀請夥伴">
                 </div>
 
@@ -107,8 +107,9 @@
                     <!-- <div v-if="notExpired"> -->
                         <button type="button" class="button--close" @click="closeMargin()">X</button>
                         <header><h2>審核參加者</h2></header>
-                        <div v-if="!this.participanters.length" class="noneapi">尚無人報名</div>
-                        <div v-for="p in participanters" :key="p.participantId" class="participanter gradient">
+                        <div v-if="!this.considers.length" class="noneapi">尚無人報名</div>
+
+                        <div v-for="p in considers" :key="p.participantId" class="participanter gradient"  :class="{'special': familiar.includes(p.participantId)}" >
                             <div class="message__member">
                                 <figure class="member__img">
                                     <img :src="getImg(p.memberPhoto)" alt="" class="image--resp">
@@ -176,7 +177,7 @@ import Comment from "./Comment.vue"
 import Message from "./Message.vue"
 
 export default {
-
+    inject: ["reload"],
     data(){
        return{
             eventId: this.$route.params.eventId,
@@ -190,8 +191,8 @@ export default {
             participanters:[],
             inputString:null,
             member: null,
-            participants: null,
-            considers: null,
+            participants: [],
+            considers: [],
             confirmer: [],
             umCommenter: [],
             inviter: [],
@@ -328,16 +329,45 @@ export default {
                 console.log(res)
                 this.participanters = res.data
                 this.checkMember = this.participanters.includes($cookies.get("MemberId"))
-                // if(this.checkMember){
-                //     this.getInviter()
-                // }
-                this.getInviter()
+                if(this.checkMember || this.checkHoster){
+                    this.getInviter()
+                }
+                if(this.checkHoster){
+                    this.getRelationship(res.data)
+                }
                 console.log(this.participanters)
                 this.getParticipanterMemberApi(this.participanters)
             })
             .catch(err=>{
                 console.log(err)
             })
+        },
+        async getRelationship(arrs){
+            console.log(111)
+            const promises = arrs.map(async item => {
+                const p = await apiRelationshipGet(item.participanter);
+                return p;
+            })
+            //將promises陣列解析成data陣列
+            const promise = await Promise.all(promises)
+            const members = promise.map( p =>{
+                return p.data
+            })
+            this.members.forEach( (m,index) =>{
+                this.familiar[index] = m.protagonistId
+            })
+            console.log(members)
+
+            //將API資料依序新增在陣列裡面
+            // arrs.forEach( (item,index) =>{
+            //     this.$set(item, 'name',  members[index].name)
+            //     this.$set(item, 'memberPhoto',  members[index].memberPhoto[0])
+            // })
+
+            // console.log(arrs)
+            // this.publicMessages = arrs.filter( m => m.status == 3)
+            // this.privateMessages = arrs.filter( m => m.status == 1)
+
         },
         async getMembersApi(arrs){
 
@@ -382,8 +412,8 @@ export default {
             })
             console.log(arrs)
 
-            this.considers = arrs.filter( p => p.status!=1)
-            this.confirmer = arrs.filter( p => p.status===1 && p.status===2)
+            this.considers = arrs.filter( p => p.status !== 1)
+            this.confirmer = arrs.filter( p => p.status === 1 || p.status === 2)
             this.umCommenter = arrs.filter( p => p.status===1)
         },
         getImg(url){
@@ -511,6 +541,7 @@ export default {
             apiparticipantPutConfirm(p)
             .then(res =>{
                 console.log(res)
+                // this.reload()
             })
             .catch(err =>{
                 console.log(err)
@@ -749,6 +780,9 @@ a{
     border: 4px solid #979797;
     padding: .3em;
     /* border-bottom: 1px solid black; */
+}
+.special{
+    border: 4px solid #FF9100;
 }
 .participanter h4{
     margin: 0;
