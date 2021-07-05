@@ -256,6 +256,10 @@ header{
     /* border-radius: 15px; */
     /* border-radius: 40px 10px; */
 }
+.event:hover{
+    background-color: #e2e2e063;
+    border-radius: 5px;
+}
 .event__text{
     height: max-content;
     margin-top: auto;

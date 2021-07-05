@@ -15,7 +15,7 @@
                 <figure class="member__img" v-for="p in confirmer" :key="p.participantId">
                     <img :src="getImg(p.memberPhoto)" alt="" class="image--resp">
                 </figure>
-                <h3>{{confirmer.length}} 人參加</h3>
+                <h3 class="underline">{{confirmer.length}} 人參加</h3>
             </div>
 
             <div v-if="!notExpired">
@@ -59,45 +59,36 @@
                     <h4>{{getCity(member.cityId)}}、{{getAge(member.birth)}}歲、{{getGender(member.gender)}}</h4>
                 </div>
 
-                <div v-if="!checkMember || !checkHoster" class="collectEvent">
+                <div v-if="!checkMember || !checkHoster" class="eventButton">
                     <input v-show="checkCollect" type="button" class="collectEvent__button" @click="collectEvent()" value="收藏活動">
                     <input v-show="!checkCollect" type="button" class="collectEvent__button" @click="removeCollect()" value="取消收藏">
                 </div>
 
                 <!-- 下方驚嘆號記得拿掉 -->
-                <div v-if="!checkMember" class="collectEvent">
+                <div v-if="!checkMember" class="eventButton">
                     <input type="button" class="collectEvent__button" id="3" @click="showMarginBoard($event)" value="邀請夥伴">
                 </div>
 
             </div>
                         
             <textarea name="Intro" id="Intro" class="intro" rows="15" v-model="event.eventContent"></textarea>
-            <!-- <p>{{event.eventContent}}</p> -->
 
-            <div class="message__wrap">
-                <Message v-for="m in this.messages" :key="m.messageId" :m="m" @update="delMesg" />
-                <!-- <div class="message" v-for=" (m, index) in this.messages" :key="m.messageId">
-                    <div class="message__member">
-                        <figure class="member__img">
-                            <img :src="getImg(m.memberPhoto[0])" alt="" class="image--resp">
-                        </figure>
-                        <h4>{{m.name}}：</h4>
-                        <div v-if="m.memberId == selfId" class="message__button">
-                            <input type="button" v-show="!isEdit" class="button--transparent__small" @click="editing(index)" value="修改">
-                            <input type="button" v-show="isEdit" class="button--transparent__small"  value="取消">
-                            <input type="button" v-show="isEdit" class="button--transparent__small" @click="editMessage(index)"  value="確認">
-                            <input type="button" v-show="!isEdit" class="button--transparent__small" @click="delMessage(m.messageId)" value="刪除">
-                        </div>
-                    </div>
-                    <div class="message__text">
-                        <textarea name="" id="m.messageId" rows="3" disabled="true" class="message__input" v-model="m.messageContent" ></textarea>
-                    </div>
-                </div> -->
+            <input v-if="!checkMember" v-show="isPublic" type="button" class="message__board__switchButton button--transparent" @click="changeMessageWrap" value="參加者留言版">
+            <input v-show="!isPublic" type="button" class="message__board__switchButton button--transparent" @click="changeMessageWrap" value="公共留言版">
+
+            <div v-show="isPublic" class="message__wrap">
+                <div v-if="!this.publicMessages.length" class="noneapi">暫無任何留言</div>
+                <Message v-for="m in this.publicMessages" :key="m.messageId" :m="m" @update="delMesg" />
+            </div>
+
+            <div v-show="!isPublic" class="message__wrap">
+                <div v-if="!this.privateMessages.length" class="noneapi">暫無任何留言</div>
+                <Message v-for="pm in this.privateMessages" :key="pm.messageId" :m="pm" @update="delMesg" />
             </div>
 
             <div class="message__board">
                 <form action="">
-                    <h3>留言</h3>
+                    <!-- <h3>留言</h3> -->
                     <textarea 
                     name="LeaveMessage" 
                     id="LeaveMessage" 
@@ -116,6 +107,7 @@
                     <!-- <div v-if="notExpired"> -->
                         <button type="button" class="button--close" @click="closeMargin()">X</button>
                         <header><h2>審核參加者</h2></header>
+                        <div v-if="!this.participanters.length" class="noneapi">尚無人報名</div>
                         <div v-for="p in participanters" :key="p.participantId" class="participanter gradient">
                             <div class="message__member">
                                 <figure class="member__img">
@@ -146,6 +138,7 @@
                 <div class="marginBoard">
                     <button type="button" class="button--close" @click="closeMargin()">X</button>
                     <header><h2>參加者</h2></header>
+                    <div v-if="!this.confirmer.length" class="noneapi">尚無參加者</div>
                     <div v-for="p in confirmer" :key="p.participantId" class="participanter gradient">
                         <div class="message__member">
                             <figure class="member__img">
@@ -160,6 +153,7 @@
                 <div class="marginBoard">
                     <button type="button" class="button--close" @click="closeMargin()">X</button>
                     <header><h2>邀請夥伴</h2></header>
+                    <div v-if="!this.inviter.length" class="noneapi">尚無可邀請的夥伴</div>
                         <div v-for="p in inviter" :key="p.protagonistId" class="participanter gradient">
                             <div class="message__member">
                                 <figure class="member__img">
@@ -190,6 +184,9 @@ export default {
             event: null,
             motivationString: null,
             messages: [],
+            publicMessages: [],
+            privateMessages: [],
+            isPublic: true,
             participanters:[],
             inputString:null,
             member: null,
@@ -359,7 +356,10 @@ export default {
                 this.$set(item, 'name',  members[index].name)
                 this.$set(item, 'memberPhoto',  members[index].memberPhoto[0])
             })
+
             console.log(arrs)
+            this.publicMessages = arrs.filter( m => m.status == 3)
+            this.privateMessages = arrs.filter( m => m.status == 1)
         },
         async getParticipanterMemberApi(arrs){
 
@@ -417,7 +417,7 @@ export default {
         },
         getCity(num){
             const cities =["基隆市","台北市","新北市","桃園縣","新竹市","新竹縣","苗栗縣","台中市","彰化縣","南投縣","雲林縣","嘉義市","嘉義縣","台南市","高雄市","屏東縣","台東縣","花蓮縣","宜蘭縣","澎湖縣","金門縣","連江縣"]
-            return cities[num-1]
+            return cities[num]
         },
         getGender(gender){
             if(gender === 2){
@@ -427,14 +427,24 @@ export default {
             }
         },
         leaveMessage(){
+
+            let status = 0
+            if(this.isPublic){
+                status = 3
+            }else{
+                status = 1
+            }
+
             apiMessagePost({
                 "eventId": this.eventId,
                 "memberId": this.$cookies.get("MemberId"),
                 "messageContent": this.inputString,
+                "status": status
             })
             .then(res =>{
                 console.log(res)
                 this.renewMessageApi()
+
             })
             .catch(err=>{
                 console.log(err)
@@ -523,6 +533,7 @@ export default {
             apiFavoriteDel(this.selfId,this.eventId)
             .then(res =>{
                 console.log(res)
+                this.checkCollect = true
             })
             .catch(err =>{
                 console.log(err)
@@ -530,7 +541,11 @@ export default {
         },
         delMesg(messageId){
 
-            this.messages = this.messages.filter( m => m.messageId !== messageId)
+            this.publicMessages = this.publicMessages.filter( m => m.messageId !== messageId)
+            this.privateMessages = this.privateMessages.filter( m => m.messageId !== messageId)
+        },
+        changeMessageWrap(){
+            this.isPublic = !this.isPublic
         }
     },
 }
@@ -542,7 +557,6 @@ figure{
     margin: 0;
 }
 .container{
-    /* border: 1px solid black; */
     width: 30%;
     padding: 1em 2.5em;
 }
@@ -591,7 +605,8 @@ figure{
 .eventImg{
     margin: 1em auto 0 auto;
     width: 300px;
-
+    border-radius: 10px;
+    overflow: hidden;
 }
 .subInfo__wrap{
     display: flex;
@@ -687,16 +702,6 @@ a{
     background-color: #363636;
     color: white;
 }
-/* .motivation__wrap{
-    display: none;
-    position: absolute;
-    left: 0;
-    top: 0;
-    background-color: #00000060;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-} */
 .marginBoard{
     position: fixed;
     background-color: white;
@@ -783,7 +788,7 @@ a{
     margin-top: 0;
     margin-bottom: 0;
 }
-.collectEvent{
+.eventButton{
     margin-left: auto;
 }
 .collectEvent__button{
@@ -805,5 +810,17 @@ a{
     width: 100%;
     margin-top: 1em;
     font-size: 1.5em;
+}
+.noneapi{
+    font-size: 1.5em;
+    color: gray;
+    text-align: center;
+    padding: 1em;
+}
+.underline{
+    border-bottom: 2px solid black;
+}
+.message__board__switchButton{
+    margin-top: 1em;
 }
 </style>

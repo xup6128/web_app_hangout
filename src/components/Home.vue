@@ -9,7 +9,8 @@
 
         <section class="ads__wrap gradient">
             <div class="ads">
-                <img v-for="ad in adsArr" :key="ad.alt" class="ad img--resp" :src=ad.src :alt=ad.alt>
+                <!-- <img v-for="ad in adsArr" :key="ad.alt" class="img--resp ad" :src=ad.src :alt=ad.alt> -->
+                <img v-for="ad in adsArr" :key="ad.alt" class="ad" :src=ad.src :alt=ad.alt>
             </div>
             <ol @click="changeAds" class="ads__pages">
                 <li v-for="(ad, index) in adsArr" :key="ad.alt" class="page">{{index}}</li>
@@ -20,20 +21,47 @@
 
             <!-- Public Event List -->
 
-            <!-- <section class="public__wrap">
-                <div v-for="n in 4" :key="n" class="event">
-                    <figure class="event__img">
-                        <img class="img--resp" src="https://www.tsc.taipei/wp-content/uploads/%E6%B4%BB%E5%8B%95%E5%9C%96%E6%A8%99.jpg" alt="">
+            <section class="public__wrap">
+
+                <div class="option" @click="quickStar(0)">
+                <a href="#FilterWrap">
+                    <figure class="option__img">
+                        <img class="img--resp img--radious" src="../assets/RightNow.png" alt="">
                     </figure>
-                    <h4>桌遊團</h4>
-                    <h5>(星期一) 六月14日 19：00</h5>
-                    <h5>106台北市大安區師大路9號</h5>
+                    <h4>馬上出發</h4><span class="chevron-arrow-right"></span>
+                </a>
                 </div>
-            </section> -->
+
+                <div class="option" @click="quickStar(5)">
+                <a href="#FilterWrap">
+                    <figure class="option__img">
+                        <img class="img--resp img--radious" src="../assets/FridayNight.png" alt="">
+                    </figure>
+                    <h4>週五狂歡夜</h4><span class="chevron-arrow-right"></span><span class="chevron-arrow-right"></span>
+                </a>    
+                </div>
+
+                <div class="option" @click="quickStar(6)">
+                <a href="#FilterWrap">
+                    <figure class="option__img">
+                        <img class="img--resp img--radious" src="../assets/Weekend.png" alt="">
+                    </figure>
+                    <h4>週末踏青郊遊</h4><span class="chevron-arrow-right"></span><span class="chevron-arrow-right"></span><span class="chevron-arrow-right"></span>
+                </a>
+                </div>
+            </section>
 
 
             <!-- 篩選器 -->
-            <section class="filter__wrap gradient">
+            <section id="FilterWrap" class="filter__wrap gradient">
+                <!-- <ul @click="dropdown($event)" class="filter__list">
+                    <li id="4" class="filter__item arrow" :class="{'filter--chosen' : this.cities.length}">城市</li>
+                    <li id="6" class="filter__item arrow" :class="{'filter--chosen' : this.day}">日期</li>
+                    <li id="1" class="filter__item arrow" :class="{'filter--chosen' : !this.eventType.length}">活動類型</li>
+                    <li id="2" class="filter__item arrow" :class="{'filter--chosen' : this.expense}">花費</li>
+                    <li id="3" class="filter__item arrow" :class="{'filter--chosen' : this.group}">人數</li>
+                    <li id="5" class="filter__item arrow" :class="{'filter--chosen' : this.distance}">距離</li>
+                </ul> -->
                 <ul @click="dropdown($event)" class="filter__list">
                     <li id="4" class="filter__item arrow">城市</li>
                     <li id="6" class="filter__item arrow">日期</li>
@@ -148,6 +176,7 @@
 
             <!-- Private Event List -->
             <section class="private__wrap">
+                <div v-if="!this.showEvents.length" class="noneapi">找不到此條件的活動，請重新設定篩選</div>
                 <router-link :to="`/Event/${e.eventId}`"
                 v-for="e in showEvents" 
                 :key="e.eventId"
@@ -304,7 +333,7 @@ export default {
                 let t = new Date(e.hostTime)
                 let timeDiff = t.getTime() - now
                 let dayDiff = Math.floor(timeDiff / (24 * 3600 * 1000))
-                console.log(dayDiff)
+                // console.log(dayDiff)
                 switch(this.day){
                     case 0:
                         return dayDiff ==0
@@ -448,7 +477,8 @@ export default {
             dist = dist.toFixed(1);
             // if (unit=="K") { dist = dist * 1.609344 }
             // if (unit=="N") { dist = dist * 0.8684 }
-            console.log(dist)
+            
+            // console.log(dist)
             return dist;
         },
         searchCancel(){
@@ -459,23 +489,36 @@ export default {
         },
         unselectAll(){
             this.checkEventTypes = []
+        },
+        quickStar(option){
+            switch(option){
+                case 0:
+                    this.day = 0;
+                    break;
+                case 5:
+                    this.day =5;
+                    break;
+                case 6:
+                    this.day =6
+                    break;
+            }
         }
     },
     created(){
 
         //do we support geolocation
-        if(!("geolocation" in navigator)) {
-            console.log('Geolocation is not available')
-            return;
-        }
+        // if(!("geolocation" in navigator)) {
+        //     console.log('Geolocation is not available')
+        //     return;
+        // }
         // get position
-        navigator.geolocation.getCurrentPosition(pos => {
-        console.log(`Your location data is ${pos.coords.latitude }, ${ pos.coords.longitude}`)
-        this.lat1 = pos.coords.latitude
-        this.lon1 = pos.coords.longitude
-        }, err => {
-        console.log(err.message)
-        })
+        // navigator.geolocation.getCurrentPosition(pos => {
+        // console.log(`Your location data is ${pos.coords.latitude }, ${ pos.coords.longitude}`)
+        // this.lat1 = pos.coords.latitude
+        // this.lon1 = pos.coords.longitude
+        // }, err => {
+        // console.log(err.message)
+        // })
 
         apiEventList({})
         .then( res =>{
@@ -520,6 +563,7 @@ export default {
 }
 .ad{
     transition: margin-left .5s;
+    width: 100%;
 }
 .ads__pages{
     position: absolute;
@@ -544,7 +588,8 @@ export default {
 }
 .img--resp{
     width: 100%;
-    height: auto;
+    max-height: 100%;
+    /* height: auto; */
 }
 .filter__wrap{
     border-radius: 10px;
@@ -583,6 +628,9 @@ export default {
     transition: all .5s;
     margin-left: .3em;
 }
+.filter--chosen{
+    background-color: #FFEEDF;
+}
 .arrow--dropdown{
     background-color: #FFEEDF;
 }
@@ -615,6 +663,7 @@ export default {
     display: flex;
     justify-content: space-between;
     padding: 1.5em 1em;
+    cursor: pointer;
 }
 .private__wrap{
     display: flex;
@@ -735,5 +784,40 @@ input[type=checkbox]{
     margin: 0;
     color: gray;
     text-align: right;
+}
+.option{
+    width: 30%;
+}
+.option__img{
+    height: 23vh;
+    margin: 0;
+    border-radius: .5em;
+    overflow: hidden;
+}
+.img--radious{
+    height: 100%;
+}
+.option h4{
+    display: inline-block;
+    margin: 0;
+    font-size: 1.5em;
+    color: #008294;
+}
+.option:hover 
+.option__img{
+    opacity: .7;
+}
+.chevron-arrow-right {
+  display: inline-block;
+  border-right: 4px solid #008294;
+  border-bottom: 4px solid #008294;
+  width: 10px; height: 10px;
+  transform: rotate(-45deg);
+}
+.noneapi{
+    font-size: 1.5em;
+    color: gray;
+    text-align: center;
+    padding: 1em;
 }
 </style>

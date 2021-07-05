@@ -122,7 +122,7 @@
                     </div>
 
                     <label for="EventContent">活動說明：</label>
-                    <button class="button--emoji" @click="toogleDialogEmoji">😃</button>
+                    <button class="button--emoji" type="button" @click="toogleDialogEmoji">😃</button>
                     <VEmojiPicker
                     v-show="showDialog"
                     :style="{ width: '440px', height: '200' }"
@@ -138,12 +138,12 @@
                     name=""
                     rows="10"
                     placeholder="請為你的活動做一點說明吧"
-                    v-model="eventContent"
+                    v-model.lazy="eventContent"
                     >
                     </textarea>
 
                     <br><br>
-                    <button @click="getLatLng()" type="button" class="button--red">註冊</button>
+                    <button @click="holdEvent()" type="button" class="button--red">舉辦活動</button>
                 </form>
                 </div>
 
@@ -261,24 +261,24 @@ export default {
             const cities =["基隆市","台北市","新北市","桃園縣","新竹市","新竹縣","苗栗縣","台中市","彰化縣","南投縣","雲林縣","嘉義市","嘉義縣","台南市","高雄市","屏東縣","台東縣","花蓮縣","宜蘭縣","澎湖縣","金門縣","連江縣"]
             return cities[num-1]
         },
-        getLatLng(){
-            let addr = this.getCity(this.cityId)+this.road
-            let geocoder = new google.maps.Geocoder();
+        // getLatLng(){
+        //     let addr = this.getCity(this.cityId)+this.road
+        //     let geocoder = new google.maps.Geocoder();
 
-            let vm = this
-            geocoder.geocode({
-                "address": addr
-            },function (res, status){
-                if(status == "OK"){
-                    vm.holdEvent(res[0].geometry.location.lat(), res[0].geometry.location.lng())
-                    // vm.save(res[0].geometry.location.lat(),res[0].geometry.location.lng())
-                }else{
-                    console.log("error")
-                }
-            })
+        //     let vm = this
+        //     geocoder.geocode({
+        //         "address": addr
+        //     },function (res, status){
+        //         if(status == "OK"){
+        //             vm.holdEvent(res[0].geometry.location.lat(), res[0].geometry.location.lng())
+        //             // vm.save(res[0].geometry.location.lat(),res[0].geometry.location.lng())
+        //         }else{
+        //             console.log("error")
+        //         }
+        //     })
 
-        },
-        holdEvent(lat, lng){
+        // },
+        holdEvent(){
 
             this.checkOvernight();
             this.checkFree();
@@ -299,8 +299,8 @@ export default {
             formData.append("MemberId", this.$cookies.get("MemberId"));
             // formData.append("Status", "true");
             // formData.append("Parent", "");
-            formData.append("Lat", lat);
-            formData.append("Lng", lng);
+            // formData.append("Lat", lat);
+            // formData.append("Lng", lng);
 
             for(let value of formData.values()){
                 console.log(value)

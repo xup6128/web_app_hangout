@@ -106,7 +106,9 @@ export default {
               return;
           }
 
-          this.notices = res.data;
+          //過濾掉自己對自己發送的通知
+          this.notices = res.data.filter( n => n.protagonistId != this.$cookies.get("MemberId"))
+          console.log("apiNoticeGet", res)
           this.getMembersApi(this.notices);
         })
         .catch((err) => {
