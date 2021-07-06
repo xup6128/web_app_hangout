@@ -10,7 +10,7 @@ module.exports = {
     // Paths
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    // proxyTable:{},
+    // proxyTable: {},
     proxyTable: {
       '/api': {
         target: "http://35.229.140.28/api",  //node express api的url位置

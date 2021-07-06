@@ -200,7 +200,7 @@
 import DatePicker from 'vue2-datepicker';
 import 'vue2-datepicker/index.css';
 import { apiEventList } from "../api"
-
+// import { apiEventList } from '../apiConst'
 
 export default {
     components: { DatePicker },
@@ -507,23 +507,24 @@ export default {
     created(){
 
         //do we support geolocation
-        // if(!("geolocation" in navigator)) {
-        //     console.log('Geolocation is not available')
-        //     return;
-        // }
+        if(!("geolocation" in navigator)) {
+            console.log('Geolocation is not available')
+            return;
+        }
         // get position
-        // navigator.geolocation.getCurrentPosition(pos => {
-        // console.log(`Your location data is ${pos.coords.latitude }, ${ pos.coords.longitude}`)
-        // this.lat1 = pos.coords.latitude
-        // this.lon1 = pos.coords.longitude
-        // }, err => {
-        // console.log(err.message)
-        // })
+        navigator.geolocation.getCurrentPosition(pos => {
+        console.log(`Your location data is ${pos.coords.latitude }, ${ pos.coords.longitude}`)
+        this.lat1 = pos.coords.latitude
+        this.lon1 = pos.coords.longitude
+        }, err => {
+        console.log(err.message)
+        })
 
-        apiEventList({})
+        apiEventList()
         .then( res =>{
 
-            console.log(res)
+            console.log("apiEventList", res)
+            
             if (!Array.isArray(res.data)) {
               console.log("IS NOT ARRAY", res.data)
               return;

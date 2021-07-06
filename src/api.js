@@ -1,55 +1,59 @@
 import axios from "axios";
 import cookies from 'vue-cookies'
 
+// const webApi = 'http://35.229.140.28/api'
+
 const eventRequest = axios.create({
-  baseURL: '/api/Event',
-  headers: { 'Content-Type': 'application/json' },
-  timeout: 20000
+  // baseURL: `${webApi}/Event`
+  baseURL: '/api/Event'
+  // headers: { 'Content-Type': 'application/json' },
+  // timeout: 20000
 })
 const memberRequest = axios.create({
-  baseURL: '/api/Member',
-  headers: { 'Content-Type': 'application/json' },
-  timeout: 20000
+  baseURL: `/api//Member`
+  // baseURL: `api/Member`,
+  // headers: { 'Content-Type': 'application/json' },
+  // timeout: 20000
 })
 const followMemberRequest = axios.create({
-  baseURL: '/api/Member/Follow',
-  headers: { 'Content-Type': 'application/json' },
-  timeout: 20000
+  baseURL: `/api//Member/Follow`
+  // headers: { 'Content-Type': 'application/json' },
+  // timeout: 20000
 })
 const messageRequest = axios.create({
-  baseURL: '/api/Event/Message',
-  headers: { 'Content-Type': 'application/json' },
-  timeout: 20000
+  baseURL: `/api//Event/Message`
+  // headers: { 'Content-Type': 'application/json' },
+  // timeout: 20000
 })
 const participantRequest = axios.create({
-  baseURL: '/api/Event/participant',
-  headers: { 'Content-Type': 'application/json' },
-  timeout: 20000
+  baseURL: `/api//Event/participant`
+  // headers: { 'Content-Type': 'application/json' },
+  // timeout: 20000
 })
 const favoriteRequest = axios.create({
-  baseURL: '/api/Member/Favorite',
-  headers: { 'Content-Type': 'application/json' },
-  timeout: 20000
+  baseURL: `/api//Member/Favorite`
+  // headers: { 'Content-Type': 'application/json' },
+  // timeout: 20000
 })
 const commentRequest = axios.create({
-  baseURL: '/api/Member/Comment',
-  headers: { 'Content-Type': 'application/json' },
-  timeout: 20000
+  baseURL: `/api//Member/Comment`
+  // headers: { 'Content-Type': 'application/json' },
+  // timeout: 20000
 })
 const relationshipRequest = axios.create({
-  baseURL: '/api/Event/Relationship',
-  headers: { 'Content-Type': 'application/json' },
-  timeout: 20000
+  baseURL: `/api//Event/Relationship`
+  // headers: { 'Content-Type': 'application/json' },
+  // timeout: 20000
 })
 const inviteRequest = axios.create({
-  baseURL: '/api/Event/Invite',
-  headers: { 'Content-Type': 'application/json' },
-  timeout: 20000
+  baseURL: `/api//Event/Invite`
+  // headers: { 'Content-Type': 'application/json' },
+  // timeout: 20000
 })
 const noticeRequest = axios.create({
-  baseURL: '/api/Notice',
-  headers: { 'Content-Type': 'application/json' },
-  timeout: 20000
+  baseURL: `/api//Notice`
+  // headers: { 'Content-Type': 'application/json' },
+  // timeout: 20000
 })
 
 //Event

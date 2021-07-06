@@ -127,7 +127,9 @@ export default {
       $cookies.remove("MemberId");
       this.isLogin = false;
       this.$router.push("/");
+      this.reload()
       alert("已登出會員");
+
     },
     dropdown(e) {
       // document.querySelector('.accountCenter').style.display = 'block';

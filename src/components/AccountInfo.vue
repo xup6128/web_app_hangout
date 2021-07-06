@@ -32,7 +32,7 @@
                         class="uploadImage"
                         accept="image/*,.pdf" 
                         @change="previewImage($event), getFiles($event)" 
-                        name="EvenImage" 
+                        name="UploadImage" 
                         required>
                     </div>
                     
@@ -136,6 +136,34 @@
                     <input type="text" id="JobType" name="JobType" v-model="category" :disabled="!isEdit"><br>
                     <label for="JobTitle" class="gradient">工作職稱：</label>
                     <input type="text" id="JobTitle" name="JobTitle" v-model="jobTitle" :disabled="!isEdit"><br>
+                    
+                    <div>
+                        <label for="AlbumImage" v-if="this.checkMember">相片牆：<button  class="album__button" v-show="!this.multiUpload" @click="multiUpload=true">編輯相片</button></label>
+                        <label for="AlbumImage" v-else>相片牆：<sapn  v-if="!this.pics1" class="noneapi">暫無任何相片</sapn></label>
+                        <button v-show="this.multiUpload" class="album__button__small" @click="reload()">取消</button>
+                        <button v-show="this.multiUpload" class="album__button__small" @click="AlbumPhotoPut">確認</button>
+
+                        <div class="AlbumeWall">
+                            <img :src=this.previewPics[0] alt="" class="image--resp" :class="{'choseToUpload': this.multiUpload}" @click="upLoadPics(0)">
+                            <img src="https://attach.setn.com/newsimages/2021/01/19/2991552-PH.jpg" alt="" class="image--resp" :class="{'choseToUpload': this.multiUpload}" @click="upLoadPics(1)">
+                            <img src="https://attach.setn.com/newsimages/2021/01/19/2991552-PH.jpg" alt="" class="image--resp" :class="{'choseToUpload': this.multiUpload}" @click="upLoadPics(2)">
+                            <img src="https://attach.setn.com/newsimages/2021/01/19/2991552-PH.jpg" alt="" class="image--resp" :class="{'choseToUpload': this.multiUpload}" @click="upLoadPics(3)">
+                        </div>
+
+                        <input type="file" 
+                        id="AlbumImage" 
+                        class="uploadImage"
+                        accept="image/*,.pdf" 
+                        @change="previewAlbum($event), changeAlbum($event)" 
+                        name="EvenImage" >
+
+                        <div class="chosenPic">
+                            <figure>
+                                <img src="https://attach.setn.com/newsimages/2021/01/19/2991552-PH.jpg" alt="" class="image--resp">
+                            </figure>
+                        </div>
+                    </div>
+
                     <label for="Intro">自我介紹</label><br>
                     <textarea name="Intro" id="Intro" class="intro"  rows="15" v-model="intro" :disabled="!isEdit"></textarea><br>
                 </div>
@@ -220,6 +248,9 @@ export default {
             comments:[],
             isEdit: false,
             preview: null,
+            key: null,
+            pics: [{}, {}, {}, {}],
+            previewPics: ["str", "str", "str", "str"],
             image: null,
             member:null,
             category: null,
@@ -229,6 +260,8 @@ export default {
             files: null,
             isCropping: false,
             avergaRate: 0,
+            multiUpload: false,
+            albumPics: true,
             // birthToDate: this.member.birth.slice(0,10),
             eventType:[
                 { eng: 'travel', zh: '旅行出遊' },
@@ -258,6 +291,10 @@ export default {
             this.intro = this.isNull(this.member.intro)
             this.birth = this.member.birth.slice(0,10)
             this.preview = this.getCover(this.member.memberPhoto[0])
+            for(let i=1;i<this.member.memberPhoto.length;i++){
+                this.pics[i-1] = this.member.memberPhoto[i]
+            }
+            this.albumPics = this.member.memberPhoto
         })
         .catch(err=>{
             console.log(err)
@@ -390,12 +427,44 @@ export default {
             this.files = new File([u8arr], filename, { type: mime });
             this.memberPhotoPut()
         },
+        trunFile(dataurl) { 
+            let arr = dataurl.split(','),
+                mime = arr[0].match(/:(.*?);/)[1],
+                bstr = atob(arr[1]),
+                n = bstr.length,
+                u8arr = new Uint8Array(n);
+            while (n--) {
+                u8arr[n] = bstr.charCodeAt(n);
+            }
+            return new File([u8arr], "file", { type: mime });
+        },
         memberPhotoPut(){
 
             let formData = new FormData();
             formData.append("MemberPhoto", this.files);
-            
-            console.log(666)
+            apiMemberPhotoPut(
+                formData
+            )
+            .then(res =>{
+                console.log(res)
+            })
+            .catch(err =>{
+                console.log(err)
+            })
+        },
+        AlbumPhotoPut(){
+
+            let formData = new FormData();
+            formData.append("MemberPhoto", this.files);
+            for(let i=0;i<4;i++){
+                if(!(this.pics[i])){returm;}
+                formData.append("MemberPhoto", this.pics[i]);
+            }
+
+            for(let value of formData.values()){
+                console.log(value)
+            }
+
             apiMemberPhotoPut(
                 formData
             )
@@ -514,6 +583,27 @@ export default {
         },
         addFile(){
             document.getElementById("UploadImage").click();
+        },
+        upLoadPics(num){
+            this.key = num
+            document.getElementById("AlbumImage").click();
+        },
+        changeAlbum(e){
+            console.log( e.target.files[0])
+            console.log(this.key)
+            this.pics[this.key] = e.target.files[0]
+        },
+        previewAlbum(event) {
+            let input = event.target;
+            if (input.files) {
+                let reader = new FileReader();
+                reader.onload = (e) => {
+                    console.log(55555)
+                    console.log(e.target.result)
+                    this.previewPics[this.key] = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
         },
     }
 }
@@ -705,5 +795,68 @@ input:disabled{
 }
 .member__text{
     width: 100%;
+}
+.noneapi{
+    font-size: .8em;
+}
+
+.AlbumeWall{
+    display: flex;
+    width: 100%;
+    margin: 2% 1%;
+}
+.AlbumeWall img{
+    display: inline-block;
+    width: 23%;
+    /* width: 32%; */
+    margin-right: 2%;
+}
+.album__button{
+    border-radius: 5px;
+    padding: .5em 1em;
+    background-color: #FFF;
+    border: 1px solid;
+    font-size: .6em;
+}
+.album__button:hover{
+    background-color: #363636;
+    color: white;
+}
+.album__button__small{
+    border-radius: 5px;
+    padding: .5em 1em;
+    background-color: #FFF;
+    border: 1px solid;
+    font-size: .9em;
+}
+.album__button__small:hover{
+    background-color: #363636;
+    color: white;
+}
+.chosenPic{
+    width: 98%;
+    margin-left: 1%;
+}
+.chosenPic figure{
+    margin: 0;
+}
+.choseToUpload{
+    cursor: pointer;
+    background-color: #FFF;
+    border-radius: 5px;
+    text-align: center;
+
+}
+.choseToUpload::before{
+    content: "點擊上傳相片";
+    padding: .5em 1em;
+    border: 1px solid;
+    font-size: .8em;
+    top: 1em;
+    z-index: 1;
+}
+.choseToUpload:hover:before{
+    background-color: #6d4141;
+    color: white;
 }
 </style>

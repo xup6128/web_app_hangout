@@ -12,6 +12,7 @@
       </div>
       <button type="button" class="button--red" @click="login()">登入</button><br>
       <p>還不是會員嗎？<span><router-link to="/signup">點我立即註冊</router-link></span></p>
+      <p>忘記密碼嗎?<span><a href="">點我信箱通知</a></span></p>
     </form>
   </div>
 </template>
@@ -39,11 +40,13 @@ import { apiMemberLogin } from "../api"
         // this.$cookies.set("token","isLogin");
         // this.$cookies.set("MemberId", "67", 60*60*24*30);
         // return
+        let data = {
+            "Account": this.account,
+            "Password": this.password
+        }
+        console.log(data)
 
-        apiMemberLogin({
-            Account: this.account,
-            Password: this.password
-        })
+        apiMemberLogin(data)
         .then(res=>{
           console.log(res.data.memberId)
 
