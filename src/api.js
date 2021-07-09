@@ -1,57 +1,67 @@
 import axios from "axios";
 import cookies from 'vue-cookies'
 
-// const webApi = 'http://35.229.140.28/api'
+const webApi = 'http://35.229.140.28/api'
+
 
 const eventRequest = axios.create({
-  // baseURL: `${webApi}/Event`
-  baseURL: '/api/Event'
+  baseURL: `${webApi}/Event`
+  // baseURL: '/api/Event'
   // headers: { 'Content-Type': 'application/json' },
   // timeout: 20000
 })
 const memberRequest = axios.create({
-  baseURL: `/api//Member`
-  // baseURL: `api/Member`,
+  baseURL: `${webApi}/Member`
+  // baseURL: `/api/Member`
   // headers: { 'Content-Type': 'application/json' },
   // timeout: 20000
 })
+
 const followMemberRequest = axios.create({
-  baseURL: `/api//Member/Follow`
+  baseURL: `${webApi}/Member/Follow`
+  // baseURL: `/api//Member/Follow`
   // headers: { 'Content-Type': 'application/json' },
   // timeout: 20000
 })
 const messageRequest = axios.create({
-  baseURL: `/api//Event/Message`
+  baseURL: `${webApi}/Event/Message`
+  // baseURL: `/api//Event/Message`
   // headers: { 'Content-Type': 'application/json' },
   // timeout: 20000
 })
 const participantRequest = axios.create({
-  baseURL: `/api//Event/participant`
+  baseURL: `${webApi}/Event/participant`
+  // baseURL: `/api//Event/participant`
   // headers: { 'Content-Type': 'application/json' },
   // timeout: 20000
 })
 const favoriteRequest = axios.create({
-  baseURL: `/api//Member/Favorite`
+  baseURL: `${webApi}/Member/Favorite`
+  // baseURL: `/api//Member/Favorite`
   // headers: { 'Content-Type': 'application/json' },
   // timeout: 20000
 })
 const commentRequest = axios.create({
-  baseURL: `/api//Member/Comment`
+  baseURL: `${webApi}/Member/Comment`
+  // baseURL: `/api//Member/Comment`
   // headers: { 'Content-Type': 'application/json' },
   // timeout: 20000
 })
 const relationshipRequest = axios.create({
-  baseURL: `/api//Event/Relationship`
+  baseURL: `${webApi}/Event/Relationship`
+  // baseURL: `/api//Event/Relationship`
   // headers: { 'Content-Type': 'application/json' },
   // timeout: 20000
 })
 const inviteRequest = axios.create({
-  baseURL: `/api//Event/Invite`
+  baseURL: `${webApi}/Event/Invite`
+  // baseURL: `/api//Event/Invite`
   // headers: { 'Content-Type': 'application/json' },
   // timeout: 20000
 })
 const noticeRequest = axios.create({
-  baseURL: `/api//Notice`
+  baseURL: `${webApi}/Notice`
+  // baseURL: `/api/Notice`
   // headers: { 'Content-Type': 'application/json' },
   // timeout: 20000
 })
@@ -61,8 +71,8 @@ export const apiEventPost = data => eventRequest.post('', data);
 export function apiEventGet(params) {
   return eventRequest.get('/' + params);
 };
-// export const apiEventList = () => eventRequest.get('/date=' + new Date().toISOString().slice(0, 19).replace(/T/i, " "));
-export const apiEventList = () => eventRequest.get('/date=2021-06-23');
+export const apiEventList = () => eventRequest.get('/date=' + new Date().toISOString().slice(0, 19).replace(/T/i, " "));
+// export const apiEventList = () => eventRequest.get('/date=2021-06-23');
 
 
 
@@ -80,9 +90,13 @@ export function apiMemberGet(params) {
 export const apiMemberGetHostEvent = () => memberRequest.get(`/${cookies.get("MemberId")}/HostEvent`);
 export const apiMemberGetJoinEvent = () => memberRequest.get(`/${cookies.get("MemberId")}/JoinEvent`);
 export const apiMemberGetInviteEvent = () => memberRequest.get(`/${cookies.get("MemberId")}/InviteEvent`);
-export function apiMemberPhotoPut(data) {
-  return memberRequest.put(`/${cookies.get("MemberId")}/0`, data)
+export function apiMemberCoverPut(data) {
+  return memberRequest.put(`/Cover/${cookies.get("MemberId")}`, data)
 }
+export function apiMemberPhotoPut(data) {
+  return memberRequest.put(`/Photo/${cookies.get("MemberId")}`, data)
+}
+export const apiMemberForget = data => memberRequest.put(`/ForgetPassword`, data);
 
 //Follow Member
 export const apiFollowMemberPost = data => followMemberRequest.post("", data);

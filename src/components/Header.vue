@@ -15,9 +15,11 @@
           class="header__tool__li gradient"
         >
           通知
-          <ul class="notification">
+          <ul class="notification mostly-customized-scrollbar" >
             <li class="notification__readAll"><div class="notification__readAll__button" @click="notificationReadAll">全部已讀</div></li>
+            <div v-if="!this.notices.length" class="noneapi">暫無通知</div>
             <li
+            v-else
               class="notification__list"
               v-for="n in notices"
               :key="n.noticeId"
@@ -50,15 +52,13 @@
           class="header__tool__li gradient"
         >
           會員中心
-          <ul class="accountCenter">
-            <li class="accountCenter__list" @click="reload">
-              <router-link :to="`/AccountInfo/${$cookies.get('MemberId')}`"
-                >會員資料</router-link
-              >
-            </li>
-            <li class="accountCenter__list">
-              <router-link to="/ManageEvent">管理活動</router-link>
-            </li>
+          <ul class="accountCenter" @click="reload">
+            <router-link :to="`/AccountInfo/${$cookies.get('MemberId')}`">
+              <li class="accountCenter__list" >會員資料</li>
+            </router-link>
+            <router-link to="/ManageEvent">
+              <li class="accountCenter__list">管理活動</li>
+            </router-link>
           </ul>
         </li>
         <li class="header__tool__li">
@@ -96,30 +96,16 @@ export default {
     console.log("IsLogin:", this.isLogin)
 
     if (this.isLogin) {
-        
-      apiNoticeGet()
-        .then((res) => {
-
-          console.log(res)
-          if (!Array.isArray(res.data)) {
-              console.log("IS NOT ARRAY", res.data)
-              return;
-          }
-          console.log("apiNoticeGet", res.data)
-
-          //過濾掉自己對自己發送的通知
-          this.notices = res.data.filter( n => n.protagonistId != this.$cookies.get("MemberId"))
-
-          this.notices.sort(function (a, b) {
-              return a.noticeId<b.noticeId?1:-1;
-          });
-
-          this.getMembersApi(this.notices);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      this.getNotification();
+      setInterval(this.getNotification, 30000)
     }
+
+    // let TimeInter = null
+    // if(){
+    //   setInterval(this.getNotification,30000)
+    // }
+
+
   },
   methods: {
     logout() {
@@ -157,7 +143,7 @@ export default {
         this.$set(item, "name", members[index].name);
         this.$set(item, "memberPhoto", members[index].memberPhoto[0]);
       });
-      console.log(arrs);
+      // console.log(arrs);
     },
     getImg(url) {
       return `http://35.229.140.28/${url}`;
@@ -181,6 +167,25 @@ export default {
         apiNoticePut(n.noticeId)
       })
 
+    },
+    getNotification(){
+
+        apiNoticeGet()
+        .then((res) => {
+          console.log("apiNoticeGet", res)
+
+          //過濾掉自己對自己發送的通知
+          this.notices = res.data.filter( n => n.protagonistId != this.$cookies.get("MemberId"))
+
+          this.notices.sort(function (a, b) {
+              return a.noticeId<b.noticeId?1:-1;
+          });
+
+          this.getMembersApi(this.notices);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
   },
 };
@@ -257,11 +262,13 @@ export default {
 }
 .notification {
   display: none;
-  z-index: 1;
+  position: relative;
+  z-index: 2;
   list-style-type: none;
   position: absolute;
   width: 900%;
-  height: 3000%;
+  min-height: 1500%;
+  max-height: 3000%;
   overflow-x: auto;
   overflow-y: scroll;
   left: 0%;

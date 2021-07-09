@@ -1,5 +1,5 @@
 <template>
-<div>
+<div class="mostly-customized-scrollbar">
     <div class="option__wrap">
         <input @click="changePage(0)" class="option__button option__button--red" type="button" value="會員資料">
         <input @click="changePage(1)" class="option__button option__button--red" type="button" :value="`追蹤人數(${this.followeds.length})`">
@@ -16,8 +16,8 @@
 
                 <button class="edit" v-show="isFollow" @click="unfollow()">取消追蹤</button>
 
-                <button v-show="isEdit" class="confirm" @click="confirm()">確認</button>
-                <button v-show="isEdit" class="cancel" @click="cancel()">取消</button><br>
+                <!-- <button v-show="isEdit" class="confirm" @click="confirm()">確認</button>
+                <button v-show="isEdit" class="cancel" @click="cancel()">取消</button><br> -->
 
                 <h1>會員資料</h1>
             </header>
@@ -26,7 +26,7 @@
                 <div v-if="checkMember" class="form__img" @click="addFile()">
                     <div v-if="!isCropping" class="previewImage gradient">
                         <img class="image--resp" :src="preview" />
-                        <h3 class="image__text">管理照片</h3>
+                        <h3 class="image__text">更換大頭照</h3>
                         <input type="file" 
                         id="UploadImage" 
                         class="uploadImage"
@@ -43,20 +43,22 @@
                         :img="preview" 
                         centerBox 
                         fixed :fixedNumber="[1,1]"/>
-                        <button @click.stop="getData()" class="button--transparent">裁剪圖片</button>
+                        <button @click.stop="getData()" class="previewImage__button">裁剪圖片</button>
                     </div>
                 </div>
 
                 <div v-else class="form__img">
                     <div v-if="!isCropping" class="previewImage gradient">
                         <img class="image--resp" :src="preview" />
-                        <h3 class="image__text">觀看相簿</h3>
+                        <h3 class="image__text"></h3>
                     </div>
                 </div>
 
                 <div class="form__text">
                     <label for="Email">帳號：</label>
                     <input type="email" id="Email" name="Email" v-model="member.account" disabled="true"><br>
+                    <label v-show="isEdit" for="Name">密碼：</label>
+                    <input v-show="isEdit" type="password" id="Password" name="Password" v-model="member.password"><br>
                     <label for="Name">名稱：</label>
                     <input type="text" id="Name" name="Name" v-model="member.name" :disabled="!isEdit"><br>
                     <div v-if="!isEdit"><label for="Sex">性別：{{getGender(member.gender)}}</label></div>
@@ -68,7 +70,8 @@
 
                     <div>
                         <label for="Birthday">生日：</label>
-                        <input type="date" id="Birthday" name="Birthday" v-model="birth" :disabled="!isEdit"><br>
+                        <h4 class="old">({{getAge(birth)}}歲)</h4>
+                        <input class="" type="date" id="Birthday" name="Birthday" v-model="birth" :disabled="!isEdit"><br>
                     </div>
 
                     <div v-if="!isEdit"><label for="Location">居住城市：{{getCity(member.cityId)}}</label></div>
@@ -76,36 +79,36 @@
                         <label for="Location">居住城市：</label>
                         <select name="Location" id="Location" v-model="member.cityId">
                             <optgroup label="北部地區">
-                                <option value="0">基隆市</option>
-                                <option value="1">台北市</option>
-                                <option value="2">新北市</option>
-                                <option value="3">桃園縣</option>
-                                <option value="4">新竹市</option>
-                                <option value="5">新竹縣</option>
-                                <option value="6">苗栗縣</option>
+                                <option value="1">基隆市</option>
+                                <option value="2">台北市</option>
+                                <option value="3">新北市</option>
+                                <option value="4">桃園縣</option>
+                                <option value="5">新竹市</option>
+                                <option value="6">新竹縣</option>
+                                <option value="7">苗栗縣</option>
                             </optgroup>
                             <optgroup label="中部地區">
-                                <option value="7">台中市</option>
-                                <option value="8">彰化縣</option>
-                                <option value="9">南投縣</option>
+                                <option value="8">台中市</option>
+                                <option value="9">彰化縣</option>
+                                <option value="10">南投縣</option>
                             </optgroup>
                             <optgroup label="南部地區">
-                                <option value="10">雲林縣</option>
-                                <option value="11">嘉義市</option>
-                                <option value="12">嘉義縣</option>
-                                <option value="13">台南市</option>
-                                <option value="14">高雄市</option>
-                                <option value="15">屏東縣</option>
+                                <option value="11">雲林縣</option>
+                                <option value="12">嘉義市</option>
+                                <option value="13">嘉義縣</option>
+                                <option value="14">台南市</option>
+                                <option value="15">高雄市</option>
+                                <option value="16">屏東縣</option>
                             </optgroup>
                             <optgroup label="東部地區">
-                                <option value="16">台東縣</option>
-                                <option value="17">花蓮縣</option>
-                                <option value="18">宜蘭縣</option>
+                                <option value="17">台東縣</option>
+                                <option value="18">花蓮縣</option>
+                                <option value="19">宜蘭縣</option>
                             </optgroup>
                             <optgroup label="離島地區">
-                                <option value="19">澎湖縣</option>
-                                <option value="20">金門縣</option>
-                                <option value="21">連江縣</option>
+                                <option value="20">澎湖縣</option>
+                                <option value="21">金門縣</option>
+                                <option value="22">連江縣</option>
                             </optgroup>
                         </select><br>
                     </div>
@@ -126,28 +129,28 @@
                                             :id="'EventType'+(index+1)" 
                                             class="checkBox"
                                             name="EventType" 
-                                            :value=index>
+                                            :value=index+1>
                                 <label :for="'EventType'+(index+1)">{{type.zh}}</label>
                             </section>
                         </span>
                     </div>
 
-                    <label for="JobType" class="gradient">工作類型：</label>
-                    <input type="text" id="JobType" name="JobType" v-model="category" :disabled="!isEdit"><br>
-                    <label for="JobTitle" class="gradient">工作職稱：</label>
-                    <input type="text" id="JobTitle" name="JobTitle" v-model="jobTitle" :disabled="!isEdit"><br>
+                    <label v-if="category || isEdit" for="JobType" class="gradient">工作類型：</label>
+                    <input v-if="category || isEdit" type="text" id="JobType" name="JobType" v-model="category" :disabled="!isEdit"><br>
+                    <label v-if="jobTitle || isEdit" for="JobTitle" class="gradient">工作職稱：</label>
+                    <input v-if="jobTitle || isEdit" type="text" id="JobTitle" name="JobTitle" v-model="jobTitle" :disabled="!isEdit"><br>
                     
                     <div>
-                        <label for="AlbumImage" v-if="this.checkMember">相片牆：<button  class="album__button" v-show="!this.multiUpload" @click="multiUpload=true">編輯相片</button></label>
-                        <label for="AlbumImage" v-else>相片牆：<sapn  v-if="!this.pics1" class="noneapi">暫無任何相片</sapn></label>
-                        <button v-show="this.multiUpload" class="album__button__small" @click="reload()">取消</button>
-                        <button v-show="this.multiUpload" class="album__button__small" @click="AlbumPhotoPut">確認</button>
+                        <label for="AlbumImage" v-if="this.checkMember">相片牆：<button  class="album__button" @change="AlbumPhotoPut" @click="addAlbum">編輯相片</button></label>
+                        <label for="AlbumImage" v-else>相片牆：<sapn  v-if="!this.previewPics" class="noneapi">暫無任何相片</sapn></label>
+                        <!-- <button v-show="this.multiUpload" class="album__button__small" @click="reload()">取消</button>
+                        <button v-show="this.multiUpload" class="album__button__small" @click="AlbumPhotoPut">確認</button> -->
 
                         <div class="AlbumeWall">
-                            <img :src=this.previewPics[0] alt="" class="image--resp" :class="{'choseToUpload': this.multiUpload}" @click="upLoadPics(0)">
-                            <img src="https://attach.setn.com/newsimages/2021/01/19/2991552-PH.jpg" alt="" class="image--resp" :class="{'choseToUpload': this.multiUpload}" @click="upLoadPics(1)">
-                            <img src="https://attach.setn.com/newsimages/2021/01/19/2991552-PH.jpg" alt="" class="image--resp" :class="{'choseToUpload': this.multiUpload}" @click="upLoadPics(2)">
-                            <img src="https://attach.setn.com/newsimages/2021/01/19/2991552-PH.jpg" alt="" class="image--resp" :class="{'choseToUpload': this.multiUpload}" @click="upLoadPics(3)">
+                            <img v-show="this.previewPics[0]" :src=this.previewPics[0] alt="" class="image--resp" :class="{'chosen': this.key==0}" @click="upLoadPics(0)">
+                            <img v-show="this.previewPics[1]" :src=this.previewPics[1] alt="" class="image--resp" :class="{'chosen': this.key==1}" @click="upLoadPics(1)">
+                            <img v-show="this.previewPics[2]" :src=this.previewPics[2] alt="" class="image--resp" :class="{'chosen': this.key==2}" @click="upLoadPics(2)">
+                            <img v-show="this.previewPics[3]" :src=this.previewPics[3] alt="" class="image--resp" :class="{'chosen': this.key==3}" @click="upLoadPics(3)">
                         </div>
 
                         <input type="file" 
@@ -155,26 +158,30 @@
                         class="uploadImage"
                         accept="image/*,.pdf" 
                         @change="previewAlbum($event), changeAlbum($event)" 
-                        name="EvenImage" >
+                        name="EvenImage" 
+                        multiple>
 
                         <div class="chosenPic">
                             <figure>
-                                <img src="https://attach.setn.com/newsimages/2021/01/19/2991552-PH.jpg" alt="" class="image--resp">
+                                <img :src=this.previewPics[this.key] alt="" class="image--resp">
                             </figure>
                         </div>
                     </div>
 
                     <label for="Intro">自我介紹</label><br>
                     <textarea name="Intro" id="Intro" class="intro"  rows="15" v-model="intro" :disabled="!isEdit"></textarea><br>
+                    <button v-show="isEdit" class="button--transparent" @click="confirm()">確認</button>
+                    <button v-show="isEdit" class="button--transparent" @click="cancel()">取消</button>
+
                 </div>
             </form>
         </div>
 
         <div class="page offPage">
             <header><h1>追蹤清單</h1></header>
-            <div class="member__wrap">
+            <div class="member__wrap" @click="reload">
                 <router-link v-for=" p in followeds" :key="p.memberId" :to="/AccountInfo/+p.memberId">
-                    <div class="member" @click="reload">
+                    <div class="member">
                         <figure class="member__img">
                             <img :src="getCover(p.memberPhoto[0])" alt="" class="image--resp">
                         </figure>
@@ -190,11 +197,11 @@
 
         <div class="page offPage">
             <header><h1>粉絲清單</h1></header>
-            <div class="member__wrap">
+            <div class="member__wrap"  @click="reload">
                 <router-link v-for=" p in followers" :key="p.memberId" :to="/AccountInfo/+p.memberId">
-                    <div class="member" @click="reload">
+                    <div class="member">
                         <figure class="member__img">
-                            <!-- <img :src="getCover(p.memberPhoto[0])" alt="" class="image--resp"> -->
+                            <img :src="getCover(p.memberPhoto[0])" alt="" class="image--resp">
                         </figure>
                         <div class="member__text">
                             <h4>{{p.name}}</h4>
@@ -208,14 +215,15 @@
 
         <div class="page offPage">
             <header><h1>評論清單</h1></header>
-            <div class="member__wrap">
+            <div class="member__wrap" @click="reload">
                 <router-link v-for=" p in comments" :key="p.commentId" :to="/AccountInfo/+p.memberId">
-                    <div class="member" @click="reload">
-                        <figure class="member__img">
-                            <!-- <img :src="getCover(p.memberPhoto[0])" alt="" class="image--resp"> -->
+                    <div class="member" >
+                        <figure class="member__img marginTop">
+                            <img :src="getCover(p.memberPhoto[0])" alt="" class="image--resp">
                         </figure>
                         <div class="member__text">
                             <h4>{{p.name}}</h4>
+                            <span class="star">{{getStar(p.rate)}}</span>
                             <!-- <h4>{{getCity(p.cityId)}}、{{getAge(p.birth)}}歲</h4>
                             <h4>{{p.category}}{{p.jobTitle}}</h4> -->
                             <textarea class="comment" name="" id="" disabled rows="5" v-model="p.commentContent"></textarea>
@@ -232,7 +240,7 @@
 </template>
 
 <script>
-import { apiMemberGet, apiMemberPut, apiFollowMemberPost, apiFollowGet, apiFollowMemberDelete, apiCommentGet, apiMemberPhotoPut} from "../api"
+import { apiMemberGet, apiMemberPut, apiFollowMemberPost, apiFollowGet, apiFollowMemberDelete, apiCommentGet, apiMemberCoverPut, apiMemberPhotoPut} from "../api"
 import { VueCropper }  from 'vue-cropper' 
 
 export default {
@@ -248,9 +256,10 @@ export default {
             comments:[],
             isEdit: false,
             preview: null,
-            key: null,
-            pics: [{}, {}, {}, {}],
-            previewPics: ["str", "str", "str", "str"],
+            key: 0,
+            pics: [{}, {}, {}, {}, {}],
+            filePics: null,
+            previewPics: ["", "", "", ""],
             image: null,
             member:null,
             category: null,
@@ -277,6 +286,11 @@ export default {
             ]
         }
     },
+    watch:{
+        memberId(){
+            $router.go(0)
+        }
+    },
     components:{
         VueCropper
     },
@@ -290,9 +304,12 @@ export default {
             this.jobTitle = this.isNull(this.member.jobTitle)
             this.intro = this.isNull(this.member.intro)
             this.birth = this.member.birth.slice(0,10)
+
+            this.member.types = this.member.types.filter( t => t !=0 )
+
             this.preview = this.getCover(this.member.memberPhoto[0])
             for(let i=1;i<this.member.memberPhoto.length;i++){
-                this.pics[i-1] = this.member.memberPhoto[i]
+                this.previewPics[i-1] = this.getCover(this.member.memberPhoto[i])
             }
             this.albumPics = this.member.memberPhoto
         })
@@ -312,6 +329,7 @@ export default {
         //獲取追蹤與粉絲資料
         apiFollowGet(this.memberId)
         .then(res => {
+            // console.log("FOLLOW", res.data)
             this.getFollowedsApi(res.data.followeds)
             this.getFollowersApi(res.data.followers)
         })
@@ -351,6 +369,7 @@ export default {
             })
 
             this.followers = members
+
         },
         async getFollowedsApi(arrs){
 
@@ -441,8 +460,8 @@ export default {
         memberPhotoPut(){
 
             let formData = new FormData();
-            formData.append("MemberPhoto", this.files);
-            apiMemberPhotoPut(
+            formData.append("cover", this.files);
+            apiMemberCoverPut(
                 formData
             )
             .then(res =>{
@@ -450,15 +469,14 @@ export default {
             })
             .catch(err =>{
                 console.log(err)
+                alert("上傳失敗，請重新操作")
             })
         },
         AlbumPhotoPut(){
 
             let formData = new FormData();
-            formData.append("MemberPhoto", this.files);
-            for(let i=0;i<4;i++){
-                if(!(this.pics[i])){returm;}
-                formData.append("MemberPhoto", this.pics[i]);
+            for(let i=0;i<this.filePics.length;i++){
+                formData.append("MemberPhoto", this.filePics[i]);
             }
 
             for(let value of formData.values()){
@@ -470,9 +488,11 @@ export default {
             )
             .then(res =>{
                 console.log(res)
+                this.reload()
             })
             .catch(err =>{
                 console.log(err)
+                alert("照片容量過大")
             })
         },
         reverse(){
@@ -503,7 +523,7 @@ export default {
         },
         getCity(num){
             const cities =["基隆市","台北市","新北市","桃園縣","新竹市","新竹縣","苗栗縣","台中市","彰化縣","南投縣","雲林縣","嘉義市","嘉義縣","台南市","高雄市","屏東縣","台東縣","花蓮縣","宜蘭縣","澎湖縣","金門縣","連江縣"]
-            return cities[num]
+            return cities[num-1]
         },
         getGender(gender){
             if(gender == 2){
@@ -513,20 +533,8 @@ export default {
             }
         },
         getInterest(type){
-            // const eventTypes=[
-            //     { eng: 'travel', zh: '旅行出遊' },
-            //     { eng: 'fitness', zh: '運動健身' },
-            //     { eng: 'party', zh: '唱歌派對' },
-            //     { eng: 'show', zh: '影音展演' },
-            //     { eng: 'game', zh: '遊戲卡牌' },
-            //     { eng: 'meal', zh: '美食美酒' },
-            //     { eng: 'invest', zh: '商業投資' },
-            //     { eng: 'learn', zh: '體驗學習' },
-            //     { eng: 'beauty', zh: '美容時尚' },
-            //     { eng: 'consult', zh: '命理諮商' },
-            //     { eng: 'other', zh: '其他' },
-            // ]
-            return this.eventType[type].zh
+
+            return this.eventType[type-1].zh
         },
         getAge(birth){
             let birthdays = new Date(birth);
@@ -584,27 +592,50 @@ export default {
         addFile(){
             document.getElementById("UploadImage").click();
         },
+        addAlbum(){
+            document.getElementById("AlbumImage").click();
+            this.multiUpload = true
+        },
         upLoadPics(num){
             this.key = num
-            document.getElementById("AlbumImage").click();
+            // document.getElementById("AlbumImage").click();
         },
         changeAlbum(e){
-            console.log( e.target.files[0])
-            console.log(this.key)
-            this.pics[this.key] = e.target.files[0]
+            this.filePics = e.target.files
+            // for(let i=0;i<e,target.files.length;i++){
+            //     this.pics[i] = e.target.files[i]
+            // }
         },
         previewAlbum(event) {
             let input = event.target;
             if (input.files) {
                 let reader = new FileReader();
                 reader.onload = (e) => {
-                    console.log(55555)
                     console.log(e.target.result)
                     this.previewPics[this.key] = e.target.result;
                 }
                 reader.readAsDataURL(input.files[0]);
             }
         },
+        getStar(rate){
+            switch(rate){
+                case 1:
+                    return "★"
+                    break;
+                case 2:
+                    return "★★"
+                    break;
+                case 3:
+                    return "★★★"
+                    break;
+                case 4:
+                    return "★★★★"
+                    break;
+                case 5:
+                    return "★★★★★"
+                    break;
+            }
+        }
     }
 }
 </script>
@@ -618,7 +649,7 @@ a{
     width: 40%;
     background-color: #FFFFFF;
     border-radius: 15px;
-    padding: 1em 2.5em;
+    padding: 1em 2.5em 3em 2.5em;
     margin-top: 3em;
     margin-bottom: 3em;
     transform: translateX(-50%);
@@ -650,6 +681,19 @@ a{
 }
 header{
     text-align: center;
+}
+.button--transparent{
+    float: right;
+    margin-left: 1em;
+    border-radius: 5px;
+    padding: .5em 1em;
+    background-color: #FFF;
+    border: 1px solid;
+    font-size: .9em;
+}
+.button--transparent:hover{
+    background-color: #363636;
+    color: white;
 }
 header button{
     float: right;
@@ -717,10 +761,6 @@ section{
     overflow: hidden;
     border: 3px solid #E1E1E1;
 }
-.image--resp{
-    width: 100%;
-    max-height: 100%;
-}
 .submit{
     display: block;
     margin-left: auto;
@@ -765,7 +805,8 @@ input:disabled{
     display: flex;
 }
 .member__img{
-    width: 100px;
+    width: 118px;
+    height: 100px;
     border-radius: 999em;
     overflow: hidden;
     border: 3px solid #E1E1E1;
@@ -773,7 +814,7 @@ input:disabled{
 .uploadImage{
     display: none;
 }
-.button--transparent{
+.previewImage__button{
     position: absolute;
     top: 90%;
     left: 50%;
@@ -789,12 +830,15 @@ input:disabled{
     /* margin-left: 100%; */
     transform: translate(-50%, -50%);
 }
-.button--transparent:hover{
+.previewImage__button:hover{
     background-color: #3636365e;
     /* color: white; */
 }
 .member__text{
     width: 100%;
+}
+.member__text h4{
+    display: inline-block;
 }
 .noneapi{
     font-size: .8em;
@@ -806,10 +850,18 @@ input:disabled{
     margin: 2% 1%;
 }
 .AlbumeWall img{
-    display: inline-block;
+    /* display: inline-block; */
     width: 23%;
-    /* width: 32%; */
+    overflow: hidden;
     margin-right: 2%;
+    border-radius: 5px;
+    box-shadow: 0 0 15px gray;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+.AlbumeWall img:hover{
+    cursor: pointer;
+    opacity: 0.5;
 }
 .album__button{
     border-radius: 5px;
@@ -858,5 +910,21 @@ input:disabled{
 .choseToUpload:hover:before{
     background-color: #6d4141;
     color: white;
+}
+.chosen{
+    box-shadow: 0 0 15px gray;
+}
+.old{
+    display: inline-block;
+}
+.marginTop{
+    margin-top: auto;
+}
+.comment{
+    background-color: transparent;
+}
+.star{
+  color: rgb(198, 212, 0);
+  font-size: 1.5em;
 }
 </style>

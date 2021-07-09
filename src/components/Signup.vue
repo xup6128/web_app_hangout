@@ -3,7 +3,7 @@
     <header class="signup__header"><h1>立即註冊</h1></header>
     <!-- <form @submit.prevent="Signup"> -->
     <form>
-      <label>信箱</label><br />
+      <label>Email</label><br />
       <input
         type="email"
         v-model.lazy="email"
@@ -14,7 +14,7 @@
         {{ emailErrMsg }}
       </div>
 
-      <label>密碼</label><br />
+      <label>Password</label><br />
       <input
         type="password"
         v-model.lazy="password"
@@ -26,7 +26,7 @@
         {{ passErrMsg }}
       </div>
 
-      <label>確認密碼</label><br />
+      <label>Password</label><br />
       <input
         type="password"
         v-model.lazy="rePassword"
@@ -49,15 +49,15 @@ import { apiMemberCheck } from "../api";
 export default {
   data() {
     return {
-      email: "xup6910623@gmail.com",
+      email: "",
       emailError: false,
       emailErrMsg: "",
 
-      password: "Cmoney1234",
+      password: "",
       passwordError: false,
       passErrMsg: "",
 
-      rePassword: "Cmoney1234",
+      rePassword: "",
       rePasswordError: false,
       rePassErrMsg: "請確認密碼輸入是否一致",
     };
@@ -107,6 +107,11 @@ export default {
   },
   methods: {
     check() {
+
+      if( !this.email || !this.password || !this.rePassword){
+        alert("請完整輸入帳號密碼")
+        return
+      }
 
       if (this.emailError || this.passwordError || this.rePasswordError) {
         console.log("return");

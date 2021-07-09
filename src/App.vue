@@ -65,6 +65,9 @@ select{
 input:focus{
   outline: none;
 }
+[readonly="readonly"] {
+  pointer-events: none;
+}
 *{
   box-sizing: content-box;
 }
@@ -72,5 +75,26 @@ input:focus{
   font-family: Arial, Helvetica, "LiHei Pro", "微軟正黑體", MintLiu, sans-serif;
   /* -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale; */
+}
+::-webkit-scrollbar {
+  display: none;
+}
+.mostly-customized-scrollbar {
+  width: 100%;
+  overflow: auto;
+  height: 100vh;
+}
+.mostly-customized-scrollbar::-webkit-scrollbar {
+  display: block;
+  width: 17px;
+  /* height: 15px; */
+  background-color: white;
+}
+.mostly-customized-scrollbar::-webkit-scrollbar-thumb {
+  background: #E5E5E5;
+  border-radius: 15px;
+}
+.mostly-customized-scrollbar::-webkit-scrollbar-thumb:hover{
+  background: #777777;
 }
 </style>

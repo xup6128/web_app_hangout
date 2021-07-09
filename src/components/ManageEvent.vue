@@ -1,5 +1,5 @@
 <template>
-<div>
+<div class="mostly-customized-scrollbar">
 
     <!-- <div class="control__board">
         <header><h2>邀請夥伴</h2></header>
@@ -124,37 +124,26 @@ export default {
             this.holdEvents.forEach(element => {
                 element.type = 0
             });
+            this.showEvents = this.showEvents.concat(this.holdEvents);
             this.events = this.events.concat(this.holdEvents);
-            this.showEvents = this.events.concat(this.holdEvents);
+
+            this.showEvents = this.showEvents.filter( e => new Date(e.hostTime).getTime() > new Date().getTime())
+            this.events = this.events.filter( e => new Date(e.hostTime).getTime() > new Date().getTime())
+
+            const set = new Set()
+            const set2 = new Set()
+            const ret =  this.showEvents.filter( e => !set.has(e.eventId)?set.add(e.eventId):false)
+            const ret2 = this.events.filter( e => !set2.has(e.eventId)?set2.add(e.eventId):false)
+            this.showEvents = ret
+            this.events = ret2
 
             this.events.sort(function (a, b) {
-                return a.hostTime<b.hostTime?1:-1;
+                return a.hostTime<b.hostTime?-1:1;
             });
             this.showEvents.sort(function (a, b) {
-                return a.hostTime<b.hostTime?1:-1;
+                return a.hostTime<b.hostTime?-1:1;
             });
 
-        })
-        .catch(err =>{
-            console.log(err)
-        })
-
-        apiFavoriteEventGet()
-        .then(res =>{
-            console.log(res.data)
-            this.collectEvents = res.data
-            this.collectEvents.forEach(element => {
-                element.type = 2
-            });
-            this.events = this.events.concat(this.collectEvents);
-            this.showEvents = this.events.concat(this.collectEvents);
-
-            this.events.sort(function (a, b) {
-                return a.hostTime<b.hostTime?1:-1;
-            });
-            this.showEvents.sort(function (a, b) {
-                return a.hostTime<b.hostTime?1:-1;
-            });
         })
         .catch(err =>{
             console.log(err)
@@ -168,16 +157,57 @@ export default {
                 element.type = 1
             });
             this.joinEvents.sort(function (a, b) {
-                return a.hostTime<b.hostTime?1:-1;
+                return a.hostTime<b.hostTime?-1:1;
             });
+            this.showEvents = this.showEvents.concat(this.joinEvents);
             this.events = this.events.concat(this.joinEvents);
-            this.showEvents = this.events.concat(this.joinEvents);
+
+            this.showEvents = this.showEvents.filter( e => new Date(e.hostTime).getTime() > new Date().getTime())
+            this.events = this.events.filter( e => new Date(e.hostTime).getTime() > new Date().getTime())
+
+            const set = new Set()
+            const set2 = new Set()
+            const ret =  this.showEvents.filter( e => !set.has(e.eventId)?set.add(e.eventId):false)
+            const ret2 = this.events.filter( e => !set2.has(e.eventId)?set2.add(e.eventId):false)
+            this.showEvents = ret
+            this.events = ret2
 
             this.events.sort(function (a, b) {
-                return a.hostTime<b.hostTime?1:-1;
+                return a.hostTime<b.hostTime?-1:1;
             });
             this.showEvents.sort(function (a, b) {
-                return a.hostTime<b.hostTime?1:-1;
+                return a.hostTime<b.hostTime?-1:1;
+            });
+        })
+        .catch(err =>{
+            console.log(err)
+        })
+
+        apiFavoriteEventGet()
+        .then(res =>{
+            console.log(res.data)
+            this.collectEvents = res.data
+            this.collectEvents.forEach(element => {
+                element.type = 2
+            });
+            this.showEvents = this.showEvents.concat(this.collectEvents);
+            this.events = this.events.concat(this.collectEvents);
+
+            this.showEvents = this.showEvents.filter( e => new Date(e.hostTime).getTime() > new Date().getTime())
+            this.events = this.events.filter( e => new Date(e.hostTime).getTime() > new Date().getTime())
+
+            const set = new Set()
+            const set2 = new Set()
+            const ret =  this.showEvents.filter( e => !set.has(e.eventId)?set.add(e.eventId):false)
+            const ret2 = this.events.filter( e => !set2.has(e.eventId)?set2.add(e.eventId):false)
+            this.showEvents = ret
+            this.events = ret2
+
+            this.events.sort(function (a, b) {
+                return a.hostTime<b.hostTime?-1:1;
+            });
+            this.showEvents.sort(function (a, b) {
+                return a.hostTime<b.hostTime?-1:1;
             });
         })
         .catch(err =>{
@@ -192,16 +222,26 @@ export default {
                 element.type = 3
             });
             this.inviteEvents.sort(function (a, b) {
-                return a.hostTime<b.hostTime?1:-1;
+                return a.hostTime<b.hostTime?-1:1;
             });
+            this.showEvents = this.showEvents.concat(this.inviteEvents);
             this.events = this.events.concat(this.inviteEvents);
-            this.showEvents = this.events.concat(this.inviteEvents);
+
+            this.showEvents = this.showEvents.filter( e => new Date(e.hostTime).getTime() > new Date().getTime())
+            this.events = this.events.filter( e => new Date(e.hostTime).getTime() > new Date().getTime())
+
+            const set = new Set()
+            const set2 = new Set()
+            const ret =  this.showEvents.filter( e => !set.has(e.eventId)?set.add(e.eventId):false)
+            const ret2 = this.events.filter( e => !set2.has(e.eventId)?set2.add(e.eventId):false)
+            this.showEvents = ret
+            this.events = ret2
 
             this.events.sort(function (a, b) {
-                return a.hostTime<b.hostTime?1:-1;
+                return a.hostTime<b.hostTime?-1:1;
             });
             this.showEvents.sort(function (a, b) {
-                return a.hostTime<b.hostTime?1:-1;
+                return a.hostTime<b.hostTime?-1:1;
             });
         })
         .catch(err =>{
@@ -289,6 +329,7 @@ header{
 .event__img{
     min-width: 250px;
     width: 250px;
+    height: 25vh;
 }
 a{
     color: black;
@@ -357,6 +398,7 @@ a{
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
+    color: gray;
 }
 
 </style>

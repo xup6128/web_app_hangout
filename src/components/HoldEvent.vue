@@ -1,6 +1,6 @@
 <template>
-<div @click="closeemoji($event)">
-    <div class="event container">
+<div @click="closeemoji($event)" class="mostly-customized-scrollbar">
+    <div class="event container gradient">
             <header class="event__header"><h1>馬上來舉辦一場活動吧！</h1></header>
 
             <article>
@@ -26,7 +26,7 @@
                         autoCrop 
                         :img="preview" 
                         centerBox 
-                        fixed :fixedNumber="[1,1]"/>
+                        fixed :fixedNumber="[1.75,1]"/>
                         <button @click="getData()" class="button--transparent">裁剪圖片</button>
                     </div>
                     
@@ -35,53 +35,61 @@
                 <div class="article__text">
                     <form action="">
                     <label for="EventName">活動名稱：</label>
-                    <input type="text"  id="EventName" name="" placeholder="請輸入活動名稱" ref="EventName" v-model="eventName" required><br>
+                    <input type="text"  
+                    id="EventName" 
+                    name="" 
+                    placeholder="請輸入活動名稱" 
+                    ref="EventName" 
+                    v-model="eventName" 
+                    maxlength="300" 
+                    required>
+                    <br>
 
                     <label for="EvenAddress">活動地點：</label>
                     <select name="" id="EvenAddress" v-model="cityId">
                         <option value="99" style="display:none">請選擇城市</option>
                         <optgroup label="北部地區">
-                            <option value="0">基隆市</option>
-                            <option value="1">台北市</option>
-                            <option value="2">新北市</option>
-                            <option value="3">桃園縣</option>
-                            <option value="4">新竹市</option>
-                            <option value="5">新竹縣</option>
-                            <option value="6">苗栗縣</option>
+                            <option value="1">基隆市</option>
+                            <option value="2">台北市</option>
+                            <option value="3">新北市</option>
+                            <option value="4">桃園縣</option>
+                            <option value="5">新竹市</option>
+                            <option value="6">新竹縣</option>
+                            <option value="7">苗栗縣</option>
                         </optgroup>
                         <optgroup label="中部地區">
-                            <option value="7">台中市</option>
-                            <option value="8">彰化縣</option>
-                            <option value="9">南投縣</option>
+                            <option value="8">台中市</option>
+                            <option value="9">彰化縣</option>
+                            <option value="10">南投縣</option>
                         </optgroup>
                         <optgroup label="南部地區">
-                            <option value="10">雲林縣</option>
-                            <option value="11">嘉義市</option>
-                            <option value="12">嘉義縣</option>
-                            <option value="13">台南市</option>
-                            <option value="14">高雄市</option>
-                            <option value="15">屏東縣</option>
+                            <option value="11">雲林縣</option>
+                            <option value="12">嘉義市</option>
+                            <option value="13">嘉義縣</option>
+                            <option value="14">台南市</option>
+                            <option value="15">高雄市</option>
+                            <option value="16">屏東縣</option>
                         </optgroup>
                         <optgroup label="東部地區">
-                            <option value="16">台東縣</option>
-                            <option value="17">花蓮縣</option>
-                            <option value="18">宜蘭縣</option>
+                            <option value="17">台東縣</option>
+                            <option value="18">花蓮縣</option>
+                            <option value="19">宜蘭縣</option>
                         </optgroup>
                         <optgroup label="離島地區">
-                            <option value="19">澎湖縣</option>
-                            <option value="20">金門縣</option>
-                            <option value="21">連江縣</option>
+                            <option value="20">澎湖縣</option>
+                            <option value="21">金門縣</option>
+                            <option value="22">連江縣</option>
                         </optgroup>
                     </select>
                     <br>
-                    <input type="text" id="EventRoad" name="" placeholder="請輸入地址" v-model="road" required><br>
+                    <input type="text" id="EventRoad" name="" placeholder="請輸入地址" v-model="road" maxlength="50" required><br>
 
                     <label for="HostTime">活動舉辦時間：</label>
-                    <input type="datetime-local" id="HostTime" name="" v-model="hostTime"><br>
+                    <input type="datetime-local" id="HostTime" name="" v-model="hostTime" required><br>
 
                     <label for="SpendTime">活動進行時間：</label>
                     <span v-show="!overnight">
-                        <input type="number" id="SpendHours" name="" min="0" max="23"   v-model="costHours">
+                        <input type="number" id="SpendHours" name="" min="0" max="23"   v-model="costHours" required>
                         ：
                         <select name="SpendMins" id="SpendMins" v-model="costMinutes">
                             <option value="0">00</option>
@@ -100,29 +108,21 @@
                     <br>
 
                     <label for="PeopleLimit">聚會上限人數：</label>
-                    <input type="number" id="PeopleLimit" name="" value="4" v-model="personLimit"> 人<br>
+                    <input type="number" id="PeopleLimit" name="" value="4" v-model="personLimit" required> 人<br>
 
                     <label for="Deadline">報名截止時間：</label>
-                    <input type="datetime-local" id="Deadline" name="" v-model="deadline"><br>
+                    <input type="datetime-local" id="Deadline" name="" v-model="deadline" required><br>
 
                     <div class="event__wrap">
                         <label for="EventType">活動類型：</label>
                         <select name="EventType" id="EventType" required v-model="typeId">
                             <option value="99" style="display:none">請選擇活動類型</option>
-                            <option v-for="(type,index) in eventType" :key="index" :value="index">{{type.zh}}</option>
+                            <option v-for="(type,index) in eventType" :key="index" :value="index+1">{{type.zh}}</option>
                         </select>
-                        <!-- <section v-for="(type, index) in eventType" :key=type.eng>
-                            <input type="checkbox" 
-                                        :id="'EventType'+(index+1)" 
-                                        name="" 
-                                        :value=type.eng 
-                                        v-model="eventCheck" >
-                            <label :for="'EventType'+(index+1)">{{type.zh}}</label>
-                        </section> -->
                     </div>
 
                     <label for="EventContent">活動說明：</label>
-                    <button class="button--emoji" type="button" @click="toogleDialogEmoji">😃</button>
+                    <button class="button--emoji gradient" type="button" @click="toogleDialogEmoji">😃</button><br>
                     <VEmojiPicker
                     v-show="showDialog"
                     :style="{ width: '440px', height: '200' }"
@@ -130,20 +130,20 @@
                     labelSearch="Search"
                     lang="pt-BR"
                     @select="onSelectEmoji"
-                    /><br>
+                    />
                     
                     <textarea
                     class="eventContent" 
                     id="EventConten"
                     name=""
-                    rows="10"
                     placeholder="請為你的活動做一點說明吧"
                     v-model.lazy="eventContent"
-                    >
+                    maxlength="300"
+                    required>
                     </textarea>
 
                     <br><br>
-                    <button @click="holdEvent()" type="button" class="button--red">舉辦活動</button>
+                    <button @click="getLatLng()" type="button" class="button--red">舉辦活動</button>
                 </form>
                 </div>
 
@@ -163,7 +163,7 @@ export default {
         return {
                 eventName:null,
                 cityId:99,
-                road:null,
+                road:"",
                 hostTime:null,
                 deadline:null,
                 eventPrice:200,
@@ -181,8 +181,6 @@ export default {
                 parent: null,
                 showDialog: false,
                 isCropping: false,
-                lat: 0,
-                lng: 0,
                 geo: null,
 
                 preview: null,
@@ -261,24 +259,23 @@ export default {
             const cities =["基隆市","台北市","新北市","桃園縣","新竹市","新竹縣","苗栗縣","台中市","彰化縣","南投縣","雲林縣","嘉義市","嘉義縣","台南市","高雄市","屏東縣","台東縣","花蓮縣","宜蘭縣","澎湖縣","金門縣","連江縣"]
             return cities[num-1]
         },
-        // getLatLng(){
-        //     let addr = this.getCity(this.cityId)+this.road
-        //     let geocoder = new google.maps.Geocoder();
+        getLatLng(){
+            let addr = this.getCity(this.cityId)+this.road
+            let geocoder = new google.maps.Geocoder();
 
-        //     let vm = this
-        //     geocoder.geocode({
-        //         "address": addr
-        //     },function (res, status){
-        //         if(status == "OK"){
-        //             vm.holdEvent(res[0].geometry.location.lat(), res[0].geometry.location.lng())
-        //             // vm.save(res[0].geometry.location.lat(),res[0].geometry.location.lng())
-        //         }else{
-        //             console.log("error")
-        //         }
-        //     })
+            let vm = this
+            geocoder.geocode({
+                "address": addr
+            },function (res, status){
+                if(status == "OK"){
+                    vm.holdEvent(res[0].geometry.location.lat(), res[0].geometry.location.lng())
+                }else{
+                    console.log("error")
+                }
+            })
 
-        // },
-        holdEvent(){
+        },
+        holdEvent(lat, lng){
 
             this.checkOvernight();
             this.checkFree();
@@ -297,10 +294,8 @@ export default {
             formData.append("PersonLimit", this.personLimit);
             formData.append("TypeId", this.typeId);
             formData.append("MemberId", this.$cookies.get("MemberId"));
-            // formData.append("Status", "true");
-            // formData.append("Parent", "");
-            // formData.append("Lat", lat);
-            // formData.append("Lng", lng);
+            formData.append("Lat", lat);
+            formData.append("Lng", lng);
 
             for(let value of formData.values()){
                 console.log(value)
@@ -311,15 +306,16 @@ export default {
             )
             .then(res =>{
                 console.log(res.data)
+                alert("活動舉辦成功")
                 this.$router.push({path:'/ManageEvent'})
             })
             .catch(err =>{
                 console.log(err)
+                alert("活動舉辦失敗，請確認所有資料都已填上")
             })
         },
         toogleDialogEmoji() {
             this.showDialog = !this.showDialog;
-            // document.querySelector(".button--emoji").style = "background-color: black"
         },
         onSelectEmoji(emoji) {
             this.eventContent += emoji.data;
@@ -369,7 +365,7 @@ export default {
         font-size: 1em;
     }
     #EventName{
-        width: 30%;
+        width: 40%;
     }
     #EventRoad{
         width: 80%;
@@ -385,8 +381,8 @@ export default {
     .previewImage{
         margin-left: auto;
         margin-right: auto;
-        width: 400px;
-        height: 400px;
+        width: 92%;
+        height: 43vh;
         /* border: 5px dashed #FF9100; */
         border: 3px dashed #E1E1E1;
         cursor: pointer;
@@ -414,6 +410,7 @@ export default {
     .eventContent{
         font-size: 1.5em;
         width: 100%;
+        min-height: 30vh;
     }
     .submit{
         display: block;
@@ -469,6 +466,9 @@ export default {
     }
     .emoji{
         position: absolute;
+        right: 0;
+        bottom: 0;
+        transform: translateX(100%);
     }
     .pointer{
         cursor: pointer;

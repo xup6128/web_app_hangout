@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="mostly-customized-scrollbar">
         <main class="container container__left--fixed">
             
             <!-- 活動資訊 -->
@@ -13,14 +13,14 @@
 
             <div @click="showMarginBoardOfParticipanter()" class="attender">
                 <figure class="member__img" v-for="p in confirmer" :key="p.participantId">
-                    <img :src="getImg(p.memberPhoto)" alt="" class="image--resp">
+                    <img :src="getImg(p.memberPhoto[0])" alt="" class="image--resp">
                 </figure>
                 <h3 class="underline">{{confirmer.length}} 人參加</h3>
             </div>
 
             <div v-if="!notExpired">
                 <button v-if="this.checkHoster" type="button" class="button--red" id="0" @click="showMarginBoard($event)">審核參加者</button>
-                <button v-else type="button" class="button--red" id="1" @click="showMarginBoard($event)">參加活動</button>
+                <button v-else type="button" class="button--red" id="1" @click="showMarginBoard($event)">參加活動 </button>
                 <h4 class="deadline"><span>報名截止時間：</span>{{timeToString(event.deadline)}}</h4>
             </div>
 
@@ -60,8 +60,8 @@
                 </div>
 
                 <div v-if="!checkMember && !checkHoster" class="eventButton">
-                    <input v-show="checkCollect" type="button" class="collectEvent__button" @click="collectEvent()" value="收藏活動">
-                    <input v-show="!checkCollect" type="button" class="collectEvent__button" @click="removeCollect()" value="取消收藏">
+                    <input v-if="checkLogin" v-show="checkCollect" type="button" class="collectEvent__button" @click="collectEvent()" value="收藏活動">
+                    <input v-if="checkLogin" v-show="!checkCollect" type="button" class="collectEvent__button" @click="removeCollect()" value="取消收藏">
                 </div>
 
                 <!-- 下方驚嘆號記得拿掉 -->
@@ -71,10 +71,10 @@
 
             </div>
                         
-            <textarea name="Intro" id="Intro" class="intro" rows="15" v-model="event.eventContent"></textarea>
+            <textarea name="Intro" id="Intro" class="intro" rows="15" v-model="event.eventContent" disabled="true"></textarea>
 
-            <input v-if="!checkMember" v-show="isPublic" type="button" class="message__board__switchButton button--transparent" @click="changeMessageWrap" value="參加者留言版">
-            <input v-show="!isPublic" type="button" class="message__board__switchButton button--transparent" @click="changeMessageWrap" value="公共留言版">
+            <input v-if="checkMember" v-show="isPublic" type="button" class="message__board__switchButton button" :class="{'button--transparent':this.checkLogin}"  @click="changeMessageWrap" value="參加者留言版" :disabled="!this.checkLogin">
+            <input v-show="!isPublic" type="button" class="message__board__switchButton button" contextmenu="" :class="{'button--transparent':this.checkLogin}" @click="changeMessageWrap" value="公共留言版">
 
             <div v-show="isPublic" class="message__wrap">
                 <div v-if="!this.publicMessages.length" class="noneapi">暫無任何留言</div>
@@ -90,13 +90,23 @@
                 <form action="">
                     <!-- <h3>留言</h3> -->
                     <textarea 
+                    v-if="checkLogin"
                     name="LeaveMessage" 
                     id="LeaveMessage" 
                     v-model="inputString" 
                     class="leaveMessage" 
                     rows="10"
-                    placeholder="留下你的意見"></textarea><br>
-                    <input type="button" class="message__board__button button--transparent" @click="leaveMessage()" value="留言">
+                    placeholder="留下你的意見"></textarea>
+                    <textarea 
+                    v-else
+                    name="LeaveMessage" 
+                    id="LeaveMessage" 
+                    v-model="inputString" 
+                    class="leaveMessage " 
+                    rows="10"
+                    placeholder="請先登入"
+                    :disabled="!this.checkLogin"></textarea><br>
+                    <input type="button" class="message__board__button button" :class="{'button--transparent':this.checkLogin}" @click="leaveMessage()" value="留言"  :disabled="!this.checkLogin">
                 </form>
             </div>
 
@@ -112,7 +122,7 @@
                         <div v-for="p in considers" :key="p.participantId" class="participanter gradient"  :class="{'special': familiar.includes(p.participantId)}" >
                             <div class="message__member">
                                 <figure class="member__img">
-                                    <img :src="getImg(p.memberPhoto)" alt="" class="image--resp">
+                                    <img :src="getImg(p.memberPhoto[0])" alt="" class="image--resp">
                                 </figure>
                                 <h4>{{p.name}}：</h4>
                             </div>
@@ -140,15 +150,18 @@
                     <button type="button" class="button--close" @click="closeMargin()">X</button>
                     <header><h2>參加者</h2></header>
                     <div v-if="!this.confirmer.length" class="noneapi">尚無參加者</div>
-                    <div v-for="p in confirmer" :key="p.participantId" class="participanter gradient">
-                        <div class="message__member">
-                            <figure class="member__img">
-                                <img :src="getImg(p.memberPhoto)" alt="" class="image--resp">
-                            </figure>
-                            <h4>{{p.name}}：</h4>
+
+                    <router-link v-for=" p in confirmer" :key="p.participantId" :to="/AccountInfo/+p.participantId">
+                        <div v-for="p in confirmer" :key="p.participantId" class="participanter gradient">
+                            <div class="message__member">
+                                <figure class="member__img">
+                                    <img :src="getImg(p.memberPhoto[0])" alt="" class="image--resp">
+                                </figure>
+                                <h4>{{p.name}}：</h4>
+                            </div>
                         </div>
-                        <!-- <h4 class="message__text">{{p.motivation}}</h4> -->
-                    </div>
+                    </router-link>
+
                 </div>
 
                 <div class="marginBoard">
@@ -158,7 +171,7 @@
                         <div v-for="p in inviter" :key="p.protagonistId" class="participanter gradient">
                             <div class="message__member">
                                 <figure class="member__img">
-                                    <img :src="getImg(p.memberPhoto)" alt="" class="image--resp">
+                                    <img :src="getImg(p.memberPhoto[0])" alt="" class="image--resp">
                                 </figure>
                                 <h4>{{p.name}}：</h4>
                             </div>
@@ -191,14 +204,15 @@ export default {
             participanters:[],
             inputString:null,
             member: null,
-            participants: [],
             considers: [],
             confirmer: [],
             umCommenter: [],
             inviter: [],
             familiar: [],
+            checkLogin: this.$cookies.get("token") === "isLogin",
             checkHoster: null,
             checkMember: null,
+            checkSignup: null,
             checkCollect: true,
             notExpired: null,
             favoriteId: null,
@@ -216,6 +230,10 @@ export default {
         .then(res =>{
             this.event = res.data;
             this.checkHoster = $cookies.get('MemberId') == this.event.memberId
+            if(this.checkHoster){
+                this.getRelationship(res.data)
+            }
+
             console.log(this.event)
 
             // console.log(Date.parse(Date.parse(this.event.deadline)).valueOf())
@@ -277,7 +295,7 @@ export default {
             //將API資料依序新增在陣列裡面
             arrs.forEach( (item,index) =>{
                 this.$set(item, 'name',  members[index].name)
-                this.$set(item, 'memberPhoto',  members[index].memberPhoto[0])
+                this.$set(item, 'memberPhoto',  members[index].memberPhoto)
             })
             console.log(arrs)
             this.inviter = arrs
@@ -292,6 +310,7 @@ export default {
             })
             .then(res =>{
                 console.log(res)
+                this.inviter = this.inviter.filter( m => m.protagonistId != memberId)
             })
             .catch(err =>{
                 console.log(err)
@@ -326,16 +345,10 @@ export default {
         getParticipanterApi(){
             apiEventGetparticipant(this.eventId)
             .then(res=>{
-                console.log(res)
+
+                console.log("participant", res)
                 this.participanters = res.data
-                this.checkMember = this.participanters.includes($cookies.get("MemberId"))
-                if(this.checkMember || this.checkHoster){
-                    this.getInviter()
-                }
-                if(this.checkHoster){
-                    this.getRelationship(res.data)
-                }
-                console.log(this.participanters)
+
                 this.getParticipanterMemberApi(this.participanters)
             })
             .catch(err=>{
@@ -343,7 +356,7 @@ export default {
             })
         },
         async getRelationship(arrs){
-            console.log(111)
+
             const promises = arrs.map(async item => {
                 const p = await apiRelationshipGet(item.participanter);
                 return p;
@@ -364,9 +377,6 @@ export default {
             //     this.$set(item, 'memberPhoto',  members[index].memberPhoto[0])
             // })
 
-            // console.log(arrs)
-            // this.publicMessages = arrs.filter( m => m.status == 3)
-            // this.privateMessages = arrs.filter( m => m.status == 1)
 
         },
         async getMembersApi(arrs){
@@ -384,7 +394,7 @@ export default {
             //將API資料依序新增在陣列裡面
             arrs.forEach( (item,index) =>{
                 this.$set(item, 'name',  members[index].name)
-                this.$set(item, 'memberPhoto',  members[index].memberPhoto[0])
+                this.$set(item, 'memberPhoto',  members[index].memberPhoto)
             })
 
             console.log(arrs)
@@ -407,14 +417,21 @@ export default {
             //將API資料依序新增在陣列裡面
             arrs.forEach( (item,index) =>{
                 this.$set(item, 'name',  members[index].name)
-                this.$set(item, 'memberPhoto',  members[index].memberPhoto[0])
+                this.$set(item, 'memberPhoto',  members[index].memberPhoto)
                 this.$set(item, 'star',  0)
             })
-            console.log(arrs)
+            console.log("ATTENTION", arrs)
 
-            this.considers = arrs.filter( p => p.status !== 1)
-            this.confirmer = arrs.filter( p => p.status === 1 || p.status === 2)
-            this.umCommenter = arrs.filter( p => p.status===1)
+            this.considers = arrs.filter( p => p.status !== 1)//審核者
+            this.umCommenter = arrs.filter( p => p.status===1)//參加者未評輪
+            this.confirmer = arrs.filter( p => p.status === 1 || p.status === 2)//參加者已評論或未評論
+
+            this.checkSignup = this.considers.filter( p => p.participantId == $cookies.get("MemberId"))
+            this.checkMember = this.confirmer.filter( p => p.participantId == $cookies.get("MemberId"))
+
+            if(this.checkMember || this.checkHoster){
+                this.getInviter()
+            }
         },
         getImg(url){
             return `http://35.229.140.28/${url}`
@@ -447,7 +464,7 @@ export default {
         },
         getCity(num){
             const cities =["基隆市","台北市","新北市","桃園縣","新竹市","新竹縣","苗栗縣","台中市","彰化縣","南投縣","雲林縣","嘉義市","嘉義縣","台南市","高雄市","屏東縣","台東縣","花蓮縣","宜蘭縣","澎湖縣","金門縣","連江縣"]
-            return cities[num]
+            return cities[num-1]
         },
         getGender(gender){
             if(gender === 2){
@@ -507,12 +524,18 @@ export default {
             })
             .then(res =>{
                 console.log(res)
+                alert("已報名活動，請待房主審核")
+                this.closeMargin()
             })
             .catch(err=>{
                 console.log(err)
             })
         },
         showMarginBoard(e){
+            if(!this.checkLogin){
+                alert('請先登入會員');
+                return
+            }
             const boards = document.querySelectorAll(".marginBoard") 
             if(this.lastMarginBoard){this.lastMarginBoard.classList.remove("marginBoard--show")}
             if(this.lastMarginBoard == boards[e.target.id]){
@@ -541,7 +564,8 @@ export default {
             apiparticipantPutConfirm(p)
             .then(res =>{
                 console.log(res)
-                // this.reload()
+                this.confirmer = this.confirmer.concat( this.considers.filter( m => m.memberId == p.memberId))
+                this.considers = this.considers.filter( m => m.memberId != p.memberId)
             })
             .catch(err =>{
                 console.log(err)
@@ -576,6 +600,7 @@ export default {
             this.privateMessages = this.privateMessages.filter( m => m.messageId !== messageId)
         },
         changeMessageWrap(){
+    
             this.isPublic = !this.isPublic
         }
     },
@@ -584,6 +609,10 @@ export default {
 
 <style scoped>
 /* reset.css */
+a{
+  color: black;
+  text-decoration: none;
+}
 figure{
     margin: 0;
 }
@@ -594,6 +623,7 @@ figure{
 .container__left--fixed{
     position: fixed;
     left: 15%;
+    overflow: hidden;
 }
 .container__right{
     margin-left: 55%;
@@ -601,7 +631,7 @@ figure{
     border-radius: 15px;
 
     padding: 1em 2.5em;
-    margin-top: 3em;
+    margin-top: 32px;
     margin-bottom: 3em;
 }
 .container h1,
@@ -635,7 +665,8 @@ figure{
 }
 .eventImg{
     margin: 1em auto 0 auto;
-    width: 300px;
+    width: 90%;
+    max-height: 36vh;
     border-radius: 10px;
     overflow: hidden;
 }
@@ -647,13 +678,16 @@ figure{
 .subInfo{
     width: 50px;
 }
+.subInfo h4{
+    margin: .3em;
+}
 .deadline{
     color: rgb(255, 27, 27);
 }
-a{
+/* a{
     font-weight: bold;
     color: rgb(35, 35, 182);
-}
+} */
 .message{
     align-items: center;
     /* border-bottom: 2px solid black; */
@@ -711,6 +745,15 @@ a{
     background-color: #d81b3b;
     cursor: pointer;
 }
+.button{
+    margin-left: 100%;
+    transform: translateX(-100%);
+    border-radius: 5px;
+    padding: .5em 1em;
+    background-color: transparent;
+    border: 1px solid;
+    font-size: .9em;
+}
 .button--transparent{
     margin-left: 100%;
     transform: translateX(-100%);
@@ -732,6 +775,10 @@ a{
 .button--transparent__small:hover{
     background-color: #363636;
     color: white;
+}
+.dis:hover{
+    background: transparent;
+    color: #B7B7B7;
 }
 .marginBoard{
     position: fixed;
@@ -857,4 +904,5 @@ a{
 .message__board__switchButton{
     margin-top: 1em;
 }
+
 </style>

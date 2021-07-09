@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="mostly-customized-scrollbar">
 
         <div class="serch__box gradient">
             <div class="search__icon"></div>
@@ -9,8 +9,9 @@
 
         <section class="ads__wrap gradient">
             <div class="ads">
-                <!-- <img v-for="ad in adsArr" :key="ad.alt" class="img--resp ad" :src=ad.src :alt=ad.alt> -->
-                <img v-for="ad in adsArr" :key="ad.alt" class="ad" :src=ad.src :alt=ad.alt>
+                <img class="ad" src="..\assets\Beach.png" alt="Beach">
+                <img class="ad" src="..\assets\Hiking.jpg" alt="Hiking">
+                <img class="ad" src="..\assets\Yoga.png" alt="Yoga">
             </div>
             <ol @click="changeAds" class="ads__pages">
                 <li v-for="(ad, index) in adsArr" :key="ad.alt" class="page">{{index}}</li>
@@ -51,24 +52,15 @@
                 </div>
             </section>
 
-
             <!-- 篩選器 -->
             <section id="FilterWrap" class="filter__wrap gradient">
-                <!-- <ul @click="dropdown($event)" class="filter__list">
-                    <li id="4" class="filter__item arrow" :class="{'filter--chosen' : this.cities.length}">城市</li>
-                    <li id="6" class="filter__item arrow" :class="{'filter--chosen' : this.day}">日期</li>
-                    <li id="1" class="filter__item arrow" :class="{'filter--chosen' : !this.eventType.length}">活動類型</li>
-                    <li id="2" class="filter__item arrow" :class="{'filter--chosen' : this.expense}">花費</li>
-                    <li id="3" class="filter__item arrow" :class="{'filter--chosen' : this.group}">人數</li>
-                    <li id="5" class="filter__item arrow" :class="{'filter--chosen' : this.distance}">距離</li>
-                </ul> -->
                 <ul @click="dropdown($event)" class="filter__list">
-                    <li id="4" class="filter__item arrow">城市</li>
-                    <li id="6" class="filter__item arrow">日期</li>
-                    <li id="1" class="filter__item arrow">活動類型</li>
-                    <li id="2" class="filter__item arrow">花費</li>
-                    <li id="3" class="filter__item arrow">人數</li>
-                    <li id="5" class="filter__item arrow">距離</li>
+                    <li id="4" class="filter__item arrow" :class="{'arrow--dropdown': this.filterNum == 4, 'chosen': this.cities.length}">城市</li>
+                    <li id="6" class="filter__item arrow" :class="{'arrow--dropdown': this.filterNum == 6, 'chosen': this.day}">日期</li>
+                    <li id="1" class="filter__item arrow" :class="{'arrow--dropdown': this.filterNum == 1, 'chosen': this.checkEventTypes.length}">活動類型</li>
+                    <li id="2" class="filter__item arrow" :class="{'arrow--dropdown': this.filterNum == 2, 'chosen': this.expense}">花費</li>
+                    <li id="3" class="filter__item arrow" :class="{'arrow--dropdown': this.filterNum == 3, 'chosen': this.group}">人數</li>
+                    <li id="5" class="filter__item arrow" :class="{'arrow--dropdown': this.filterNum == 5, 'chosen': this.distance}">距離</li>
                 </ul>
                 <div>
                 <div v-if="filterNum == 1" class="filter__option__wrap">
@@ -76,7 +68,7 @@
                         <label  v-for="(type, index) in eventType" :key=type.eng>
                                     <input type="checkbox" 
                                     name="eventType" 
-                                    :value=index 
+                                    :value=index+1 
                                     v-model="checkEventTypes" >
                                     {{type.zh}}
                         </label>
@@ -89,66 +81,77 @@
                 <div v-if="filterNum == 2" class="filter__option__wrap">
                     <div class="filter__option">
                         <label>預算：
+                        </label>
                             <input type="radio" v-model="expense" :value="0" name="Expense" @change="retainRecord" @click="controlExpenseSingel($event)">免費
                             <input type="radio" v-model="expense" :value="300" name="Expense" @change="retainRecord" @click="controlExpenseSingel($event)">300以內
                             <input type="radio" v-model="expense" :value="500" name="Expense" @change="retainRecord" @click="controlExpenseSingel($event)">500以內
                             <input type="radio" v-model="expense" :value="1000" name="Expense" @change="retainRecord" @click="controlExpenseSingel($event)">1000以內
                             <!-- <input type="radio" v-model="expense" :value="99999" name="Expense" @change="retainRecord" @click="controlSingel($event)">不限制 -->
-                        </label>
                     </div>
                 </div>
                 <div v-if="filterNum == 3" class="filter__option__wrap">
                     <div class="filter__option">
                         <label>聚會人數：
+                        </label>
                             <input type="radio" v-model="group" value="c" name="people" @change="retainRecord" @click="controlGroupSingel($event)">兩人聚會
                             <input type="radio" v-model="group" value="s"  name="people" @change="retainRecord" @click="controlGroupSingel($event)">小型聚會(3~4人)
                             <input type="radio" v-model="group" value="m"  name="people" @change="retainRecord" @click="controlGroupSingel($event)">中型聚會(5~8人)
                             <input type="radio" v-model="group" value="b"  name="people" @change="retainRecord" @click="controlGroupSingel($event)">大型聚會(8人以上)
-                        </label>
                     </div>
                 </div>
                 <div v-if="filterNum == 4" class="filter__option__wrap">
                     <div class="filter__option">北部地區：
-                        <label><input type="checkbox" v-model="cities"  :value="0" name="City">基隆市</label>
-                        <label><input type="checkbox" v-model="cities"  :value="1" name="City">台北市</label>
-                        <label><input type="checkbox" v-model="cities"  :value="2" name="City">新北市</label>
-                        <label><input type="checkbox" v-model="cities"  :value="3" name="City">桃園縣</label>
-                        <label><input type="checkbox" v-model="cities"  :value="4" name="City">新竹市</label>
-                        <label><input type="checkbox" v-model="cities"  :value="5" name="City">新竹縣</label>
-                        <label><input type="checkbox" v-model="cities"  :value="6" name="City">苗栗縣</label>
+                        <label><input type="checkbox" v-model="cities"  :value="1" name="City">基隆市</label>
+                        <label><input type="checkbox" v-model="cities"  :value="2" name="City">台北市</label>
+                        <label><input type="checkbox" v-model="cities"  :value="3" name="City">新北市</label>
+                        <label><input type="checkbox" v-model="cities"  :value="4" name="City">桃園縣</label>
+                        <label><input type="checkbox" v-model="cities"  :value="5" name="City">新竹市</label>
+                        <label><input type="checkbox" v-model="cities"  :value="6" name="City">新竹縣</label>
+                        <label><input type="checkbox" v-model="cities"  :value="7" name="City">苗栗縣</label>
                     </div>
                     <div class="filter__option">中部地區：
-                        <label><input type="checkbox" v-model="cities"  :value="7" name="City">台中市</label>
-                        <label><input type="checkbox" v-model="cities"  :value="8" name="City">彰化縣</label>
-                        <label><input type="checkbox" v-model="cities"  :value="9" name="City">南投縣</label>
+                        <label><input type="checkbox" v-model="cities"  :value="8" name="City">台中市</label>
+                        <label><input type="checkbox" v-model="cities"  :value="9" name="City">彰化縣</label>
+                        <label><input type="checkbox" v-model="cities"  :value="10" name="City">南投縣</label>
                     </div>
                     <div class="filter__option">南部地區：
-                        <label><input type="checkbox" v-model="cities"  :value="10" name="City">雲林縣</label>
-                        <label><input type="checkbox" v-model="cities"  :value="11" name="City">嘉義市</label>
-                        <label><input type="checkbox" v-model="cities"  :value="12" name="City">嘉義縣</label>
-                        <label><input type="checkbox" v-model="cities"  :value="13" name="City">台南市</label>
-                        <label><input type="checkbox" v-model="cities"  :value="14" name="City">高雄市</label>
-                        <label><input type="checkbox" v-model="cities"  :value="15" name="City">屏東縣</label>
+                        <label><input type="checkbox" v-model="cities"  :value="11" name="City">雲林縣</label>
+                        <label><input type="checkbox" v-model="cities"  :value="12" name="City">嘉義市</label>
+                        <label><input type="checkbox" v-model="cities"  :value="13" name="City">嘉義縣</label>
+                        <label><input type="checkbox" v-model="cities"  :value="14" name="City">台南市</label>
+                        <label><input type="checkbox" v-model="cities"  :value="15" name="City">高雄市</label>
+                        <label><input type="checkbox" v-model="cities"  :value="16" name="City">屏東縣</label>
                     </div>
                     <div class="filter__option">東部地區：
-                        <label><input type="checkbox" v-model="cities"  :value="16" name="City">台東縣</label>
-                        <label><input type="checkbox" v-model="cities"  :value="17" name="City">花蓮縣</label>
-                        <label><input type="checkbox" v-model="cities"  :value="18" name="City">宜蘭縣</label>
+                        <label><input type="checkbox" v-model="cities"  :value="17" name="City">台東縣</label>
+                        <label><input type="checkbox" v-model="cities"  :value="18" name="City">花蓮縣</label>
+                        <label><input type="checkbox" v-model="cities"  :value="19" name="City">宜蘭縣</label>
                     </div>
                     <div class="filter__option">離島地區：
-                        <label><input type="checkbox" v-model="cities"  :value="19" name="City">澎湖縣</label>
-                        <label><input type="checkbox" v-model="cities"  :value="20" name="City">金門縣</label>
-                        <label><input type="checkbox" v-model="cities"  :value="21" name="City">連江縣</label>
+                        <label><input type="checkbox" v-model="cities"  :value="20" name="City">澎湖縣</label>
+                        <label><input type="checkbox" v-model="cities"  :value="21" name="City">金門縣</label>
+                        <label><input type="checkbox" v-model="cities"  :value="22" name="City">連江縣</label>
                     </div>
                 </div>
                 <div v-if="filterNum == 5" class="filter__option__wrap">
                     <div class="filter__option">
+                        <label for="Distance">
+                            請先輸入使用者所在地：
+                            <input 
+                            v-model="addr" 
+                            type="text" 
+                            name="Distance"
+                            @change="getLatLng">
+                        </label>
+                        <button class="button--transparent" >計算距離</button>
+                    </div>
+                    <div class="filter__option">
                         <label>距離(以內)：
+                        </label>
                             <input type="radio" v-model="distance" :value="0.5" name="distance" @change="retainRecord" @click="controlDistanceSingel($event)">500公尺
                             <input type="radio" v-model="distance" :value="1" name="distance" @change="retainRecord" @click="controlDistanceSingel($event)">1公里
                             <input type="radio" v-model="distance" :value="3" name="distance" @change="retainRecord" @click="controlDistanceSingel($event)">3公里
                             <input type="radio" v-model="distance" :value="5" name="distance" @change="retainRecord" @click="controlDistanceSingel($event)">5公里
-                        </label>
                     </div>
                 </div>
                 <!-- <div v-if="filterNum == 6">
@@ -161,12 +164,16 @@
                 <div v-if="filterNum == 6" class="filter__option__wrap">
                     <div class="filter__option">
                         <label>日期：
+                        </label>
                             <input type="radio" v-model="day" :value="0" name="day" @change="retainRecord" @click="controlDaySingel($event)">今天及時行樂
                             <input type="radio" v-model="day" :value="1" name="day" @change="retainRecord" @click="controlDaySingel($event)">明天預先安排
                             <input type="radio" v-model="day" :value="5" name="day" @change="retainRecord" @click="controlDaySingel($event)">週五尋找刺激
-                            <input type="radio" v-model="day" :value="6" name="day" @change="retainRecord" @click="controlDaySingel($event)">週末可以不一樣
-                            <br><br>選擇特定日期<input type="date" v-model="day" name="day" >
-                        </label>
+                            <input type="radio" v-model="day" :value="6" name="day" @change="retainRecord" @click="controlDaySingel($event)">週末可以不一樣<br>
+                            
+                    </div>
+
+                    <div class="filter__option">
+                        選擇特定日期<input type="date" v-model="day" name="day" >
                     </div>
                 </div>
                 
@@ -189,7 +196,7 @@
                     <h4>{{e.eventName}}</h4>
                     <h4>{{timeToString(e.hostTime)}}</h4>
                     <h4>{{getCity(e.cityId)}}、{{e.road}}</h4>
-                    <span v-if="e.lat && e.lng" class="event__distance"><h4 class="event__distance__text">{{getDistance(e.lat, e.lng)}}公里</h4></span>
+                    <span v-if="e.dist" class="event__distance"><h4 class="event__distance__text">{{e.dist}}公里</h4></span>
                 </router-link>
             </section>
         </div>
@@ -216,9 +223,8 @@ export default {
             cities: [],
             day: null,
             keyword: null,
-            lat1: null,
-            lng1: null,
-            checkEventTypes:[0,1,2,3,4,5,6,7,8,9,10,11],
+            addr: "",
+            checkEventTypes:[1,2,3,4,5,6,7,8,9,10,11],
             // time1: null,
             // time2: null,
             eventType: [],
@@ -229,9 +235,9 @@ export default {
             eventList: [],
             showEvents: [],
             adsArr:[
-                { src:'https://imgcy.trivago.com/c_limit,d_dummy.jpeg,f_auto,h_1300,q_auto,w_2000/itemimages/19/79/197931_v3.jpeg', alt: 'beach'},
-                { src:'https://www.incimages.com/uploaded_files/image/1920x1080/getty_1141196125_411306.jpg', alt: 'hiking'},
-                { src:'https://discoverhalifaxns.com/wp-content/uploads/2020/07/Crystal-Crescent-Beach_-IMG_0024.jpg', alt: 'wood bridge'},
+                { src:'/static/img/Beach.fffd3bb.png', alt: 'beach'},
+                { src:'/static/img/Hiking.eb90d8e.jpg', alt: 'hiking'},
+                { src:'/static/img/Yoga.395af21.png', alt: 'yoga'},
             ],
             eventType:[
                 { eng: 'travel', zh: '旅行出遊' },
@@ -268,7 +274,7 @@ export default {
             this.showEvents = this.eventList.map(e => e)
 
             //篩選城市
-            if(!this.cities){
+            if(this.cities.length){
                 this.showEvents = this.eventList.filter( e =>  this.cities.includes(e.cityId) )
             }
 
@@ -306,7 +312,7 @@ export default {
                 if(this.distance == null){
                     return true
                 }
-                return this.distance >= this.getDistance(e.lat, e.lng)
+                return this.distance >= e.dist
             } )
 
             // 關鍵字搜尋
@@ -319,20 +325,22 @@ export default {
 
             // 篩選日期
             let now =null
-            if(this.day.length){
-                now = (new Date(this.day)).getTime()
-            }else{
-                now = (new Date()).getTime()
-            }
 
             this.showEvents = this.showEvents.filter( e => {
                 if(this.day == null){
                     return true
                 }
+                // console.log(this.day.length>1)
+
+                if(this.day.length){
+                    now = (new Date(this.day))
+                }else{
+                    now = (new Date())
+                }
                 
                 let t = new Date(e.hostTime)
-                let timeDiff = t.getTime() - now
-                let dayDiff = Math.floor(timeDiff / (24 * 3600 * 1000))
+
+                let dayDiff = t.getDate() - now.getDate()
                 // console.log(dayDiff)
                 switch(this.day){
                     case 0:
@@ -355,17 +363,10 @@ export default {
         dropdown(e){
             let self = e.target
             if(self.nodeName !== "LI"){return}
-            if(this.lastFilterItem){
-                this.lastFilterItem.classList.remove('arrow--dropdown')
-            }
             if(this.filterNum == self.id){
-                // console.log(self.classList)
-                self.classList.remove('arrow--dropdown')
                 this.filterNum =0
                 return
             }
-            self.classList.add('arrow--dropdown')
-            this.lastFilterItem = self;
             this.filterNum = self.id
         },
         changeAds(e){
@@ -407,6 +408,7 @@ export default {
             return r
         },
         controlExpenseSingel($event){
+            console.log($event.target)
             let _this = this;
             window.setTimeout(() =>{
                 if(!this.changed){
@@ -456,15 +458,15 @@ export default {
             const cities =["基隆市","台北市","新北市","桃園縣","新竹市","新竹縣","苗栗縣","台中市","彰化縣","南投縣","雲林縣","嘉義市","嘉義縣","台南市","高雄市","屏東縣","台東縣","花蓮縣","宜蘭縣","澎湖縣","金門縣","連江縣"]
             return cities[num-1]
         },
-        getDistance(lat2, lon2) {
+        getDistance(lat2, lon2, lat1, lon1) {
 
-            if ( !lat2 && !lon2) {
-                return "無地理資訊";
+            if (( !lat2 && !lon2 )|| (!lat1 && !lon1)) {
+                return "";
             }
 
-            let radlat1 = Math.PI * this.lat1/180;
+            let radlat1 = Math.PI * lat1/180;
             let radlat2 = Math.PI * lat2/180;
-            let theta = this.lon1-lon2;
+            let theta = lon1-lon2;
             let radtheta = Math.PI * theta/180;
             let dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
             if (dist > 1) {
@@ -478,14 +480,13 @@ export default {
             // if (unit=="K") { dist = dist * 1.609344 }
             // if (unit=="N") { dist = dist * 0.8684 }
             
-            // console.log(dist)
             return dist;
         },
         searchCancel(){
             this.keyword = ""
         },
         selectAll(){
-            this.checkEventTypes = [0,1,2,3,4,5,6,7,8,9,10,11]
+            this.checkEventTypes = [1,2,3,4,5,6,7,8,9,10,11]
         },
         unselectAll(){
             this.checkEventTypes = []
@@ -497,28 +498,53 @@ export default {
                     break;
                 case 5:
                     this.day =5;
+                    this.group ="m"
+                    this.checkEventTypes = [1,3,4,5,6]
                     break;
                 case 6:
                     this.day =6
+                    this.group ="m"
+                    this.checkEventTypes = [1,4,6,8,9]
                     break;
             }
-        }
+        },
+        getLatLng(){
+            let geocoder = new google.maps.Geocoder();
+
+            let vm = this
+            geocoder.geocode({
+                "address": this.addr
+            },function (res, status){
+                if(status == "OK"){
+                    console.log(res[0].geometry.location.lat())
+                    console.log( res[0].geometry.location.lng())
+                    vm.eventList.forEach(e => {
+                        vm.$set(e, "dist", vm.getDistance(e.lat, e.lng, res[0].geometry.location.lat(), res[0].geometry.location.lng()))
+                    });
+                    // vm.holdEvent(res[0].geometry.location.lat(), res[0].geometry.location.lng())
+                    // vm.save(res[0].geometry.location.lat(),res[0].geometry.location.lng())
+                }else{
+                    console.log("error")
+                }
+            })
+
+        },
     },
     created(){
 
         //do we support geolocation
-        if(!("geolocation" in navigator)) {
-            console.log('Geolocation is not available')
-            return;
-        }
+        // if(!("geolocation" in navigator)) {
+        //     console.log('Geolocation is not available')
+        //     return;
+        // }
         // get position
-        navigator.geolocation.getCurrentPosition(pos => {
-        console.log(`Your location data is ${pos.coords.latitude }, ${ pos.coords.longitude}`)
-        this.lat1 = pos.coords.latitude
-        this.lon1 = pos.coords.longitude
-        }, err => {
-        console.log(err.message)
-        })
+        // navigator.geolocation.getCurrentPosition(pos => {
+        // console.log(`Your location data is ${pos.coords.latitude }, ${ pos.coords.longitude}`)
+        // this.lat1 = pos.coords.latitude
+        // this.lon1 = pos.coords.longitude
+        // }, err => {
+        // console.log(err.message)
+        // })
 
         apiEventList()
         .then( res =>{
@@ -531,6 +557,17 @@ export default {
           }
 
             this.eventList = res.data
+
+            // console.log(new Date().getTime())
+            this.eventList = this.eventList.filter( e =>{
+                return new Date(e.deadline).getTime() > new Date().getTime()
+                // console.log(new Date(e.deadline).getTime())
+            })
+
+            this.eventList.sort(function (a, b) {
+                return a.hostTime<b.hostTime?-1:1;
+            });
+
             this.showEvents = this.eventList.map( e => e)
             console.log(this.eventList);
         })
@@ -564,7 +601,7 @@ export default {
 }
 .ad{
     transition: margin-left .5s;
-    width: 100%;
+    min-width: 100%;
 }
 .ads__pages{
     position: absolute;
@@ -629,12 +666,12 @@ export default {
     transition: all .5s;
     margin-left: .3em;
 }
-.filter--chosen{
+.chosen{
     background-color: #FFEEDF;
 }
-.arrow--dropdown{
+/* .arrow--dropdown{
     background-color: #FFEEDF;
-}
+} */
 .arrow--dropdown::after{
     transform: rotate(45deg);
 }
@@ -688,10 +725,17 @@ a{
 .event__router h5{
     margin: .5em;
 }
+.event__router:hover figure{
+    opacity: .7;
+}
+.event__router:hover {
+    background-color: rgba(173, 173, 173, 0.15);
+}
 .event__img{
     margin: 0;
     border-radius: 1em 1em 0 0;
     overflow: hidden;
+    height: 300px;
 }
 .event h4, .event h5{
     margin-top: .5em;
@@ -821,4 +865,5 @@ input[type=checkbox]{
     text-align: center;
     padding: 1em;
 }
+
 </style>

@@ -1,5 +1,6 @@
 <template>
-  <div class="login">
+<div>
+  <div class="login" v-show="!forget">
     <header><h1>會員登入</h1></header>
     <form @submit.prevent="login">
       <label for="Name">信箱</label><br>
@@ -12,13 +13,23 @@
       </div>
       <button type="button" class="button--red" @click="login()">登入</button><br>
       <p>還不是會員嗎？<span><router-link to="/signup">點我立即註冊</router-link></span></p>
-      <p>忘記密碼嗎?<span><a href="">點我信箱通知</a></span></p>
+      <p>忘記密碼嗎？<span @click="forget=true" class="tiptext">發送信箱通知</span></p>
     </form>
   </div>
+
+    <div class="forgetPassword" v-show="forget">
+      <header><h1>發送信箱</h1></header>
+      <label >信箱</label><br>
+      <input type="text" name="Account" v-model="account" required ref="Account"><br><br><br>
+      <button type="button" class="button--red" @click="sendMail()">發送密碼</button><br>
+      <button type="button" class="button--red" @click="forget=false">取消</button><br>
+    </div>
+
+</div>
 </template>
 
 <script>
-import { apiMemberLogin } from "../api" 
+import { apiMemberLogin, apiMemberForget } from "../api" 
 
   export default {
     inject:['reload'],
@@ -28,6 +39,7 @@ import { apiMemberLogin } from "../api"
         password: '',
         remember: '',
         persistence: '',
+        forget: false,
       }
     },
     mounted() {
@@ -71,7 +83,7 @@ import { apiMemberLogin } from "../api"
 
         })
         .catch(err=> {
-          alert('login failed')
+          alert('登入失敗')
           console.log(err)
         })
       },
@@ -81,6 +93,20 @@ import { apiMemberLogin } from "../api"
           this.remember = true;
           this.$refs.Passward.focus();
         }
+      },
+      sendMail(){
+
+        apiMemberForget({
+          "Account": this.account
+        })
+        .then(res =>{
+          console.log(res)
+          alert("發信成功，請至您的信箱查收新的密碼")
+        })
+        .catch(err =>{
+          console.log(err)
+        })
+
       }
     },
   }
@@ -88,6 +114,16 @@ import { apiMemberLogin } from "../api"
 
 <style scoped>
 .login{
+  width: max-content;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 2em;
+  background-color: white;
+  margin-top: 5%;
+  border: 1px solid black;
+  box-shadow: 5px 5px 5px 0 gray;
+}
+.forgetPassword{
   width: max-content;
   margin-left: auto;
   margin-right: auto;
@@ -127,5 +163,9 @@ label {
 .button--red:hover {
   background-color: #d81b3b;
   cursor: pointer;
+}
+.tiptext{
+  text-decoration: underline;
+  color: #551A8B;
 }
 </style>

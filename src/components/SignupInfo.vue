@@ -1,5 +1,6 @@
 <template>
-    <div class="container">
+<div @click="closeemoji($event)" class="mostly-customized-scrollbar">
+    <div class="container gradient">
         <header><h1>會員資料填寫</h1></header>
         <form action="/action_page.php">
 
@@ -34,43 +35,43 @@
                 <label for="Name">*名稱：</label>
                 <input type="text" v-model="name" id="Name" name="Name" required autofocus><br>
                 <label for="Sex">*性別：</label>
-                <input type="radio" v-model="gender" id="Male" name="Sex" value="2" class="checkBox">男姓
-                <input type="radio" v-model="gender" id="Female" name="Sex" value="1" class="checkBox">女姓<br>
+                <input type="radio" v-model="gender" id="Male" name="Sex" :value="2" class="checkBox">男姓
+                <input type="radio" v-model="gender" id="Female" name="Sex" :value="1" class="checkBox">女姓<br>
                 <label for="Birthday">*生日：</label>
                 <input type="date" v-model="birth" id="Birthday" name="Birthday" required><br>
                 <label for="Location">*居住城市：</label>
                 <select v-model="city" name="Location" id="Location" required>
                     <optgroup label="北部地區">
-                        <option value="1">基隆市</option>
-                        <option value="2">台北市</option>
-                        <option value="3">新北市</option>
-                        <option value="4">桃園縣</option>
-                        <option value="5">新竹市</option>
-                        <option value="6">新竹縣</option>
-                        <option value="7">苗栗縣</option>
+                        <option :value="1">基隆市</option>
+                        <option :value="2">台北市</option>
+                        <option :value="3">新北市</option>
+                        <option :value="4">桃園縣</option>
+                        <option :value="5">新竹市</option>
+                        <option :value="6">新竹縣</option>
+                        <option :value="7">苗栗縣</option>
                     </optgroup>
                     <optgroup label="中部地區">
-                        <option value="8">台中市</option>
-                        <option value="9">彰化縣</option>
-                        <option value="10">南投縣</option>
+                        <option :value="8">台中市</option>
+                        <option :value="9">彰化縣</option>
+                        <option :value="10">南投縣</option>
                     </optgroup>
                     <optgroup label="南部地區">
-                        <option value="11">雲林縣</option>
-                        <option value="12">嘉義市</option>
-                        <option value="13">嘉義縣</option>
-                        <option value="14">台南市</option>
-                        <option value="15">高雄市</option>
-                        <option value="16">屏東縣</option>
+                        <option :value="11">雲林縣</option>
+                        <option :value="12">嘉義市</option>
+                        <option :value="13">嘉義縣</option>
+                        <option :value="14">台南市</option>
+                        <option :value="15">高雄市</option>
+                        <option :value="16">屏東縣</option>
                     </optgroup>
                     <optgroup label="東部地區">
-                        <option value="17">台東縣</option>
-                        <option value="18">花蓮縣</option>
-                        <option value="19">宜蘭縣</option>
+                        <option :value="17">台東縣</option>
+                        <option :value="18">花蓮縣</option>
+                        <option :value="19">宜蘭縣</option>
                     </optgroup>
                     <optgroup label="離島地區">
-                        <option value="20">澎湖縣</option>
-                        <option value="21">金門縣</option>
-                        <option value="22">連江縣</option>
+                        <option :value="20">澎湖縣</option>
+                        <option :value="21">金門縣</option>
+                        <option :value="22">連江縣</option>
                     </optgroup>
                 </select><br>
 
@@ -81,7 +82,7 @@
                                     :id="'EventType'+(index+1)" 
                                     class="checkBox"
                                     name="EventType" 
-                                    :value=index 
+                                    :value=index+1
                                     v-model="eventCheck" >
                         <label :for="'EventType'+(index+1)">{{type.zh}}</label>
                     </section>
@@ -91,19 +92,38 @@
                 <input type="text" v-model="category" id="JobType" name="JobType" placeholder="(選填)"><br>
                 <label for="JobTitle" class="gradient">工作職稱：</label>
                 <input type="text" v-model="jobtitle" id="JobTitle" name="JobTitle" placeholder="(選填)"><br>
-                <label for="Intro" class="intro">*自我介紹：</label><br>
-                <textarea name="Intro" v-model="intro" id="Intro" style="font-size:1.5em" cols="70" rows="15" placeholder="幫助大家更快速了解你自己" required></textarea><br>
+                <label for="Intro" class="intro">*自我介紹：</label>
+                <button class="button--emoji" type="button" @click="toogleDialogEmoji">😃</button><br>
+                <VEmojiPicker
+                v-show="showDialog"
+                :style="{ width: '440px', height: '200' }"
+                class="emoji"
+                labelSearch="Search"
+                lang="pt-BR"
+                @select="onSelectEmoji"
+                />
+                <textarea 
+                name="Intro" 
+                v-model="intro" 
+                id="Intro" 
+                style="font-size:1.5em" 
+                cols="70" 
+                rows="15" 
+                placeholder="幫助大家更快速了解你自己" 
+                required
+                maxlength="1000"></textarea><br>
 
-                <!-- <input type="submit" class="submit" value="完成註冊" @click="Signup()"> -->
                 <button @click="signup()" type="button" class="button--red">註冊</button>
             </div>
         </form>
     </div>
+</div>
 </template>
 
 <script>
 import { apiMemberSignUp } from "../api"
 import { VueCropper }  from 'vue-cropper' 
+import { VEmojiPicker, emojisDefault, categoriesDefault } from "v-emoji-picker";
 
 export default {
     data(){
@@ -117,9 +137,10 @@ export default {
             birth: null,
             city: null,
             eventCheck: [],
-            category: null,
-            jobtitle: null,
-            intro: null,
+            category: "",
+            jobtitle: "",
+            intro: "",
+            showDialog: false,
             isCropping: false,
             eventType:[
                 { eng: 'travel', zh: '旅行出遊' },
@@ -136,7 +157,8 @@ export default {
         }
     },
     components:{
-        VueCropper
+        VueCropper,
+        VEmojiPicker
     },
     methods: {
         addFile(){
@@ -209,11 +231,29 @@ export default {
             )
             .then(res =>{
                 console.log(res)
+                alert("會員註冊成功")
                 this.$router.push({path: '/Login'})
             })
             .catch(err =>{
                 console.log(err)
+                alert("會員註冊失敗，請確認所有資料都已填上")
             })
+        },
+        toogleDialogEmoji() {
+            this.showDialog = !this.showDialog;
+            // document.querySelector(".button--emoji").style = "background-color: black"
+        },
+        onSelectEmoji(emoji) {
+            this.intro += emoji.data;
+            // Optional
+            // this.toogleDialogEmoji();
+        },
+        closeemoji(e){
+            if(this.showDialog){
+                console.log(e.target.classList[0])
+                if(e.target.classList[0].includes("emoji") || e.target.classList[0] == "category"){return}
+                this.showDialog = false
+            }
         }
     }
 }
@@ -303,5 +343,22 @@ section{
     width: max-content;
     margin-left: 100%;
     transform: translateX(-100%);
+}
+.button--emoji{
+    display: inline-block;
+    margin-right: 0;
+    cursor: pointer;
+    font-size: 1.2em;
+    background-color: white;
+    border: 1px solid black;
+}
+.button--emoji:hover{
+    background-color: #363636;
+}
+.emoji{
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    transform: translateX(100%);
 }
 </style>

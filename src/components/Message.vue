@@ -15,6 +15,7 @@
         </div>
 
         <div class="message__text">
+            <h5 class="markTime">{{timeToString(m.time)}}</h5>
             <textarea name="" id="m.messageId" rows="3" :disabled="!isEdit" class="message__input" v-model="m.messageContent" ></textarea>
         </div>
 
@@ -73,6 +74,19 @@ export default {
                 console.log(err)
             })
         },
+        timeToString(time){
+            const monthList = ['一','二','三','四','五','六','七','八','九','十','十一','十二'] 
+            const dayList = ['日','一','二','三','四','五','六']
+            let t = new Date(time)
+            let r = 
+            "(星期"+dayList[t.getUTCDay()]+") "+
+            monthList[t.getMonth()]+"月"+ 
+            t.getDate()+"日 "+
+            (t.getHours()<10 ? '0' : '')+t.getHours()+":"+
+            (t.getMinutes()<10 ? '0' : '')+t.getMinutes()
+
+            return r
+        },
     },
 
 }
@@ -121,5 +135,11 @@ export default {
 .button--transparent__small:hover{
     background-color: #363636;
     color: white;
+}
+.markTime{
+    text-align: right;
+    margin-top: 0;
+    margin-bottom: 0;
+    color: #757575;
 }
 </style>
