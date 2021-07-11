@@ -165,8 +165,8 @@
                     <div class="filter__option">
                         <label>日期：
                         </label>
-                            <input type="radio" v-model="day" :value="0" name="day" @change="retainRecord" @click="controlDaySingel($event)">今天及時行樂
-                            <input type="radio" v-model="day" :value="1" name="day" @change="retainRecord" @click="controlDaySingel($event)">明天預先安排
+                            <input type="radio" v-model="day" :value="1" name="day" @change="retainRecord" @click="controlDaySingel($event)">今天及時行樂
+                            <input type="radio" v-model="day" :value="2" name="day" @change="retainRecord" @click="controlDaySingel($event)">明天預先安排
                             <input type="radio" v-model="day" :value="5" name="day" @change="retainRecord" @click="controlDaySingel($event)">週五尋找刺激
                             <input type="radio" v-model="day" :value="6" name="day" @change="retainRecord" @click="controlDaySingel($event)">週末可以不一樣<br>
                             
@@ -343,9 +343,9 @@ export default {
                 let dayDiff = t.getDate() - now.getDate()
                 // console.log(dayDiff)
                 switch(this.day){
-                    case 0:
-                        return dayDiff ==0
                     case 1:
+                        return dayDiff ==0
+                    case 2:
                         return dayDiff ==1
                     case 5:
                         return t.getUTCDay() == 5
@@ -494,7 +494,7 @@ export default {
         quickStar(option){
             switch(option){
                 case 0:
-                    this.day = 0;
+                    this.day = 1;
                     break;
                 case 5:
                     this.day =5;

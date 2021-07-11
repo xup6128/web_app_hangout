@@ -152,7 +152,7 @@
                     <div v-if="!this.confirmer.length" class="noneapi">尚無參加者</div>
 
                     <router-link v-for=" p in confirmer" :key="p.participantId" :to="/AccountInfo/+p.participantId">
-                        <div v-for="p in confirmer" :key="p.participantId" class="participanter gradient">
+                        <div class="participanter gradient">
                             <div class="message__member">
                                 <figure class="member__img">
                                     <img :src="getImg(p.memberPhoto[0])" alt="" class="image--resp">
